@@ -1,7 +1,18 @@
-# queue_it_up
+# Queue it Up
 Spotipy/Django Web Application Game
 
-Create virtual environment and install django
+#Create virtual environment and install django
 
+#In desired directory run
 
-https://www.google.com/amp/s/poweruphosting.com/blog/install-django/amp/
+python -m venv venv
+ 
+#activate virutal environment 
+ 
+C:\> venv\Scripts\activate.bat
+
+#Install Django
+(venv) $ pip install Django
+
+#Useful Django tutorial for additional help
+https://realpython.com/get-started-with-django-1/
