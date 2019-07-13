@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+	<div class = "container">
+		<div class ="">
+			<h3>     </h3>
+			<form action="" method="post">
+
+				{% csrf_token %}
+				<table>
+					<tbody>
+						<tr>
+							<td>
+							<h6>{{ form.party_name.label }}</h6>
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							{{ form.party_name }}
+							</td>
+
+						</tr>
+						
+						
+						<tr>
+							<td>
+							<h6>{{ form.user_name.label }}</h6>
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							{{ form.user_name }}
+							</td>
+
+						</tr>
+	
+						<tr>
+							<td>
+							<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				
+			</form>
+		</div>	
+	</div>
+</html>
+{% endblock %}

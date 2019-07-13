@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+	<div class = "container">
+		<div>
+			
+			<h2><small>Welcome to </small><span class="badge badge-pill badge-primary">{{party_name}}</span></h2>
+			
+		</div>
+		
+		<div class = "row">
+			<div class = "col">
+				<h4><small>Guests:</small></h4>
+			</div>
+
+		</div>
+		
+		<div class = "row">
+			
+			<div class = "col">
+				{% for q in guests %}
+				
+				
+				<h5><span class="badge badge-pill badge-light">{{ q.name }}</span></h5>
+
+				{% endfor %}
+			</div>
+			
+
+		</div>	
+		
+		<div class = "row">
+			<div class = "col">
+				
+			</div>
+			<div class = "col text-left">
+				<form action="" method="post">
+					{% csrf_token %}
+					{% if access %}
+						<input type="submit" class="btn btn-outline-primary btn-lg" value="Start">
+					{% else %}
+						<a href ="#" class = "btn btn-outline-primary btn-lg disabled" role="button">Start</a>
+					{% endif %}
+				</form>
+			</div>
+			
+			<div class = "col">
+				
+			</div>
+		</div>
+	</div>
+</html>
+{% endblock %}
