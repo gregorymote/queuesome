@@ -5,10 +5,19 @@
 {% block page_content %}
 <html lang="en">
 	<body>
-	<div class = "container">
+	<div class = "container text-center">
 		
-		<h1>Let's Play</h1>
-			
+		<h4>{{party.name}}</h4>
+		<h6>Category: {{category.name}}</h6>
+	
+	
+		<form action="" method="post">
+			{% csrf_token %}
+					
+			{% ifequal user.turn "picking" %}
+				<input type="submit" class="btn btn-outline-primary" value="Choose Category">
+			{% endifequal %}
+		</form>
 	</div>
 	</body>
 </html>

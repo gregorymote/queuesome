@@ -15,8 +15,10 @@ def name_party(request):
 
         if form.is_valid():
             p = Party(name=form.cleaned_data['party_name'],
-                      category = "",
+                      roundNum = 1,
+                      roundTotal = 1,
                       started = False,
+                      state = 'assign',
                       
                       )
             p.save()          
@@ -28,8 +30,8 @@ def name_party(request):
                 points = 0,
                 isHost = True,
                 hasSkip = True,
-                state = "",
-                turn = "",
+                hasPicked = False,
+                turn = "not_picked",
                 )
             u.save()
                 
@@ -63,8 +65,8 @@ def create_user(request):
                     points = 0,
                     isHost = False,
                     hasSkip = True,
-                    state = "",
-                    turn = "",
+                    hasPicked = False,
+                    turn = "not_picked",
                     )
             u.save()
 

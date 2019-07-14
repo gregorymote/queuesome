@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+	<div class = "container">
+		<div class ="">
+			<h3>  </h3>
+			<form action="" method="post">
+
+				{% csrf_token %}
+				<table>
+					<tbody>
+						<tr>
+							<td>
+							<h6>{{ form.cat_choice.label }}</h6>
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							{{ form.cat_choice }}
+							</td>
+
+						</tr>
+						
+						{% if showCustom %}
+						<tr>
+							<td>
+							<h6>{{ form.custom.label }}</h6>
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							{{ form.custom }}
+							</td>
+
+						</tr>
+						{% endif %}
+	
+						<tr>
+							<td>
+							<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				
+			</form>
+		</div>	
+	</div>
+</html>
+{% endblock %}

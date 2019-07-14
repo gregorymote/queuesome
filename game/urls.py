@@ -4,5 +4,6 @@ from game import views
 urlpatterns = [
         path('<int:pid>/lobby/', views.lobby, name='lobby'),
         path('<int:pid>/play/', views.play, name='play'),
+        path('<int:pid>/play/choose_category', views.chooseCat, name='choose_category'),
 
     ]
