@@ -14,9 +14,11 @@
 		<form action="" method="post">
 			{% csrf_token %}
 					
-			{% ifequal user.turn "picking" %}
+			{% if user.turn == "picking" %}
 				<input type="submit" class="btn btn-outline-primary" value="Choose Category">
-			{% endifequal %}
+			{% elif party.state == "pick_song" and not user.hasPicked %}
+				<input type="submit" class="btn btn-outline-primary" value="Pick Song">
+			{% endif %}
 		</form>
 	</div>
 	</body>

@@ -7,6 +7,7 @@ from party.models import Users
 from party.models import Category
 from game.forms import blankForm
 from game.forms import chooseCategoryForm
+from game.forms import searchForm
 
 
 def lobby(request, pid):
@@ -82,7 +83,8 @@ def play(request, pid):
         if form.is_valid():
             if p.state == 'choose_category':
                 return HttpResponseRedirect(reverse('choose_category', kwargs={'pid':pid}))
-            
+            if p.state == 'pick_song':
+                return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
 
@@ -142,11 +144,31 @@ def createCategory(choice, request, p):
     c.name = choice
     c.save()
 
-    p.roundTotal = p.roundTotal + 1
     p.state = 'pick_song'
     p.save()
 
+def pickSong(request, pid):
+    
+    p = Party.objects.get(pk=pid)
+    u = getUser(request, p)
+    c = Category.objects.get(party=p, roundNum=p.roundTotal) 
+    
+    if request.method == 'POST':
+        form = searchForm(request.POST)
 
+        if form.is_valid():
+            u.hasPicked = True
+            u.save()
+            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+    else:
+
+        form = searchForm(initial={'search':'',})
+    context = {
+        'form':form,
+        'category':c,
+        }
+    
+    return render(request, 'game/pickSong.html', context)
 
 def getUser(request, p):
     

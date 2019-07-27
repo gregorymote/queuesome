@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+
+	
+	<body>
+	
+		
+		<div class="container">
+			
+				<div>
+					
+					<h4>Choose a Device</h4>
+					 
+					
+				</div>
+			
+		</div>
+	
+	</body>
+	
+</html>
+{% endblock %}

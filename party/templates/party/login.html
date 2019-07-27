@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+	<div class = "container">
+		<div class ="">
+			
+			<form action="" method="post">
+			{% csrf_token %}
+			<h5>{{ form.username.label }}</h5>
+				
+				<table>
+					<tbody>
+						<tr>
+							<td>
+							{{ form.username }}
+							</td>
+
+						</tr>
+							
+						<tr>
+							<td>
+							<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				
+			</form>
+		</div>	
+	</div>
+</html>
+{% endblock %}

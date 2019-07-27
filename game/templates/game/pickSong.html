@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+	<div class = "container">
+		<div class ="">
+			<h5>{{category.name}}</h5>
+			<form action="" method="post">
+
+				{% csrf_token %}
+				<table>
+					<tbody>
+						<tr>
+							<td>
+							<h6>{{ form.search }}</h6>
+							</td>
+
+						</tr>
+						<tr>
+						
+							<td>
+								<h6><small>Search by:</small> {{ form.choice_field.0 }}     {{ form.choice_field.1 }}</h6>
+							</td>
+							
+							<td>
+								
+							</td>
+						
+						</tr>
+	
+						<tr>
+							<td>
+							<input type="submit" class="btn btn-outline-primary btn-sm" value="Search">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				
+			</form>
+		</div>	
+	</div>
+</html>
+{% endblock %}

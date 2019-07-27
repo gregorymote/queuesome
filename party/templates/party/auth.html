@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+
+	
+	<body>
+	
+		
+		<div class="container">
+			
+				<div>
+					
+					<h4>Account Authentication</h4>
+					<form action="" method="post">
+						{% csrf_token %}
+						<h5>{{ form.auth_code.label }}</h5>
+							
+							<table>
+								<tbody>
+									<tr>
+										<td>
+										{{ form.auth_code }}
+										</td>
+
+									</tr>
+										
+									<tr>
+										<td>
+										<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+										</td>
+									<tr>
+								</tbody>
+							</table>
+							
+					</form>
+					
+					
+
+				
+				</div>
+			
+		</div>
+	
+	</body>
+	
+</html>
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+
+	
+	<body>
+	
+		
+		<div class="container text-center">
+			
+				<div>
+				<h5>This is your Authentication Code</h5>
+				<form action="" method="post">
+					{% csrf_token %}
+					<h1>{{code}}</h1>
+					
+					{% if not isVisible %}
+					<p>You may need to refresh the page after completing authentication</p>
+					{% endif %}
+						
+					<div class = "row">
+						<div class = "col">
+						</div>
+					<div class = "col">
+						</div>
+						<div class = "col">
+							{% if isVisible %}
+							<input type="submit" class="btn btn-outline-primary btn" value="Choose a Device">
+							
+							{% endif %}
+						</div>
+					</div>
+					
+				</form>
+					 
+					
+				</div>
+			
+		</div>
+	
+	</body>
+	
+</html>
+{% endblock %}
