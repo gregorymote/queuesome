@@ -1,6 +1,8 @@
 # Queue it Up
 Spotipy/Django Web Application Game
 
+#add util_custom to \Lib\site-packages\spotipy
+
 #Create virtual environment and install django
 
 #In desired directory run
