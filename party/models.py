@@ -11,6 +11,7 @@ class Party(models.Model):
     roundTotal = models.IntegerField(default = 1)
     started = models.BooleanField(null = True)
     state = models.CharField(max_length=30, null =True)
+    deviceID = models.CharField(max_length=200, null=True)
     
     
     def __str__(self):
@@ -39,5 +40,22 @@ class Category(models.Model):
 class Library(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
+class Devices(models.Model):
+    name = models.CharField(max_length=100)
+    deviceID = models.CharField(max_length=200)
+    party = models.ForeignKey('Party', on_delete=models.CASCADE,)
+
+    def __str__(self):
+        return self.name
+
+class Searches(models.Model):
+    name = models.CharField(max_length=500)
+    uri = models.CharField(max_length=500)
+    art = models.CharField(max_length=500, null=True)
+    party = models.ForeignKey('Party', on_delete=models.CASCADE,)
+    user = models.ForeignKey('Users',on_delete=models.CASCADE,)
     def __str__(self):
         return self.name

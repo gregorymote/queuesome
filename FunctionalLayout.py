@@ -19,7 +19,7 @@ except (AttributeError, JSONDecodeError):
     token = util.prompt_for_user_token(username, scope, client_id='6de276d9e60548d5b05a7af92a5db3bb',client_secret='4ebf1b0ef7a34002bf95f8c2aa8365b0',redirect_uri='http://localhost:8000') # add scope
 
 # Create our spotify object with permissions
-print(token)
+
 spotifyObject = spotipy.Spotify(auth=token)
 
 user = spotifyObject.current_user()
@@ -120,18 +120,21 @@ while True:
 
             #Get Search Results
             searchResults = spotifyObject.search(searchQuery, 5, 0, 'track')
+            
             #print(json.dumps(searchResults, sort_keys=True, indent=4))
             trackURIs = []
             trackArt = []
             a = 0
             
             track = searchResults['tracks']['items']
+            #print (track)
             albumArt = searchResults['tracks']['items'][0]['album']['images'][0]['url']
             for items in track:
-                print(str(a) + " " + items['name'])
+                print(str(a) + " " + items['name'] + items['items']['album'])
                 trackURIs.append(items['uri'])
                 trackArt.append(albumArt)
                 a+=1
+                #print (items)
    
                 
             songSelection = input("Player " + str(x) + " Enter the number associated with the Song youre tryna queue (or x to exit): ")

@@ -5,10 +5,12 @@ from django.urls import reverse
 from party.models import Party
 from party.models import Users
 from party.models import Category
+from party.models import Searches
 from game.forms import blankForm
 from game.forms import chooseCategoryForm
 from game.forms import searchForm
 
+import spotipy
 
 def lobby(request, pid):
 
@@ -130,7 +132,7 @@ def chooseCat(request, pid):
         'form':form,
         'showCustom':showCustom,
         }
-    #print(showCustom)
+    
     return render(request, 'game/chooseCat.html', context)
 
 
@@ -157,8 +159,21 @@ def pickSong(request, pid):
         form = searchForm(request.POST)
 
         if form.is_valid():
-            u.hasPicked = True
-            u.save()
+            #u.hasPicked = True
+
+            spotifyObject = spotipy.Spotify(auth=p.token)
+            
+            search = form.cleaned_data['search']
+            choice =  form.cleaned_data['choice_field']
+
+            if choice == 1: #Search for Track
+                searchResults = spotifyObject.search(searchQuery, 5, 0, 'track')
+            
+
+            
+
+            
+            
             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
 
@@ -169,6 +184,10 @@ def pickSong(request, pid):
         }
     
     return render(request, 'game/pickSong.html', context)
+
+def searchResults(request, pid):
+
+    return render(request, 'game/searchResults.html')
 
 def getUser(request, p):
     

@@ -1,6 +1,7 @@
 from django import forms
 
 from party.models import Party
+from party.models import Devices
 
 
 class LoginForm(forms.Form):
@@ -17,5 +18,16 @@ class CreateUserForm(forms.Form):
 
 class AuthForm(forms.Form):
     auth_code = forms.CharField(label = 'Enter code', required=True)
+
+class ChooseDeviceForm(forms.Form):
+
+    device = forms.ModelChoiceField(queryset=Devices.objects.all())
+        
+    def __init__(self,*args,**kwargs):
+        
+        self.partyObject = kwargs.pop('partyObject')
+        super(ChooseDeviceForm,self).__init__(*args,**kwargs)
+        self.fields['device'].queryset = Devices.objects.filter(party=self.partyObject)
+    
 
 

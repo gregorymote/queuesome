@@ -16,9 +16,11 @@ from party.forms import LoginForm
 from party.forms import NamePartyForm
 from party.forms import CreateUserForm
 from party.forms import AuthForm
+from party.forms import ChooseDeviceForm
 from game.forms import blankForm
 from party.models import Party
 from party.models import Users
+from party.models import Devices
 
 secret='4ebf1b0ef7a34002bf95f8c2aa8365b0'
 uri = 'http://localhost:8000/party/auth/'
@@ -76,7 +78,7 @@ def your_code(request, pid, code):
         form = blankForm(request.POST)
 
         if form.is_valid():
-            return HttpResponseRedirect(reverse('start_party', kwargs={'pid':p.pk,}))
+            return HttpResponseRedirect(reverse('choose_device', kwargs={'pid':p.pk,}))
 
     else:
         form = blankForm(initial ={'blank':''})
@@ -92,9 +94,33 @@ def your_code(request, pid, code):
 def choose_device(request, pid):
     
     p = Party.objects.get(pk = pid)
-    spotifyObject = spotipy.Spotify(auth=p.token)
+    d = list(Devices.objects.filter(party=p))
+
+    if len(d) == 0:
+        spotifyObject = spotipy.Spotify(auth=p.token)
+        deviceResults = spotifyObject.devices()
+        deviceResults = deviceResults['devices']
+
+        for x in deviceResults:
+            d = Devices(name = x['name'], deviceID = x['id'], party = p)
+            d.save()
+
+    if request.method == 'POST':
+        form = ChooseDeviceForm(request.POST, partyObject=p)
+
+        if form.is_valid():
+
+            device = form.cleaned_data['device']
+            p.deviceID=device.deviceID
+
+            return HttpResponseRedirect(reverse('start_party', kwargs={'pid':p.pk,}))
+
+    else:
+         form = ChooseDeviceForm( partyObject=p, initial = {'device':''})
+
+    context = {'form': form,}
             
-    return render(request, 'party/choose_device.html')
+    return render(request, 'party/choose_device.html',context)
 
 
 
@@ -208,9 +234,23 @@ def create_user(request):
 def getCode():
     code = ""                                    
     for x in range(5):
-        code = chr(random.randint(41,123)) + code
+        rand = random.randint(48,123)
+        while not isValid(rand):
+            rand = random.randint(48,123)
+        code = chr(rand) + code
     return code
-                                            
+
+
+def isValid(num):
+    if num >=58 and num < 65:
+        return False
+    elif num >=91 and num < 97:
+        return False
+    else:
+        return True
+    
+
+    
 def getURL(path):
 
     i = 0
