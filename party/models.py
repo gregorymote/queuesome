@@ -4,9 +4,10 @@ import spotipy
 class Party(models.Model):
     name = models.CharField(max_length=100, null = True)
     username = models.CharField(max_length=100, null = True)
-    token = models.CharField(max_length=2000, null = True)
+    token = models.CharField(max_length=1000, null = True)
     code = models.CharField(max_length=10, null = True)
-    url = models.CharField(max_length=2000, null = True)
+    url = models.CharField(max_length=1000, null = True)
+    url_open = models.CharField(max_length=1000, null = True)
     roundNum = models.IntegerField(default = 1)
     roundTotal = models.IntegerField(default = 1)
     started = models.BooleanField(null = True)
@@ -39,6 +40,18 @@ class Category(models.Model):
 
 class Library(models.Model):
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+    
+class Songs(models.Model):
+    name = models.CharField(max_length=500)
+    uri = models.CharField(max_length=500)
+    art = models.CharField(max_length=500)
+    user = models.ForeignKey('Users',on_delete=models.CASCADE,)
+    category = models.ForeignKey('Category',on_delete=models.CASCADE,)
+    played = models.BooleanField(default = False)
+    order = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.name

@@ -58,11 +58,13 @@ def generateURL(username, scope=None, client_id = None,
 
     #if not token_info:
     auth_url = sp_oauth.get_authorize_url()
-    try:
-        import webbrowser
-        webbrowser.open(auth_url)
-    except:
-        print("")
+
+    return auth_url
+##    try:
+##        import webbrowser
+##        webbrowser.open(auth_url)
+##    except:
+##        print("")
     
 def createToken(url, username, scope=None, client_id = None,
         client_secret = None, redirect_uri = None, cache_path = None):

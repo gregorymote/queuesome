@@ -28,7 +28,7 @@ scope = 'user-read-private user-read-playback-state user-modify-playback-state'
 cl_id='6de276d9e60548d5b05a7af92a5db3bb'
 
 def login(request):
-    
+    url = ''
     if request.method == 'POST':
 
         form = LoginForm(request.POST)
@@ -41,16 +41,18 @@ def login(request):
             p.save()
             
             try:
-                util.generateURL(uname, scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+                url = util.generateURL(uname, scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
             except (AttributeError, JSONDecodeError):
                 os.remove(f".cache-{username}")
-                util.generateURL(username, scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
+                url = util.generateURL(username, scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
 
+            p.url_open = url
+            p.save()
             return HttpResponseRedirect(reverse('your_code', kwargs={'pid':p.pk, 'code':auth_code}))
             
     else:
         form = LoginForm(initial= {'username' : ''})
-
+    
     context = {
         'form' : form,
         }
@@ -60,10 +62,11 @@ def login(request):
 def your_code(request, pid, code):
     
     p = Party.objects.get(pk = pid)
+    
     isVisible = False
-
+    
     if p.url != None and p.token == None:
-        print ('visited')
+        
         try:
             p.token = util.createToken(p.url, p.username, scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
             p.save()
@@ -87,6 +90,7 @@ def your_code(request, pid, code):
                'form':form,
                'code':code,
                'isVisible': isVisible,
+               'url': p.url_open,
                }
     return render(request, 'party/your_code.html', context)
 
@@ -137,6 +141,7 @@ def auth(request):
             try:
                 p = Party.objects.get(code=auth_code)
                 p.url = url
+                p.url_open = ''
                 p.save()
                 return HttpResponseRedirect(reverse('complete'))
             except:

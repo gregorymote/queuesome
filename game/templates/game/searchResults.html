@@ -12,8 +12,11 @@
 		<div class="container">
 			
 				<div>
-					
-					<h4>Choose a Device</h4>
+					{% if isArtist %}
+					<h4>Artist Results</h4>
+					{% else %}
+					<h4>Search Results</h4>
+					{% endif %}
 					 <form action="" method="post">
 
 						{% csrf_token %}
@@ -22,21 +25,25 @@
 								
 								<tr>
 									<td>
-									{{ form.device }}
+									{{ form.results }}
 									</td>
 
 								</tr>
 			
 								<tr>
 									<td>
-									<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+									<input type="submit" class="btn btn-outline-primary btn-sm" name="back"  value="Back">
+									{% if isArtist %}
+									<input type="submit" class="btn btn-outline-primary btn-sm" name="artist" value="Search Artist's Songs">
+									{% else %}
+									<input type="submit" class="btn btn-outline-primary btn-sm" name="add2q" value="Add to Queue">
+									{% endif %}
 									</td>
 								<tr>
 							</tbody>
 						</table>
 				
 					</form>
-					
 				</div>
 			
 		</div>
