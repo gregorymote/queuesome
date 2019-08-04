@@ -27,3 +27,7 @@ pip install spotipy
 pip install git+https://github.com/plamere/spotipy.git --upgrade
 
 #add util_custom to \Lib\site-packages\spotipy
+
+#add value of client secret to client secret variable at the top of party/views.py
+
+#Note: client secret has been removed from github to abide by Spotify's terms and conditions
