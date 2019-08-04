@@ -13,8 +13,10 @@ from game.forms import searchForm
 from game.forms import searchResultsForm
 
 import spotipy
+import time
 import random
 import os
+import threading
 
 def lobby(request, pid):
 
@@ -92,8 +94,11 @@ def play(request, pid):
         if not p.started:
             p.started = True
             p.save()
-
-
+    try:         
+        c = Category.objects.get(party=p, roundNum=p.roundNum)  
+    except:
+        print("category does not exist yet")
+        
     if len(list(Users.objects.filter(party=p, hasPicked=False))) == 0 and p.state == 'pick_song':
         p.roundTotal = p.roundTotal + 1
         p.state = 'assign'
@@ -104,9 +109,11 @@ def play(request, pid):
             x.hasPicked = False
             x.save()
 
-        #os.system('python party/playMusic.py %s' % (pid))
-        
-    c = Category.objects.get(party=p, roundNum=p.roundNum)  
+        isPlaying = Songs.objects.filter(category__party=p, state='playing')
+        if not isPlaying:
+            t = threading.Thread(target=playMusic, args=(pid,))
+            t.start()
+            print("running in parralell")
         
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -239,8 +246,11 @@ def searchResults(request, pid):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
     c = Category.objects.get(party=p, roundNum=p.roundTotal) 
-    isArtist = (list(Searches.objects.filter(party=p).filter(user=u))[0].art == None)
-
+    try:
+        isArtist = (list(Searches.objects.filter(party=p).filter(user=u))[0].art == None)
+    except:
+        isArtist = True
+        
     if request.method == 'POST':
         
         form = searchResultsForm(request.POST, partyObject=p, userObject=u)
@@ -257,7 +267,8 @@ def searchResults(request, pid):
                               user=u,
                               category=c,
                               played=False,
-                              order=random.randint(1,101)
+                              order=random.randint(1,101),
+                              state = 'not_played',
                               )
                     s.save()
                     u.hasPicked = True
@@ -305,4 +316,25 @@ def getUser(request, p):
     current_user = list(current_user)
     u = current_user[0]
     return u
+
+def playMusic(pid):
     
+    p = Party.objects.get(pk = pid)
+    spotifyObject = spotipy.Spotify(auth=p.token)
+
+    while (Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played')):
+
+        queue = list(Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played'))
+        for song in queue:
+            ls = [song.uri]
+            spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+            song.state = 'playing'
+            song.startTime = time.time()
+            song.save()
+            while(time.time() - song.startTime < p.time):
+                continue
+            song.state= 'played'
+            song.save()
+
+        p.roundNum = p.roundNum + 1
+        p.save()

@@ -13,6 +13,7 @@ class Party(models.Model):
     started = models.BooleanField(null = True)
     state = models.CharField(max_length=30, null =True)
     deviceID = models.CharField(max_length=200, null=True)
+    time = models.IntegerField(default=60)
     
     
     def __str__(self):
@@ -52,6 +53,8 @@ class Songs(models.Model):
     category = models.ForeignKey('Category',on_delete=models.CASCADE,)
     played = models.BooleanField(default = False)
     order = models.IntegerField(default = 0)
+    state = models.CharField(max_length=10, default='not_played')
+    startTime= models.FloatField(default=0)
 
     def __str__(self):
         return self.name

@@ -22,7 +22,7 @@ from party.models import Party
 from party.models import Users
 from party.models import Devices
 
-secret='4ebf1b0ef7a34002bf95f8c2aa8365b0'
+secret='removed for legal purposes' 
 uri = 'http://localhost:8000/party/auth/'
 scope = 'user-read-private user-read-playback-state user-modify-playback-state'
 cl_id='6de276d9e60548d5b05a7af92a5db3bb'
