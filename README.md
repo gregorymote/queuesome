@@ -27,14 +27,3 @@ pip install spotipy
 pip install git+https://github.com/plamere/spotipy.git --upgrade
 
 #add util_custom to \Lib\site-packages\spotipy
-
-
-#install django background tasks
-
-pip install django-background-tasks
-
-#add 'background_task' to installed_apps
-
-python manage.py migrate
-
-#additonal reference for setup go to: https://django-background-tasks.readthedocs.io/en/latest/
