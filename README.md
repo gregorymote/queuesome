@@ -36,7 +36,8 @@ pip install git+https://github.com/plamere/spotipy.git --upgrade
 
 edit party/view and change my_IP and my_PORT at the top of the page
 
-edit queue_it_up/settings and change
+edit queue_it_up/settings and add IP address to ALLOWED_HOSTS
 
 #From cmd line run
+
 python manage.py runserver 0.0.0.0:<value of my_PORT>
