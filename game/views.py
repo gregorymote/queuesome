@@ -26,7 +26,9 @@ def lobby(request, pid):
         form = blankForm(request.POST)
 
         if form.is_valid():
-            
+            c = Category(name='Looks Like We Got A Lull on Our Hands',
+                         roundNum=0, party=p)
+            c.save()
             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -62,9 +64,13 @@ def play(request, pid):
 
     p = Party.objects.get(pk = pid)
     u = getUser(request, pid)
-
+    print('roundNum:', p.roundNum)
+    print('roundTotal:', p.roundTotal)
+    print('state:', p.state)
+    
     if p.state == 'assign':
         x = Users.objects.filter(party=p, turn='not_picked')
+        
         if x:
             x = list(x)
             lead = x[0]
@@ -72,11 +78,12 @@ def play(request, pid):
             lead.save()
             p.state = 'choose_category'
             p.save()
+            
         else:
             users = Users.objects.filter(party=p)
             for user in users:
-                u.turn = 'not_picked'
-                u.save()
+                user.turn = 'not_picked'
+                user.save()
             x = list(users)
             lead = x[0]
             lead.turn = 'picking'
@@ -84,23 +91,26 @@ def play(request, pid):
             p.state = 'choose_category'
             p.save()
         
-        c = Category(name = lead.name + " is Picking the Category",
-                     roundNum = p.roundTotal,
-                     party = p,
-                     leader = lead,
-                    )
-        c.save()
+        q = Category.objects.filter(party=p, roundNum=p.roundTotal)
+
+        if u.sessionID == lead.sessionID:
+            c = Category(name = lead.name + " is Picking the Category",
+                         roundNum = p.roundTotal + 1,
+                         party = p,
+                         leader = lead,
+                        )
+            c.save()
+            p.roundTotal = p.roundTotal + 1
+            p.save()
+            print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
+           
 
         if not p.started:
             p.started = True
-            p.save()
-    try:         
-        c = Category.objects.get(party=p, roundNum=p.roundNum)  
-    except:
-        print("category does not exist yet")
-        
+            p.save()       
+    
     if len(list(Users.objects.filter(party=p, hasPicked=False))) == 0 and p.state == 'pick_song':
-        p.roundTotal = p.roundTotal + 1
+        
         p.state = 'assign'
         p.save()
         
@@ -113,7 +123,6 @@ def play(request, pid):
         if not isPlaying:
             t = threading.Thread(target=playMusic, args=(pid,))
             t.start()
-            print("running in parralell")
         
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -126,11 +135,27 @@ def play(request, pid):
     else:
         form = blankForm(initial={'text':'blank',})
 
+    try:
+        s = Songs.objects.get(category__party=p, state='playing')
+        c = s.category
+        p.roundNum = c.roundNum
+        p.save()
+        
+    except:
+        s = Songs(art='lull')
+        c = Category.objects.get(party=p, roundNum=0)
+        n = Category.objects.filter(party=p).order_by('-roundNum')
+        if len(list(n)) != 0:
+            p.roundNum = n[0].roundNum
+            print('most recent round num', n[0].roundNum)
+            p.save()
+        
     context = {
         'form':form,
         'party': p,
         'user' : u,
-        'category' : c, 
+        'category' : c,
+        'song' : s,
         }
     
     return render(request, 'game/play.html', context)
@@ -311,7 +336,6 @@ def searchResults(request, pid):
 def getUser(request, p):
     
     sk = request.session.session_key
-    #print(sk)
     current_user = Users.objects.filter(sessionID = sk, party = p)
     current_user = list(current_user)
     u = current_user[0]
@@ -320,21 +344,23 @@ def getUser(request, p):
 def playMusic(pid):
     
     p = Party.objects.get(pk = pid)
+    rN = p.roundNum
+    print ('rN:', rN)
     spotifyObject = spotipy.Spotify(auth=p.token)
-
-    while (Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played')):
-
-        queue = list(Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played'))
+    while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played')):
+       
+        print ('playing music for round:', rN)
+        queue = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played'))
         for song in queue:
             ls = [song.uri]
             spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
             song.state = 'playing'
             song.startTime = time.time()
             song.save()
-            while(time.time() - song.startTime < p.time):
+            while(time.time() - song.startTime < 80):#p.time):
                 continue
             song.state= 'played'
             song.save()
 
-        p.roundNum = p.roundNum + 1
-        p.save()
+        rN = rN + 1
+    print('EXITING THREAD')

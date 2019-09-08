@@ -9,7 +9,15 @@
 		
 		<h4>{{party.name}}</h4>
 		<h6>Category: {{category.name}}</h6>
-	
+		{% if song.art != "lull" %}
+		<img src={{song.art}} class="img-thumbnail" width="300" height="300" alt="...">
+		<h6>{{song.name}}</h6>
+		{% else %}
+		{% load staticfiles %}
+		<img src="{% static 'images/sleep.jpg' %}" class="img-thumbnail" width="300" height="300"  alt="" />
+		<h6>Someone Needs to Choose a Cateogry or Pick a Song</h6>
+		{% endif %}
+		
 	
 		<form action="" method="post">
 			{% csrf_token %}
@@ -20,6 +28,7 @@
 				<input type="submit" class="btn btn-outline-primary" value="Pick Song">
 			{% endif %}
 		</form>
+		
 	</div>
 	</body>
 </html>

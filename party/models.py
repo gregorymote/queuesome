@@ -13,7 +13,7 @@ class Party(models.Model):
     started = models.BooleanField(null = True)
     state = models.CharField(max_length=30, null =True)
     deviceID = models.CharField(max_length=200, null=True)
-    time = models.IntegerField(default=60)
+    time = models.IntegerField(default=90)
     
     
     def __str__(self):

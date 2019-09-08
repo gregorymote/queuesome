@@ -22,8 +22,10 @@ from party.models import Party
 from party.models import Users
 from party.models import Devices
 
-secret='removed for legal purposes' 
-uri = 'http://localhost:8000/party/auth/'
+my_IP='localhost'
+my_PORT='8000'
+secret='4ebf1b0ef7a34002bf95f8c2aa8365b0' 
+uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
 scope = 'user-read-private user-read-playback-state user-modify-playback-state'
 cl_id='6de276d9e60548d5b05a7af92a5db3bb'
 
@@ -169,7 +171,7 @@ def name_party(request, pid):
         if form.is_valid():
             p.name=form.cleaned_data['party_name']
             p.roundNum = 1
-            p.roundTotal = 1
+            p.roundTotal = 0
             p.started = False
             p.state = 'assign'
                       
@@ -239,9 +241,9 @@ def create_user(request):
 def getCode():
     code = ""                                    
     for x in range(5):
-        rand = random.randint(48,123)
+        rand = random.randint(48,122)
         while not isValid(rand):
-            rand = random.randint(48,123)
+            rand = random.randint(48,122)
         code = chr(rand) + code
     return code
 
@@ -267,7 +269,7 @@ def getURL(path):
         i = i + 1
     end = i
 
-    url = 'localhost:8000' + path[start:end]
+    url = my_IP + ':' + my_PORT + path[start:end]
 
     return url
                                          
