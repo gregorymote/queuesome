@@ -31,3 +31,12 @@ pip install git+https://github.com/plamere/spotipy.git --upgrade
 #add value of client secret to client secret variable at the top of party/views.py
 
 #Note: client secret has been removed from github to abide by Spotify's terms and conditions
+
+#To Create Access to other Devices from Your IP Address
+
+edit party/view and change my_IP and my_PORT at the top of the page
+
+edit queue_it_up/settings and change
+
+#From cmd line run
+python manage.py runserver 0.0.0.0:<value of my_PORT>
