@@ -32,6 +32,8 @@ pip install git+https://github.com/plamere/spotipy.git --upgrade
 
 #Note: client secret has been removed from github to abide by Spotify's terms and conditions
 
+
+
 #To Create Access to other Devices from Your IP Address
 
 edit party/view and change my_IP and my_PORT at the top of the page
