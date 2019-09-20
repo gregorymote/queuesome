@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 {% extends "base.html" %}
-
 {% block page_content %}
 <html lang="en">
 	<body>
@@ -27,6 +26,10 @@
 			{% elif party.state == "pick_song" and not user.hasPicked %}
 				<input type="submit" class="btn btn-outline-primary" value="Pick Song">
 			{% endif %}
+			
+			<!-- <i class="fa fa-thumbs-o-up"></i> --> 
+			
+			
 		</form>
 		
 	</div>
