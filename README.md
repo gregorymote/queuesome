@@ -60,6 +60,18 @@ for x in cats:
 l = Library(name = x)
 l.save()</I>
 
+<h3>Clean Out Old Parties</h3>
+
+Open the Python Shell by Entering:
+
+<I>python manage.py shell</I>
+
+Paste the Following code
+
+<I>from party.Models import Party
+ 
+ Party.objects.all().delete()</I>
+
 
 
 
