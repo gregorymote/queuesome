@@ -57,10 +57,8 @@ Paste the Following code with new Categories in the cat list
 cats = ["new cat1", "new cat2"]
 
 for x in cats:
-
-    l = Library(name = x)
-    
-    l.save()</I>
+l = Library(name = x)
+l.save()</I>
 
 
 
