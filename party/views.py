@@ -40,7 +40,7 @@ def login(request):
            
             uname = form.cleaned_data['username']
         
-            auth_code = getCode()
+            auth_code = getCode(5)
             p = Party(name='creating party', username=uname, code=auth_code)
             p.save()
             
@@ -176,8 +176,18 @@ def name_party(request, pid):
             p.roundTotal = 0
             p.started = False
             p.state = 'assign'
-                      
-            p.save()          
+
+            unique = False
+
+            while not unique:
+                jc = getCode(4)
+                try:
+                    Party.objects.get(joinCode=jc)
+                except:
+                    p.joinCode = jc
+                    unique = True
+                   
+            p.save()
             
             u = Users(
                 name = form.cleaned_data['user_name'],
@@ -208,27 +218,29 @@ def name_party(request, pid):
     return render(request, 'party/name_party.html', context)
 
 def create_user(request):
-
+    invalid = False
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
+            try:
+                p = Party.objects.get(joinCode=form.cleaned_data['party_code'])
+                
+                u = Users(
+                        name= form.cleaned_data['user_name'],
+                        party = p,
+                        sessionID = request.session.session_key,
+                        points = 0,
+                        isHost = False,
+                        hasSkip = True,
+                        hasPicked = False,
+                        turn = "not_picked",
+                        )
+                u.save()
 
-            #print('\n\n\n\n',request.session.session_key,'\n\n\n\n\n')
-            u = Users(
-                    name= form.cleaned_data['user_name'],
-                    party = form.cleaned_data['party_choice'],
-                    sessionID = request.session.session_key,
-                    points = 0,
-                    isHost = False,
-                    hasSkip = True,
-                    hasPicked = False,
-                    turn = "not_picked",
-                    )
-            u.save()
+                return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
 
-            
-
-            return HttpResponseRedirect(reverse('lobby', kwargs={'pid':u.party.pk}))
+            except:
+                invalid = True
     else:
         form = CreateUserForm(initial={
                                         'party_choice': '',
@@ -236,13 +248,14 @@ def create_user(request):
 
     context = {
         'form' : form,
+        'invalid' : invalid,
         }
 
     return render(request, 'party/create_user.html', context)
 
-def getCode():
+def getCode(i):
     code = ""                                    
-    for x in range(5):
+    for x in range(i):
         rand = random.randint(48,122)
         while not isValid(rand):
             rand = random.randint(48,122)

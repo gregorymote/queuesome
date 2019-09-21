@@ -3,6 +3,7 @@
 {% extends "base.html" %}
 {% block page_content %}
 <html lang="en">
+	
 	<body>
 	<div class = "container text-center">
 		
@@ -34,5 +35,13 @@
 		
 	</div>
 	</body>
+	
+	<nav class="navbar fixed-bottom navbar-dark bg-primary">
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<span class="navbar-brand">{{party.joinCode}}</span>
+	</nav>
+
 </html>
 {% endblock %}

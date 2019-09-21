@@ -29,6 +29,17 @@
 									</td>
 
 								</tr>
+								
+							{% if invalid and isArtist %}
+								<div class="alert alert-info">
+									select a valid artist
+								</div>
+							
+							{% elif invalid and not isArtist  %}
+								<div class="alert alert-info">
+									select a valid song
+								</div>
+							{% endif %}
 			
 								<tr>
 									<td>

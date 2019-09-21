@@ -13,7 +13,7 @@ class NamePartyForm(forms.Form):
 
 
 class CreateUserForm(forms.Form):
-    party_choice = forms.ModelChoiceField(queryset=Party.objects.all()) 
+    party_code = forms.CharField(label = 'Enter Room Code', required=True) 
     user_name = forms.CharField(label = 'Your Name', required = True)
 
 class AuthForm(forms.Form):

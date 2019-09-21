@@ -7,15 +7,15 @@
 	<div class = "container">
 		<div>
 			
-			<h2><small>Welcome to </small><span class="badge badge-pill badge-primary">{{party_name}}</span></h2>
+			<h2><small>Welcome to </small><span class="badge badge-pill badge-primary">{{party.name}}</span></h2>
 			
 		</div>
 		
 		<div class = "row">
 			<div class = "col">
-				<h4><small>Guests:</small></h4>
+				<h4> </h4>
 			</div>
-
+			
 		</div>
 		
 		<div class = "row">
@@ -33,23 +33,38 @@
 		</div>	
 		
 		<div class = "row">
-			<div class = "col">
-				
-			</div>
-			<div class = "col text-left">
+
+			<div class = "col text-right">
 				<form action="" method="post">
 					{% csrf_token %}
 					{% if access %}
-						<input type="submit" class="btn btn-outline-primary btn-lg" value="Start">
-					
-						
+						<input type="submit" class="btn btn-outline-primary btn-lg" value="Let's Go">
 					{% endif %}
 				</form>
 			</div>
 			
-			<div class = "col">
+
+		</div>
+		<div class = "row">
+			<div class = "col text-center">
+				<h1> </h1>
+			</div>
+
+		</div>
+		<div class = "row">
+			<div class = "col text-center">
 				
 			</div>
+
+		</div>
+		
+		<div class = "row">
+
+			<div class = "col text-center">
+				<h1 class = "display-3"><span class="badge badge-secondary">{{party.joinCode}}</span></h1>
+				<h6>This Is Your Room Code</h6>
+			</div>		
+
 		</div>
 	</div>
 </html>

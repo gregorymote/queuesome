@@ -14,6 +14,7 @@ class Party(models.Model):
     state = models.CharField(max_length=30, null =True)
     deviceID = models.CharField(max_length=200, null=True)
     time = models.IntegerField(default=90)
+    joinCode = models.CharField(max_length=10, null = True)
     
     
     def __str__(self):

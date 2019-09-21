@@ -25,16 +25,24 @@
 							</td>
 							
 							<td>
-								
+
 							</td>
 						
 						</tr>
-	
+
 						<tr>
 							<td>
 							<input type="submit" class="btn btn-outline-primary btn-sm" value="Search">
 							</td>
 						<tr>
+						
+						{% if invalid %}
+							<div class="alert alert-info">
+								enter a track or artist
+							</div>
+							
+						{% endif %}
+						
 					</tbody>
 				</table>
 				

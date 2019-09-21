@@ -14,20 +14,6 @@
 					<tbody>
 						<tr>
 							<td>
-							<h6>{{ form.party_choice.label }}</h6>
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-							{{ form.party_choice }}
-							</td>
-
-						</tr>
-						
-						
-						<tr>
-							<td>
 							<h6>{{ form.user_name.label }}</h6>
 							</td>
 						</tr>
@@ -38,6 +24,27 @@
 							</td>
 
 						</tr>
+						<tr>
+							<td>
+							<h6>{{ form.party_code.label }}</h6>
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							{{ form.party_code }}
+							{% if invalid %}
+							<div class="alert alert-info">
+								invalid room code
+							</div>
+							<p>  </p>
+							{% endif %}
+							</td>
+
+						</tr>
+						
+						
+
 	
 						<tr>
 							<td>
