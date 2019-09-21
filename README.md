@@ -3,35 +3,34 @@ Spotipy/Django Web Application Game
 
 <h3>Create virtual environment and install django</h3>
 
-#In desired directory run
+In desired directory run (This only needs to be done the first time)
 
-python -m venv venv
+<I>python -m venv venv</I>
  
-#activate virutal environment 
+Activate Virutal Environment (You'll need to do this every time you reopen cmd)
  
-C:\> venv\Scripts\activate.bat
+<I>C:\> venv\Scripts\activate.bat</I>
 
-#Install Django
+Install Django
 
-(venv) $ pip install Django
+<I>(venv) $ pip install Django</I>
 
-#Useful Django tutorial for additional help https://realpython.com/get-started-with-django-1/
+Useful Django tutorial for additional help https://realpython.com/get-started-with-django-1/
 
 
 <h3>Additional libraries needed</h3>
 
-#install spotipy
+install spotipy
 
-pip install spotipy
+<I>pip install spotipy</I>
 
-pip install git+https://github.com/plamere/spotipy.git --upgrade
+<I>pip install git+https://github.com/plamere/spotipy.git --upgrade</I>
 
-#add util_custom to \Lib\site-packages\spotipy
+add util_custom to \Lib\site-packages\spotipy
 
-#add value of client secret to client secret variable at the top of party/views.py
+add value of client secret to client secret variable at the top of party/views.py
 
-#Note: client secret has been removed from github to abide by Spotify's terms and conditions
-
+Note: client secret has been removed from github for security purposes
 
 
 <h3>To Create Access to other Devices from Your IP Address</h3>
@@ -40,6 +39,39 @@ edit party/view and change my_IP and my_PORT at the top of the page
 
 edit queue_it_up/settings and add IP address to ALLOWED_HOSTS
 
-#From cmd line run
+From cmd line run
 
-python manage.py runserver 0.0.0.0:value of my_PORT
+<I>python manage.py runserver 0.0.0.0:value of my_PORT</I>
+
+
+<h3>Add More Categories</h3>
+
+Open the Python Shell by Entering:
+
+<I>python manage.py shell</I>
+
+Paste the Following code with new Categories in the cat list
+
+<I>from party.Models import Library
+
+cats = ["new cat1", "new cat2"]
+
+for x in cats:
+l = Library(name = x)
+l.save()</I>
+
+<h3>Clean Out Old Parties</h3>
+
+Open the Python Shell by Entering:
+
+<I>python manage.py shell</I>
+
+Paste the Following code
+
+<I>from party.Models import Party
+ 
+ Party.objects.all().delete()</I>
+
+
+
+
