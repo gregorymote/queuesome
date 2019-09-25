@@ -39,8 +39,17 @@ def login(request):
         if form.is_valid():
            
             uname = form.cleaned_data['username']
-        
-            auth_code = getCode(5)
+            
+            unique = False
+
+            while not unique:
+                auth_code = getCode(5)
+                print(auth_code)
+                try:
+                    Party.objects.get(code=auth_code)
+                except:
+                    unique = True
+            print(auth_code)
             p = Party(name='creating party', username=uname, code=auth_code)
             p.save()
             
