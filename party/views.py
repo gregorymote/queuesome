@@ -50,7 +50,7 @@ def login(request):
                 except:
                     unique = True
             print(auth_code)
-            p = Party(name='creating party', username=uname, code=auth_code)
+            p = Party(name='creating party', code=auth_code, username=uname)
             p.save()
             
             try:
@@ -73,6 +73,10 @@ def login(request):
     return render(request, 'party/login.html', context)
 
 def your_code(request, pid, code):
+
+    #if not checkPermission(pid, request):
+        #return HttpResponseRedirect(reverse('start'))
+        
     
     p = Party.objects.get(pk = pid)
     
@@ -110,17 +114,25 @@ def your_code(request, pid, code):
 
 def choose_device(request, pid):
     
-    p = Party.objects.get(pk = pid)
-    d = list(Devices.objects.filter(party=p))
+    p = Party.objects.get(pk = pid)   
+    spotifyObject = spotipy.Spotify(auth=p.token)
+    deviceResults = spotifyObject.devices()
+    deviceResults = deviceResults['devices']
+    curr_devices = []
 
-    if len(d) == 0:
-        spotifyObject = spotipy.Spotify(auth=p.token)
-        deviceResults = spotifyObject.devices()
-        deviceResults = deviceResults['devices']
-
-        for x in deviceResults:
+    for x in deviceResults:
+        curr_devices.append(x['id'])
+                            
+    for x in deviceResults:
+        try:
+            Devices.objects.get(party=p, deviceID= x['id'])
+        except:
             d = Devices(name = x['name'], deviceID = x['id'], party = p)
             d.save()
+    query = Devices.objects.filter(party=p)
+    for x in query:
+        if x.deviceID  not in curr_devices:
+            x.delete()
 
     if request.method == 'POST':
         form = ChooseDeviceForm(request.POST, partyObject=p)
@@ -133,8 +145,8 @@ def choose_device(request, pid):
             return HttpResponseRedirect(reverse('start_party', kwargs={'pid':p.pk,}))
 
     else:
-         form = ChooseDeviceForm( partyObject=p, initial = {'device':''})
-
+        form = ChooseDeviceForm( partyObject=p, initial = {'device':''})
+        
     context = {'form': form,}
             
     return render(request, 'party/choose_device.html',context)
@@ -275,7 +287,7 @@ def getCode(i):
 def isValid(num):
     if num >=58 and num < 65:
         return False
-    elif num >=91 and num < 97:
+    elif num >=91:
         return False
     else:
         return True
@@ -296,5 +308,25 @@ def getURL(path):
     url = my_IP + ':' + my_PORT + path[start:end]
 
     return url
+
+def getUser(request, p):
+    
+    sk = request.session.session_key
+    current_user = Users.objects.filter(sessionID = sk, party = p)
+    current_user = list(current_user)
+    u = current_user[0]
+    return u
+
+def checkPermission(pid, request):
+    
+    p = Party.objects.get(pk = pid)
+    u = getUser(request, p)
+
+    queury = Users.objects.filter(party = p, pk=u.pk)
+
+    if queury:
+        return True
+    else:
+        return False
                                          
                                            

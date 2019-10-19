@@ -5,7 +5,7 @@ from party.models import Devices
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(label = 'Enter your Spotify Username', required=True)
+    username = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":35,"style": "resize: none"}),label = 'Email Address or Username', required=True)
 
 class NamePartyForm(forms.Form):
     party_name = forms.CharField(label='Party Name', required=True)

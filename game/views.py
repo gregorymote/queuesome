@@ -5,6 +5,7 @@ from django.urls import reverse
 from party.models import Party
 from party.models import Users
 from party.models import Category
+from party.models import Library
 from party.models import Songs
 from party.models import Searches
 from game.forms import blankForm
@@ -186,6 +187,8 @@ def chooseCat(request, pid):
 
                 if form.cleaned_data['custom'] != default:
                     createCategory(form.cleaned_data['custom'], request, p)
+                    l = Library(name=form.cleaned_data['custom'])
+                    l.save()
                     return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
 

@@ -5,31 +5,62 @@
 {% block page_content %}
 <html lang="en">
 	<div class = "container">
-		<div class ="">
+		
 			
 			<form action="" method="post">
 			{% csrf_token %}
-			<h5>{{ form.username.label }}</h5>
+			
+			<div class = "row, text-center">
+				<h5>{{form.username.label}}<h5>
 				
-				<table>
-					<tbody>
-						<tr>
-							<td>
-							{{ form.username }}
-							</td>
+			</div>
+			
+			<div class = "row, text-center pt-2">
+				{{form.username}}
+			</div>
 
-						</tr>
-							
-						<tr>
-							<td>
-							<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
-							</td>
-						<tr>
-					</tbody>
-				</table>
-				
+			
+			<div class = "row, text-center pt-2">
+				<input type="submit" class="btn btn-outline-success btn-lg" value="Log in to Spotify Premium">
+			</div>
+			
 			</form>
-		</div>	
+			
+			  <!-- Button to Open the Modal -->
+		  <div class = "pt-5 text-right">
+		  <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
+			Help
+		  </button>
+		</div>
+		  <!-- The Modal -->
+		  <div class="modal fade" id="myModal">
+			<div class="modal-dialog">
+			<div class="modal-dialog modal-dialog-scrollable">
+			  <div class="modal-content">
+			  
+				<!-- Modal Header -->
+				<div class="modal-header">
+				  <h4 class="modal-title">About Logging In</h4>
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				
+				<!-- Modal body -->
+				<div class="modal-body">
+				 <p>Queue it Up requires the party host to have access to a Spotify Premium account. After entering your username you will be brought to Spotify's official log in page.
+				  </p>
+				  <p>If you are not redirected to Spotify's login page after submitting your username, it is because your web browser remembers you. If you want to log in with a different account, try clearing your web browser's cookies and site data. 
+					</p>
+				</div>
+				
+				<!-- Modal footer -->
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+				</div>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		
 	</div>
 </html>
 {% endblock %}

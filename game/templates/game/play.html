@@ -11,15 +11,19 @@
 	<body>
 	<div class = "container text-center">
 		
-		<h4>{{party.name}}</h4>
-		<h6>Category: {{category.name}}</h6>
+		<h6>{{party.name}}</h6>
+		<h4>{{category.name}}</h4>
 		{% if song.art != "lull" %}
-		<img src={{song.art}} class="img-thumbnail" width="300" height="300" alt="...">
-		<h6>{{song.name}}</h6>
+			<img src={{song.art}} class="img-thumbnail" width="300" height="300" alt="...">
+			<div class = "pt-2">
+				<h6>{{song.name}}</h6>
+			</div>
 		{% else %}
-		{% load staticfiles %}
-		<img src="{% static 'images/sleep.jpg' %}" class="img-thumbnail" width="300" height="300"  alt="" />
-		<h6>Someone Needs to Choose a Cateogry or Pick a Song</h6>
+			{% load staticfiles %}
+			<img src="{% static 'images/sleep.jpg' %}" class="img-thumbnail" width="300" height="300"  alt="" />
+			<div class = "pt-2">
+				<h6>Someone Needs to Choose a Cateogry or Pick a Song</h6>
+			</div>
 		{% endif %}
 		
 	

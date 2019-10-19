@@ -46,6 +46,38 @@
 		</div>
 	
 	</body>
-	
+		  <!-- Button to Open the Modal -->
+		  <div class = "pt-5 text-right">
+		  <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
+			Help
+		  </button>
+		</div>
+		  <!-- The Modal -->
+		  <div class="modal fade" id="myModal">
+			<div class="modal-dialog">
+			<div class="modal-dialog modal-dialog-scrollable">
+			  <div class="modal-content">
+			  
+				<!-- Modal Header -->
+				<div class="modal-header">
+				  <h4 class="modal-title">About Authentication</h4>
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				
+				<!-- Modal body -->
+				<div class="modal-body">
+				 <p>This is your authentication code. A new tab should have automatically opened in your browser. Navigate to that tab and submit your authentication code</p>
+				 <h6> Already submitted your Code?</h6>
+				<p>Hit the refresh button and choose your device</p>
+				</div>
+				
+				<!-- Modal footer -->
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+				</div>
+				</div>
+			  </div>
+			</div>
+		  </div>
 </html>
 {% endblock %}

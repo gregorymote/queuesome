@@ -9,11 +9,11 @@ class blankForm(forms.Form):
     blank = forms.CharField(label='text', required=False)
     
 class chooseCategoryForm(forms.Form):
-    cat_choice = forms.ModelChoiceField(label = 'Choose a Category', queryset=Library.objects.all()) 
+    cat_choice = forms.ModelChoiceField(label = 'Choose a Category', queryset=Library.objects.filter(visible=True)) 
     custom = forms.CharField(label = 'create your own', required = False)
 
 class searchForm(forms.Form):
-    search = forms.CharField(label = 'search', required = False)
+    search = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":40,"style": "resize: none"}), label = 'search', required = False)
     
     choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
 

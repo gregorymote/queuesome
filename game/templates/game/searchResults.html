@@ -25,7 +25,9 @@
 								
 								<tr>
 									<td>
-									{{ form.results }}
+										
+										{{ form.results }}
+										
 									</td>
 
 								</tr>
@@ -43,12 +45,14 @@
 			
 								<tr>
 									<td>
+									<div class = "pt-2">
 									<input type="submit" class="btn btn-outline-primary btn-sm" name="back"  value="Back">
 									{% if isArtist %}
 									<input type="submit" class="btn btn-outline-primary btn-sm" name="artist" value="Search Artist's Songs">
 									{% else %}
 									<input type="submit" class="btn btn-outline-primary btn-sm" name="add2q" value="Add to Queue">
 									{% endif %}
+									</div>
 									</td>
 								<tr>
 							</tbody>
