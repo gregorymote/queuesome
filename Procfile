@@ -1,1 +1,1 @@
-web: python manage.py runserver
+web: gunicorn queue_it_up.wsgi:application --log-file -
