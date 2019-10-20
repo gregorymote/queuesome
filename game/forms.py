@@ -13,7 +13,7 @@ class chooseCategoryForm(forms.Form):
     custom = forms.CharField(label = 'create your own', required = False)
 
 class searchForm(forms.Form):
-    search = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":40,"style": "resize: none"}), label = 'search', required = False)
+    search = forms.CharField(label = 'search', required = False)
     
     choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
 
