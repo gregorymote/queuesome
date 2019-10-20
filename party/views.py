@@ -5,7 +5,7 @@ import spotipy
 import webbrowser
 import time
 import random
-import spotipy.util_custom as util
+import util_custom as util
 from json.decoder import JSONDecodeError
 
 from django.shortcuts import render, get_object_or_404

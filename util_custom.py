@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 import os
-from . import oauth2
+import spotipy.oauth2 as oauth2
 import spotipy
 
 def generateURL(username, scope=None, client_id = None,
