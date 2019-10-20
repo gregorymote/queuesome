@@ -7,7 +7,7 @@ class Party(models.Model):
     token = models.CharField(max_length=1000, null = True)
     code = models.CharField(max_length=10, null = True)
     url = models.CharField(max_length=1000, null = True)
-    url_open = models.CharField(max_length=1000, null = True)
+    url_open = models.CharField(max_length=999, null = True)
     roundNum = models.IntegerField(default = 1)
     roundTotal = models.IntegerField(default = 1)
     started = models.BooleanField(null = True)
@@ -15,7 +15,6 @@ class Party(models.Model):
     deviceID = models.CharField(max_length=200, null=True)
     time = models.IntegerField(default=90)
     joinCode = models.CharField(max_length=10, null = True)
-    
     
     def __str__(self):
         return self.name
