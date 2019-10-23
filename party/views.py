@@ -230,8 +230,8 @@ def name_party(request, pid):
 
             
         form = NamePartyForm(initial={
-                                    'party_name' : 'Enter a Party Name',
-                                    'user_name' : 'name'})
+                                    'party_name' : '',
+                                    'user_name' : ''})
 
 
     context = {
@@ -267,7 +267,7 @@ def create_user(request):
     else:
         form = CreateUserForm(initial={
                                         'party_choice': '',
-                                        'user_name': 'name'})
+                                        'user_name': ''})
 
     context = {
         'form' : form,

@@ -5,7 +5,7 @@ from party.models import Devices
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":35,"style": "resize: none"}),label = 'Email Address or Username', required=True)
+    username = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":34,"style": "resize: none"}),label = 'Email Address or Username', required=True)
 
 class NamePartyForm(forms.Form):
     party_name = forms.CharField(label='Party Name', required=True)
@@ -13,7 +13,7 @@ class NamePartyForm(forms.Form):
 
 
 class CreateUserForm(forms.Form):
-    party_code = forms.CharField(label = 'Enter Room Code', required=True) 
+    party_code = forms.CharField(label = 'Room Code', required=True) 
     user_name = forms.CharField(label = 'Your Name', required = True)
 
 class AuthForm(forms.Form):

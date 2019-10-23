@@ -1,6 +1,8 @@
 <h2> Queue it Up </h2>
 Spotipy/Django Web Application Game
 
+Try it yourself at q-it-up.herokuapp.com
+
 <h3>Create virtual environment and install django</h3>
 
 In desired directory run (This only needs to be done the first time)
