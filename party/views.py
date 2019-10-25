@@ -189,6 +189,12 @@ def name_party(request, pid):
 
     p = Party.objects.get(pk = pid)
 
+    print("started:" , p.started)
+
+    if p.started:
+        
+        return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
+
     if request.method == 'POST':
 
         form = NamePartyForm(request.POST)
@@ -247,7 +253,9 @@ def create_user(request):
         if form.is_valid():
             try:
                 p = Party.objects.get(joinCode=form.cleaned_data['party_code'])
-                
+                q = Users.objects.filter(party=p, sessionID=request.session.session_key)
+                if q:
+                    return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
                 u = Users(
                         name= form.cleaned_data['user_name'],
                         party = p,
@@ -287,9 +295,7 @@ def getCode(i):
 
 
 def isValid(num):
-    if num >=58 and num < 65:
-        return False
-    elif num >=91:
+    if (num >=58 and num < 65) or (num >=91) or (num == 48) or (num == 79):
         return False
     else:
         return True

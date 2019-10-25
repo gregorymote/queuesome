@@ -30,7 +30,17 @@ def lobby(request, pid):
             c = Category(name='Looks Like We Got A Lull',
                          roundNum=0, party=p)
             c.save()
-            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+            spotifyObject = spotipy.Spotify(auth=p.token)
+            searchResults = spotifyObject.search("Kickstart my heart", 1, 0, 'track')
+            tracks = searchResults['tracks']['items']
+            ls = []
+            for x in tracks:
+                ls.append(x['uri'])
+            try:    
+                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+            except:
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
         p = Party.objects.get(pk = pid)
@@ -92,18 +102,16 @@ def play(request, pid):
             p.state = 'choose_category'
             p.save()
         
-        q = Category.objects.filter(party=p, roundNum=p.roundTotal)
-
-        
-        c = Category(name = lead.name + " is Picking the Category",
-                         roundNum = p.roundTotal + 1,
-                         party = p,
-                         leader = lead,
-                        )
-        c.save()
-        p.roundTotal = p.roundTotal + 1
-        p.save()
-        print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
+                
+##        c = Category(name = lead.name + " is Picking the Category",
+##                         roundNum = p.roundTotal + 1,
+##                         party = p,
+##                         leader = lead,
+##                        )
+##        c.save()
+        #p.roundTotal = p.roundTotal + 1
+        #p.save()
+        #print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
            
 
         if not p.started:
@@ -127,12 +135,25 @@ def play(request, pid):
         
     if request.method == 'POST':
         form = blankForm(request.POST)
-
+        
         if form.is_valid():
-            if p.state == 'choose_category':
-                return HttpResponseRedirect(reverse('choose_category', kwargs={'pid':pid}))
-            if p.state == 'pick_song':
-                return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
+            if ('like' in request.POST):
+                u.hasLiked = True
+                u.save()
+                current_song = Songs.objects.get(state='playing', category__party = p)
+                current_song.likes = current_song.likes + 1
+                print(current_song.likes)
+                current_song.save()
+                rent_song = Songs.objects.get(state='playing', category__party = p)
+                print(rent_song.likes)
+            elif ('results' in request.POST):
+                 return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))    
+            else:
+                if p.state == 'choose_category':
+                    return HttpResponseRedirect(reverse('choose_category', kwargs={'pid':pid}))
+                if p.state == 'pick_song':
+                    return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
+              
     else:
         form = blankForm(initial={'text':'blank',})
 
@@ -210,20 +231,18 @@ def createCategory(choice, request, p):
     u = getUser(request, p)
     u.turn = 'has_picked'
     u.save()
-
-    try:
-        c = Category.objects.get(party=p, roundNum=p.roundTotal)
-    except:
-        c = Category(name = "",
-                    roundNum = p.roundTotal + 1,
-                    party = p,
-                    )
-        p.roundTotal = p.roundTotal + 1
-
-    c.name = choice
+    
+    c = Category(name = choice,
+                 roundNum = p.roundTotal + 1,
+                 party = p,
+                 leader = u,
+                )
     c.save()
 
+    print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
+
     p.state = 'pick_song'
+    p.roundTotal = p.roundTotal + 1
     p.save()
 
 def pickSong(request, pid):
@@ -361,6 +380,32 @@ def searchResults(request, pid):
         
     return render(request, 'game/searchResults.html', context)
 
+def roundResults(request, pid):
+
+    p = Party.objects.get(pk=pid)
+    if p.roundNum > 1:
+        songs = list(Songs.objects.filter(category__roundNum = p.roundNum - 1, category__party = p))
+        category = songs[0].category.name
+    else:
+        category = "No Results Yet"
+        songs = []
+    
+    if request.method == 'POST':
+        form = blankForm(request.POST)
+
+        if form.is_valid():
+            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+    else:
+        form = blankForm(initial={'text':'blank',})
+
+    context = {
+                'form' : form,
+                'songs': songs,
+                'category': category,
+                }    
+    return render(request, 'game/roundResults.html', context)
+
+
 def getUser(request, p):
     
     sk = request.session.session_key
@@ -386,10 +431,24 @@ def playMusic(pid):
             song.state = 'playing'
             song.startTime = time.time()
             song.save()
-            while(time.time() - song.startTime < 80):#p.time):
+            while(time.time() - song.startTime < p.time):
                 continue
             song.state= 'played'
             song.save()
+            users = Users.objects.filter(party = p)
+            for x in users:
+                x.hasLiked = False
+                x.save()
 
         rN = rN + 1
+    searchResults = spotifyObject.search("Rockabye Baby!", 1, 0, "artist")
+    artist = searchResults['artists']['items'][0]['id']
+    search = spotifyObject.artist_top_tracks(artist, country='US')
+    tracks = search['tracks']
+    ls = []
+    for track in tracks:
+        ls.append(track['uri'])
+    spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+    spotifyObject.shuffle(True, device_id = p.deviceID)
+    next_track(device_id = p.deviceID)
     print('EXITING THREAD')

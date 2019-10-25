@@ -13,7 +13,7 @@ class Party(models.Model):
     started = models.BooleanField(null = True)
     state = models.CharField(max_length=30, null =True)
     deviceID = models.CharField(max_length=200, null=True)
-    time = models.IntegerField(default=90)
+    time = models.IntegerField(default=80)
     joinCode = models.CharField(max_length=10, null = True)
     
     def __str__(self):
@@ -26,6 +26,7 @@ class Users(models.Model):
     points = models.IntegerField()
     isHost = models.BooleanField()
     hasSkip = models.BooleanField()
+    hasLiked = models.BooleanField(default=False)
     hasPicked = models.BooleanField(default = False)
     turn = models.CharField(max_length=20)
     def __str__(self):
@@ -56,6 +57,7 @@ class Songs(models.Model):
     order = models.IntegerField(default = 0)
     state = models.CharField(max_length=10, default='not_played')
     startTime= models.FloatField(default=0)
+    likes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
