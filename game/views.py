@@ -6,6 +6,7 @@ from party.models import Party
 from party.models import Users
 from party.models import Category
 from party.models import Library
+from party.models import Likes
 from party.models import Songs
 from party.models import Searches
 from game.forms import blankForm
@@ -100,19 +101,7 @@ def play(request, pid):
             lead.turn = 'picking'
             lead.save()
             p.state = 'choose_category'
-            p.save()
-        
-                
-##        c = Category(name = lead.name + " is Picking the Category",
-##                         roundNum = p.roundTotal + 1,
-##                         party = p,
-##                         leader = lead,
-##                        )
-##        c.save()
-        #p.roundTotal = p.roundTotal + 1
-        #p.save()
-        #print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
-           
+            p.save()        
 
         if not p.started:
             p.started = True
@@ -141,11 +130,9 @@ def play(request, pid):
                 u.hasLiked = True
                 u.save()
                 current_song = Songs.objects.get(state='playing', category__party = p)
-                current_song.likes = current_song.likes + 1
-                print(current_song.likes)
-                current_song.save()
-                rent_song = Songs.objects.get(state='playing', category__party = p)
-                print(rent_song.likes)
+                l = current_song.likes
+                l.num = l.num + 1
+                l.save()
             elif ('results' in request.POST):
                  return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))    
             else:
@@ -169,7 +156,6 @@ def play(request, pid):
         n = Category.objects.filter(party=p).order_by('-roundNum')
         if len(list(n)) != 0:
             p.roundNum = n[0].roundNum
-            print('most recent round num', n[0].roundNum)
             p.save()
         
     context = {
@@ -327,6 +313,9 @@ def searchResults(request, pid):
                 
                 search = form.cleaned_data['results']
                 if search != None:
+                    l = Likes()
+                    l.save()
+                
                     s = Songs(name=search.name,
                               uri=search.uri,
                               art=search.art,
@@ -335,6 +324,7 @@ def searchResults(request, pid):
                               played=False,
                               order=random.randint(1,101),
                               state = 'not_played',
+                              likes = l,
                               )
                     s.save()
                     u.hasPicked = True
@@ -384,7 +374,7 @@ def roundResults(request, pid):
 
     p = Party.objects.get(pk=pid)
     if p.roundNum > 1:
-        songs = list(Songs.objects.filter(category__roundNum = p.roundNum - 1, category__party = p))
+        songs = list(Songs.objects.filter(category__roundNum = p.roundNum - 1, category__party = p).order_by('-likes__num'))
         category = songs[0].category.name
     else:
         category = "No Results Yet"
@@ -424,7 +414,6 @@ def playMusic(pid):
        
         print ('playing music for round:', rN)
         queue = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played').order_by('order'))
-        print (queue)
         for song in queue:
             ls = [song.uri]
             spotifyObject.start_playback(device_id=p.deviceID , uris=ls)

@@ -57,10 +57,13 @@ class Songs(models.Model):
     order = models.IntegerField(default = 0)
     state = models.CharField(max_length=10, default='not_played')
     startTime= models.FloatField(default=0)
-    likes = models.IntegerField(default=0)
+    likes = models.ForeignKey('Likes',on_delete=models.CASCADE,) 
 
     def __str__(self):
         return self.name
+
+class Likes(models.Model):
+    num = models.IntegerField(default=0)
 
 class Devices(models.Model):
     name = models.CharField(max_length=100)

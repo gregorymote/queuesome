@@ -34,7 +34,6 @@ cl_id='6de276d9e60548d5b05a7af92a5db3bb'
 
 def login(request):
     url = ''
-    print (uri)
     if request.method == 'POST':
 
         form = LoginForm(request.POST)
@@ -45,13 +44,11 @@ def login(request):
             unique = False
 
             while not unique:
-                auth_code = getCode(5)
-                print(auth_code)
+                auth_code = getCode(4)
                 try:
                     Party.objects.get(code=auth_code)
                 except:
                     unique = True
-            print(auth_code)
             p = Party(name='creating party', code=auth_code, username=uname)
             p.save()
             
@@ -94,7 +91,6 @@ def your_code(request, pid, code):
             p.token = util.createToken(p.url, p.username, scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
             p.save()
         isVisible = True
-        print('token created')
 
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -188,8 +184,6 @@ def complete(request):
 def name_party(request, pid):
 
     p = Party.objects.get(pk = pid)
-
-    print("started:" , p.started)
 
     if p.started:
         
