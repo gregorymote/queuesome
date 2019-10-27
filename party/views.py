@@ -22,12 +22,12 @@ from party.models import Party
 from party.models import Users
 from party.models import Devices
 
-#my_IP='q-it-up.herokuapp.com'
-my_IP='localhost'
+my_IP='q-it-up.herokuapp.com'
+#my_IP='localhost'
 my_PORT='8000'
 secret='4ebf1b0ef7a34002bf95f8c2aa8365b0'
-uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
-#uri = 'http://' + my_IP + '/party/auth/'
+#uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
+uri = 'http://' + my_IP + '/party/auth/'
 
 scope = 'user-read-private user-read-playback-state user-modify-playback-state'
 cl_id='6de276d9e60548d5b05a7af92a5db3bb'
