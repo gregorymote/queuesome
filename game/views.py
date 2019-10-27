@@ -147,16 +147,19 @@ def play(request, pid):
     try:
         s = Songs.objects.get(category__party=p, state='playing')
         c = s.category
-        p.roundNum = c.roundNum
-        p.save()
+
+        if p.roundNum != c.roundNum:
+            p.roundNum = c.roundNum
+            p.save()
         
     except:
         s = Songs(art='lull')
         c = Category.objects.get(party=p, roundNum=0)
-        n = Category.objects.filter(party=p).order_by('-roundNum')
+        n = Songs.objects.filter(category__party=p, state='played').order_by('-category__roundNum')
         if len(list(n)) != 0:
-            p.roundNum = n[0].roundNum
-            p.save()
+            if p.roundNum != n[0].category.roundNum + 1:
+                p.roundNum = n[0].category.roundNum + 1
+                p.save()
         
     context = {
         'form':form,
@@ -439,5 +442,5 @@ def playMusic(pid):
         ls.append(track['uri'])
     spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
     spotifyObject.shuffle(True, device_id = p.deviceID)
-    next_track(device_id = p.deviceID)
+    #next_track(device_id = p.deviceID)
     print('EXITING THREAD')

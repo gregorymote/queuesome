@@ -13,18 +13,18 @@
 		
 
 		{% if song.art != "lull" %}
-			<h6>{{category.leader}}'s Category</h6>
-			<h4>{{category.name}}</h4>
+			<p>{{category.leader}}'s Category</p>
+			<h5>{{category.name}}</h5>
 			<img src={{song.art}} class="img-thumbnail" width="300" height="300" alt="...">
-			<div class = "pt-2">
+			<div class = "pt-1">
 				<h6>{{song.name}}</h6>
 			</div>
 		{% else %}
-			<h6>{{party.name}}</h6>
-			<h4>{{category.name}}</h4>
+			<p>{{party.name}}</p>
+			<h5>{{category.name}}</h5>
 			{% load staticfiles %}
-			<img src="{% static 'images/sleep.jpg' %}" class="img-thumbnail" width="300" height="300"  alt="" />
-			<div class = "pt-2">
+			<img src="{% static 'images/ad.jpg' %}" class="img-thumbnail" width="300" height="300"  alt="" />
+			<div class = "pt-1">
 				<h6>Someone Needs to Choose a Cateogry or Pick a Song</h6>
 			</div>
 		{% endif %}
@@ -32,22 +32,27 @@
 	
 		<form action="" method="post">
 			{% csrf_token %}
+			
+			<div class = "row">
+				<div class = "col text-center pb-2">
+				{% if user.turn == "picking" %}
 					
-			{% if user.turn == "picking" %}
-				<div class = "pb-2">
-				<input type="submit" class="btn btn-outline-primary" value="Choose Category">
+					<input type="submit" class="btn btn-outline-primary" value="Choose Category">
+					
+				{% elif party.state == "pick_song" and not user.hasPicked %}
+					
+					<input type="submit" class="btn btn-outline-primary" value="Pick Song">
+					
+				{% endif %}
+				
+				
+				{% if not user.hasLiked and song.art != "lull" %}
+				
+				<button class="btn btn-outline-primary" name = "like"><i class="fa fa-thumbs-o-up"></i></button>
+				
+				{% endif %}
 				</div>
-			{% elif party.state == "pick_song" and not user.hasPicked %}
-				<div class = "pb-2">
-				<input type="submit" class="btn btn-outline-primary" value="Pick Song">
-				</div>
-			{% endif %}
-			
-			{% if not user.hasLiked and song.art != "lull" %}
-			<button class="btn btn-outline-primary" name = "like"><i class="fa fa-thumbs-o-up"></i></button>
-			{% endif %}
-			
-		
+			</div>
 		
 	</div>
 	</body>
