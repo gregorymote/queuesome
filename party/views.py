@@ -246,7 +246,7 @@ def create_user(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             try:
-                p = Party.objects.get(joinCode=form.cleaned_data['party_code'])
+                p = Party.objects.get(joinCode=form.cleaned_data['party_code'].upper())
                 q = Users.objects.filter(party=p, sessionID=request.session.session_key)
                 if q:
                     return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))

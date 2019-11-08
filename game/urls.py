@@ -8,4 +8,5 @@ urlpatterns = [
         path('<int:pid>/play/pick_song', views.pickSong, name='pick_song'),
         path('<int:pid>/play/pick_song/search_results', views.searchResults, name='search_results'),
         path('<int:pid>/play/round_results', views.roundResults, name='round_results'),
+        path('<int:pid>/play/settings', views.settings, name='settings'),
     ]

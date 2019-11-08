@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+<div class="container">
+	<div class="text-center">
+		<h5>Settings</h5>
+	</div>
+	<form action="" method="post">
+		{% csrf_token %}
+
+		<div class="row">
+			<h6>Time <small>(seconds)</small></h6>
+		</div>
+		<div class="row">
+			{{ form.time }}
+		</div>
+
+		<div class="row pt-3">
+			<h6>Device</h6>
+		</div>
+
+		<div class="row">
+			{{ form.device }}
+		</div>
+
+		{% if invalid %}
+		<div class="pt-2">
+			<div class="alert alert-info">
+				enter a device
+			</div>
+		</div>
+		{% endif %}
+
+		<div class="text-right pt-3">
+			<input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
+			<input type="submit" class="btn btn-outline-primary" name="submit" value="Submit"></input>
+		</div>
+
+		<!-- Button to Open the Modal -->
+		<div class="pt-5 text-center">
+			<button type="button" class="btn btn-outline-danger btn-lg" data-toggle="modal" data-target="#myModal">
+				Kill Party
+			</button>
+		</div>
+
+
+		<!-- The Modal -->
+		<div class="modal fade" id="myModal">
+			<div class="modal-dialog">
+				<div class="modal-dialog modal-dialog-scrollable">
+					<div class="modal-content">
+
+						<!-- Modal Header -->
+						<div class="modal-header">
+							<h4 class="modal-title">Delete this Party</h4>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+
+						<!-- Modal body -->
+						<div class="modal-body">
+							<i>If we stay here...The Party Dies</i>
+							<div class="text-right">
+								<p>- Cash Levy</p>
+							</div>
+						</div>
+
+						<!-- Modal footer -->
+						<div class="modal-footer">
+							<input type="submit" class="btn btn-outline-danger" name="kill" value="Kill Party"></input>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+</html>
+{% endblock %}

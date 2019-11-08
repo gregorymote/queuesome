@@ -2,6 +2,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from party.models import Library
 from party.models import Searches
+from party.models import Devices
 
 CHOICES = [('1', 'Track'), ('2', 'Artist')]
 
@@ -26,3 +27,15 @@ class searchResultsForm(forms.Form):
         self.userObject = kwargs.pop('userObject')
         super(searchResultsForm,self).__init__(*args,**kwargs)
         self.fields['results'].queryset = Searches.objects.filter(party=self.partyObject).filter(user=self.userObject)
+
+class settingsForm(forms.Form):
+
+    time = forms.IntegerField()
+
+    device = forms.ModelChoiceField(queryset=Devices.objects.all(), required = False)
+        
+    def __init__(self,*args,**kwargs):
+        
+        self.partyObject = kwargs.pop('partyObject')
+        super(settingsForm,self).__init__(*args,**kwargs)
+        self.fields['device'].queryset = Devices.objects.filter(party=self.partyObject)

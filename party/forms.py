@@ -28,6 +28,3 @@ class ChooseDeviceForm(forms.Form):
         self.partyObject = kwargs.pop('partyObject')
         super(ChooseDeviceForm,self).__init__(*args,**kwargs)
         self.fields['device'].queryset = Devices.objects.filter(party=self.partyObject)
-    
-
-

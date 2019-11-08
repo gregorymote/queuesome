@@ -9,10 +9,12 @@ from party.models import Library
 from party.models import Likes
 from party.models import Songs
 from party.models import Searches
+from party.models import Devices
 from game.forms import blankForm
 from game.forms import chooseCategoryForm
 from game.forms import searchForm
 from game.forms import searchResultsForm
+from game.forms import settingsForm
 
 import spotipy
 import time
@@ -73,8 +75,10 @@ def lobby(request, pid):
 
 
 def play(request, pid):
-
-    p = Party.objects.get(pk = pid)
+    try:
+        p = Party.objects.get(pk = pid)
+    except:
+        return HttpResponseRedirect(reverse('start'))
     u = getUser(request, pid)
     print('roundNum:', p.roundNum)
     print('roundTotal:', p.roundTotal)
@@ -137,7 +141,9 @@ def play(request, pid):
                 except Exception as e:
                     print(e)
             elif ('results' in request.POST):
-                 return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))    
+                 return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))
+            elif('settings' in request.POST):
+                return HttpResponseRedirect(reverse('settings', kwargs={'pid':pid}))
             else:
                 if p.state == 'choose_category':
                     return HttpResponseRedirect(reverse('choose_category', kwargs={'pid':pid}))
@@ -400,6 +406,60 @@ def roundResults(request, pid):
                 'category': category,
                 }    
     return render(request, 'game/roundResults.html', context)
+
+def settings(request, pid):
+    invalid = False
+    p = Party.objects.get(pk = pid)   
+    spotifyObject = spotipy.Spotify(auth=p.token)
+    deviceResults = spotifyObject.devices()
+    deviceResults = deviceResults['devices']
+    curr_devices = []
+
+    for x in deviceResults:
+        curr_devices.append(x['id'])
+                            
+    for x in deviceResults:
+        try:
+            Devices.objects.get(party=p, deviceID= x['id'])
+        except:
+            d = Devices(name = x['name'], deviceID = x['id'], party = p)
+            d.save()
+    query = Devices.objects.filter(party=p)
+
+    for x in query:
+        if x.deviceID  not in curr_devices:
+            x.delete()
+        
+    if request.method == 'POST':
+        form = settingsForm(request.POST, partyObject=p)
+
+        if form.is_valid():
+            
+            if ('back' in request.POST):
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+
+            elif ('kill' in request.POST):
+                p.delete()
+                return HttpResponseRedirect(reverse('start'))
+                
+            else:
+                device = form.cleaned_data['device']
+                if device != None:
+                    p.deviceID=device.deviceID
+                    time = form.cleaned_data['time']
+                    p.time = time
+                    p.save()
+                    return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                else:
+                    invalid = True
+    else:
+        form = settingsForm(partyObject=p, initial={'time':p.time,})
+
+    context = {
+                'form' : form,
+                'invalid':invalid,
+                }    
+    return render(request, 'game/settings.html', context)
 
 
 def getUser(request, p):
