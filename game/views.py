@@ -129,10 +129,13 @@ def play(request, pid):
             if ('like' in request.POST):
                 u.hasLiked = True
                 u.save()
-                current_song = Songs.objects.get(state='playing', category__party = p)
-                l = current_song.likes
-                l.num = l.num + 1
-                l.save()
+                try:
+                    current_song = Songs.objects.get(state='playing', category__party = p)
+                    l = current_song.likes
+                    l.num = l.num + 1
+                    l.save()
+                except Exception as e:
+                    print(e)
             elif ('results' in request.POST):
                  return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))    
             else:
@@ -419,14 +422,19 @@ def playMusic(pid):
         queue = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played').order_by('order'))
         for song in queue:
             ls = [song.uri]
-            spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
-            song.state = 'playing'
-            song.startTime = time.time()
-            song.save()
-            while(time.time() - song.startTime < p.time):
-                continue
-            song.state= 'played'
-            song.save()
+            try:
+                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+                song.state = 'playing'
+                song.startTime = time.time()
+                song.save()
+                while(time.time() - song.startTime < p.time):
+                    continue
+                song.state= 'played'
+                song.save()
+            except Exception as e:
+                song.debug = e
+                song.state = "error, not played"
+                song.save()
             users = Users.objects.filter(party = p)
             for x in users:
                 x.hasLiked = False
@@ -442,5 +450,4 @@ def playMusic(pid):
         ls.append(track['uri'])
     spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
     spotifyObject.shuffle(True, device_id = p.deviceID)
-    #next_track(device_id = p.deviceID)
     print('EXITING THREAD')

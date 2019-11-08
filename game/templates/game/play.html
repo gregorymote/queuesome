@@ -13,17 +13,17 @@
 		
 
 		{% if song.art != "lull" %}
-			<h4>{{category.name}}</h4>
+			<h5>{{category.name}}</h5>
 			<h6>{{category.leader}}'s Category</h6>
-			<img src={{song.art}} class="img-thumbnail" width="300" height="300" alt="...">
+			<img src={{song.art}} class="img-thumbnail" width="200" height="200" alt="...">
 			<div class = "pt-1">
 				<h6>{{song.name}}</h6>
 			</div>
 		{% else %}
-			<h4>{{category.name}}</h4>
+			<h5>{{category.name}}</h5>
 			<h6>{{party.name}}</h6>
 			{% load staticfiles %}
-			<img src="{% static 'images/ad.jpg' %}" class="img-thumbnail" width="300" height="300"  alt="" />
+			<img src="{% static 'images/ad.jpg' %}" class="img-thumbnail" width="200" height="200"  alt="" />
 			<div class = "pt-1">
 				<h6>Someone Needs to Choose a Category or Pick a Song</h6>
 			</div>
