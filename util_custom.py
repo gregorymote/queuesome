@@ -57,7 +57,7 @@ def generateURL(username, scope=None, client_id = None,
     token_info = sp_oauth.get_cached_token()
 
     #if not token_info:
-    auth_url = sp_oauth.get_authorize_url()
+    auth_url = sp_oauth.get_authorize_url(show_dialog=True)
 
     return auth_url
 ##    try:
