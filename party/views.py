@@ -25,7 +25,7 @@ from party.models import Devices
 my_IP='q-it-up.herokuapp.com'
 #my_IP='localhost'
 my_PORT='8000'
-secret='4ebf1b0ef7a34002bf95f8c2aa8365b0'
+secret=''
 #uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
 uri = 'http://' + my_IP + '/party/auth/'
 
@@ -139,6 +139,7 @@ def choose_device(request, pid):
 
             device = form.cleaned_data['device']
             p.deviceID=device.deviceID
+            p.save()
 
             return HttpResponseRedirect(reverse('start_party', kwargs={'pid':p.pk,}))
 
