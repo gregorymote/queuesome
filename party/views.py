@@ -29,7 +29,7 @@ secret='96427b36b111421c870825a239fe8c46'
 #uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
 uri = 'http://' + my_IP + '/party/auth/'
 
-scope = 'user-read-private user-read-playback-state user-modify-playback-state'
+scope = 'user-read-playback-state user-modify-playback-state'
 cl_id='6de276d9e60548d5b05a7af92a5db3bb'
 
 def login(request):
