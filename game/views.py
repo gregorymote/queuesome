@@ -33,17 +33,17 @@ def lobby(request, pid):
             c = Category(name='Looks Like We Got A Lull',
                          roundNum=0, party=p)
             c.save()
-            spotifyObject = spotipy.Spotify(auth=p.token)
-            searchResults = spotifyObject.search("Kickstart my heart", 1, 0, 'track')
-            tracks = searchResults['tracks']['items']
-            ls = []
-            for x in tracks:
-                ls.append(x['uri'])
-            try:    
-                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
-                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-            except:
-                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+##            spotifyObject = spotipy.Spotify(auth=p.token)
+##            searchResults = spotifyObject.search("Kickstart my heart", 1, 0, 'track')
+##            tracks = searchResults['tracks']['items']
+##            ls = []
+##            for x in tracks:
+##                ls.append(x['uri'])
+##            try:    
+##                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+##                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+##            except:
+            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
         p = Party.objects.get(pk = pid)
@@ -501,13 +501,13 @@ def playMusic(pid):
                 x.save()
 
         rN = rN + 1
-    searchResults = spotifyObject.search("Rockabye Baby!", 1, 0, "artist")
-    artist = searchResults['artists']['items'][0]['id']
-    search = spotifyObject.artist_top_tracks(artist, country='US')
-    tracks = search['tracks']
-    ls = []
-    for track in tracks:
-        ls.append(track['uri'])
-    spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
-    spotifyObject.shuffle(True, device_id = p.deviceID)
+##    searchResults = spotifyObject.search("Rockabye Baby!", 1, 0, "artist")
+##    artist = searchResults['artists']['items'][0]['id']
+##    search = spotifyObject.artist_top_tracks(artist, country='US')
+##    tracks = search['tracks']
+##    ls = []
+##    for track in tracks:
+##        ls.append(track['uri'])
+##    spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+##    spotifyObject.shuffle(True, device_id = p.deviceID)
     print('EXITING THREAD')
