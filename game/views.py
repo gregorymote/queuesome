@@ -272,8 +272,9 @@ def pickSong(request, pid):
                         artistName = x['artists'][0]['name']  
                         trackName = x['name']
                         trackURI = x['uri']
+                        url = x['external_urls']['spotify']
                         s = Searches(name = trackName + ", " + artistName,
-                                     uri=trackURI, art=albumArt, party=p, user=u)
+                                     uri=trackURI, art=albumArt, party=p, user=u, link=url)
                         s.save()
                     
                 else:
@@ -337,6 +338,7 @@ def searchResults(request, pid):
                               order=random.randint(1,101),
                               state = 'not_played',
                               likes = l,
+                              link=search.link,
                               )
                     s.save()
                     u.hasPicked = True

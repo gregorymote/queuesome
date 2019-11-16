@@ -58,6 +58,7 @@ class Songs(models.Model):
     startTime= models.FloatField(default=0)
     likes = models.ForeignKey('Likes',on_delete=models.CASCADE,)
     debug = models.CharField(max_length=1200, null=True)
+    link = models.CharField(max_length=500, null=True)
 
     def __str__(self):
         return self.name
@@ -79,5 +80,6 @@ class Searches(models.Model):
     art = models.CharField(max_length=500, null=True)
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
     user = models.ForeignKey('Users',on_delete=models.CASCADE,)
+    link = models.CharField(max_length=500, null=True)
     def __str__(self):
         return self.name
