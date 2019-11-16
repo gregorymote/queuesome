@@ -17,9 +17,9 @@
 			<h6>{{category.leader}}'s Category</h6>
 			<img src={{song.art}} class="img-thumbnail" width="200" height="200" alt="...">
 			<div class = "pt-1">
-				<a href={{song.link}}><h6>{{song.name}}</h6></a>
 				{% load staticfiles %}
 				<img src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+				<a href={{song.link}}><h6>{{song.name}}</h6></a>
 			</div>
 		{% else %}
 			<h5>{{category.name}}</h5>
