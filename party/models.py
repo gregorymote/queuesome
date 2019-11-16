@@ -3,7 +3,6 @@ import spotipy
 
 class Party(models.Model):
     name = models.CharField(max_length=100, null = True)
-    username = models.CharField(max_length=100, null = True)
     token = models.CharField(max_length=1000, null = True)
     code = models.CharField(max_length=10, null = True)
     url = models.CharField(max_length=1000, null = True)

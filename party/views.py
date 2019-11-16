@@ -36,21 +36,27 @@ def login(request):
     url = ''
     if request.method == 'POST':
 
-        form = LoginForm(request.POST)
+        form = blankForm(request.POST)
         if form.is_valid():
            
-            uname = form.cleaned_data['username']
+            uname = 'temp'
             
-            unique = False
-
-            while not unique:
-                auth_code = getCode(4)
-                try:
-                    Party.objects.get(code=auth_code)
-                except:
-                    unique = True
-            p = Party(name='creating party', code=auth_code, username=uname)
+            p = Party(name='creating party')
             p.save()
+
+            Users.objects.filter(sessionID=request.session.session_key).delete()
+            
+            u = Users(
+                name = 'Host',
+                party = p,
+                sessionID = request.session.session_key,
+                points = 0,
+                isHost = True,
+                hasSkip = True,
+                hasPicked = False,
+                turn = "not_picked",
+                )
+            u.save()
             
             try:
                 url = util.generateURL(uname, scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
@@ -60,54 +66,17 @@ def login(request):
 
             p.url_open = url
             p.save()
-            return HttpResponseRedirect(reverse('your_code', kwargs={'pid':p.pk, 'code':auth_code}))
+            
+            return HttpResponseRedirect(url)
             
     else:
-        form = LoginForm(initial= {'username' : ''})
+        form = blankForm(initial= {'blank' : ''})
     
     context = {
         'form' : form,
         }
 
     return render(request, 'party/login.html', context)
-
-def your_code(request, pid, code):
-
-    #if not checkPermission(pid, request):
-        #return HttpResponseRedirect(reverse('start'))
-        
-    
-    p = Party.objects.get(pk = pid)
-    
-    isVisible = False
-    
-    if p.url != None and p.token == None:
-        
-        try:
-            p.token = util.createToken(p.url, p.username, scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
-            p.save()
-        except (AttributeError, JSONDecodeError):
-            os.remove(f".cache-{username}")
-            p.token = util.createToken(p.url, p.username, scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
-            p.save()
-        isVisible = True
-
-    if request.method == 'POST':
-        form = blankForm(request.POST)
-
-        if form.is_valid():
-            return HttpResponseRedirect(reverse('choose_device', kwargs={'pid':p.pk,}))
-
-    else:
-        form = blankForm(initial ={'blank':''})
-
-    context = {
-               'form':form,
-               'code':code,
-               'isVisible': isVisible,
-               'url': p.url_open,
-               }
-    return render(request, 'party/your_code.html', context)
 
 
 def choose_device(request, pid):
@@ -151,41 +120,28 @@ def choose_device(request, pid):
     return render(request, 'party/choose_device.html',context)
 
 
-
 def auth(request):
-
+    u = Users.objects.get(sessionID=request.session.session_key)
+    p = u.party
     url = getURL(str(request.get_full_path))
+    p.url = url
+    p.save()
 
-    if request.method == 'POST':
+    try:
+        p.token = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+        p.save()
+    except (AttributeError, JSONDecodeError):
+        os.remove(f".cache-temp")
+        p.token = util.createToken(p.url, 'temp', scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
+        p.save()
+   
+    return HttpResponseRedirect(reverse('choose_device', kwargs={'pid':p.pk,}))
 
-        form = AuthForm(request.POST)
-
-        if form.is_valid():
-            auth_code = form.cleaned_data['auth_code']
-            try:
-                p = Party.objects.get(code=auth_code)
-                p.url = url
-                p.url_open = ''
-                p.save()
-                return HttpResponseRedirect(reverse('complete'))
-            except:
-                print("could not find party with auth code: " + auth_code)
-    else:
-        form = AuthForm(initial={'auth_code':''})
-    
-    context = {'form': form,}
-    
-    return render(request, 'party/auth.html', context)
-
-
-def complete(request):
-
-    return render(request, 'party/complete.html')
 
 def name_party(request, pid):
 
     p = Party.objects.get(pk = pid)
-
+    u = getUser(request, p)
     if p.started:
         
         return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
@@ -212,17 +168,7 @@ def name_party(request, pid):
                     unique = True
                    
             p.save()
-            
-            u = Users(
-                name = form.cleaned_data['user_name'],
-                party = p,
-                sessionID = request.session.session_key,
-                points = 0,
-                isHost = True,
-                hasSkip = True,
-                hasPicked = False,
-                turn = "not_picked",
-                )
+            u.name = form.cleaned_data['user_name']
             u.save()
                 
             return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
@@ -298,7 +244,7 @@ def isValid(num):
 
     
 def getURL(path):
-
+    print('path:', path)
     i = 0
     while path[i] != '/':
         i = i + 1
