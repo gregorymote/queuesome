@@ -494,6 +494,9 @@ def playMusic(pid):
                 song.state= 'played'
                 song.save()
             except Exception as e:
+                print("***********************")
+                print(e)
+                print("***********************")
                 song.debug = e
                 song.state = "error, not played"
                 song.save()
