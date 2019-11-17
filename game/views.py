@@ -125,6 +125,14 @@ def play(request, pid):
         if not isPlaying:
             t = threading.Thread(target=playMusic, args=(pid,))
             t.start()
+            
+    if p.state == 'choose_category' and Users.objects.filter(party=p, turn='not_picked') and not Users.objects.filter(party=p, turn='picking'):
+        x = Users.objects.filter(party=p, turn='not_picked')
+        if x:
+            x = list(x)
+            lead = x[0]
+            lead.turn = 'picking'
+            lead.save()
         
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -467,9 +475,10 @@ def settings(request, pid):
 def getUser(request, p):
     
     sk = request.session.session_key
-    current_user = Users.objects.filter(sessionID = sk, party = p)
-    current_user = list(current_user)
-    u = current_user[0]
+    try:
+        u = Users.objects.get(sessionID = sk, party = p)
+    except:
+        return HttpResponseRedirect(reverse('start'))
     return u
 
 def playMusic(pid):
