@@ -7,6 +7,8 @@ import time
 import random
 import util_custom as util
 from json.decoder import JSONDecodeError
+from ast import literal_eval
+from spotipy import oauth2
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -81,7 +83,8 @@ def login(request):
 
 def choose_device(request, pid):
     
-    p = Party.objects.get(pk = pid)   
+    p = Party.objects.get(pk = pid)
+    checkToken(p.token_info, pid)
     spotifyObject = spotipy.Spotify(auth=p.token)
     deviceResults = spotifyObject.devices()
     deviceResults = deviceResults['devices']
@@ -128,11 +131,15 @@ def auth(request):
     p.save()
 
     try:
-        p.token = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+        p.token = token_info['access_token']
+        p.token_info = token_info
         p.save()
     except (AttributeError, JSONDecodeError):
         os.remove(f".cache-temp")
-        p.token = util.createToken(p.url, 'temp', scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
+        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+        p.token = token_info['access_token']
+        p.token_info = token_info
         p.save()
    
     return HttpResponseRedirect(reverse('choose_device', kwargs={'pid':p.pk,}))
@@ -277,5 +284,28 @@ def checkPermission(pid, request):
         return True
     else:
         return False
-                                         
+
+def checkToken(token_info, pid):
+
+    token_info = literal_eval(token_info)
+    print('Expires in: ', token_info['expires_at'] - time.time())
+    p = Party.objects.get(pk = pid)
+    
+    cache_path = ".cache-" + 'temp'
+
+    sp_oauth = oauth2.SpotifyOAuth(cl_id, secret, uri, 
+        scope=scope, cache_path=cache_path)
+    
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        print('token_info:', token_info)
+        p.token = token_info['access_token'] ##
+        p.token_info = token_info
+        p.save()
+        print("TOKEN REFRESHED")
+        return p.token
+    else:
+        print("TOKEN STILL VALID")
+        return None
+                              
                                            

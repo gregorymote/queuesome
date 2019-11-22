@@ -10,6 +10,7 @@ from party.models import Likes
 from party.models import Songs
 from party.models import Searches
 from party.models import Devices
+from party.views import checkToken
 from game.forms import blankForm
 from game.forms import chooseCategoryForm
 from game.forms import searchForm
@@ -266,7 +267,7 @@ def pickSong(request, pid):
 
         if form.is_valid():
             
-
+            checkToken(p.token_info, pid)
             spotifyObject = spotipy.Spotify(auth=p.token)
             
             search = form.cleaned_data['search']
@@ -361,6 +362,7 @@ def searchResults(request, pid):
                 return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
 
             elif('artist' in request.POST):
+                checkToken(p.token_info, pid)
                 spotifyObject = spotipy.Spotify(auth=p.token)
                 search = form.cleaned_data['results']
                 if search != None:
@@ -419,7 +421,8 @@ def roundResults(request, pid):
 
 def settings(request, pid):
     invalid = False
-    p = Party.objects.get(pk = pid)   
+    p = Party.objects.get(pk = pid)
+    checkToken(p.token_info, pid)
     spotifyObject = spotipy.Spotify(auth=p.token)
     deviceResults = spotifyObject.devices()
     deviceResults = deviceResults['devices']
@@ -486,6 +489,7 @@ def playMusic(pid):
     p = Party.objects.get(pk = pid)
     rN = p.roundNum
     print ('rN:', rN)
+    checkToken(p.token_info, pid)
     spotifyObject = spotipy.Spotify(auth=p.token)
     while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played')):
        
@@ -494,6 +498,9 @@ def playMusic(pid):
         for song in queue:
             ls = [song.uri]
             try:
+                check = checkToken(p.token_info, pid)
+                if check != None:
+                    spotifyObject = spotipy.Spotify(auth=check)
                 spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
                 song.state = 'playing'
                 song.startTime = time.time()
@@ -506,7 +513,6 @@ def playMusic(pid):
                 print("***********************")
                 print(e)
                 print("***********************")
-                song.debug = e
                 song.state = "error, not played"
                 song.save()
             users = Users.objects.filter(party = p)
