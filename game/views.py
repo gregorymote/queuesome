@@ -25,6 +25,9 @@ import threading
 
 def lobby(request, pid):
 
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+
     p = Party.objects.get(pk = pid)
     
     if request.method == 'POST':
@@ -76,17 +79,18 @@ def lobby(request, pid):
 
 
 def play(request, pid):
-    try:
-        p = Party.objects.get(pk = pid)
-    except:
+
+    if not checkActive(pid):
         return HttpResponseRedirect(reverse('start'))
-    u = getUser(request, pid)
-    print('roundNum:', p.roundNum)
-    print('roundTotal:', p.roundTotal)
-    print('state:', p.state)
     
-    if p.state == 'assign':
+    p = Party.objects.get(pk = pid)
+    u = getUser(request, pid)
+    
+    if p.state == 'assign' and u.isHost:
         x = Users.objects.filter(party=p, turn='not_picked')
+        print('****')
+        print(x)
+        print('****')
         
         if x:
             x = list(x)
@@ -192,6 +196,10 @@ def play(request, pid):
 
 
 def chooseCat(request, pid):
+
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+    
     default = ''
     p = Party.objects.get(pk=pid)
     u = getUser(request, pid)
@@ -253,6 +261,10 @@ def createCategory(choice, request, p):
     p.save()
 
 def pickSong(request, pid):
+
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+    
     invalid = False
     p = Party.objects.get(pk=pid)
     u = getUser(request, p)
@@ -310,6 +322,9 @@ def pickSong(request, pid):
     return render(request, 'game/pickSong.html', context)
 
 def searchResults(request, pid):
+
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
 
     invalid = False
     
@@ -396,6 +411,9 @@ def searchResults(request, pid):
 
 def roundResults(request, pid):
 
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+
     p = Party.objects.get(pk=pid)
     if p.roundNum > 1:
         songs = list(Songs.objects.filter(category__roundNum = p.roundNum - 1, category__party = p).order_by('-likes__num'))
@@ -420,6 +438,10 @@ def roundResults(request, pid):
     return render(request, 'game/roundResults.html', context)
 
 def settings(request, pid):
+
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+    
     invalid = False
     p = Party.objects.get(pk = pid)
     checkToken(p.token_info, pid)
@@ -452,7 +474,8 @@ def settings(request, pid):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
 
             elif ('kill' in request.POST):
-                p.delete()
+                p.active = False
+                p.save()
                 return HttpResponseRedirect(reverse('start'))
                 
             else:
@@ -483,6 +506,13 @@ def getUser(request, p):
     except:
         return HttpResponseRedirect(reverse('start'))
     return u
+
+def checkActive(pid):
+    try:
+        p = Party.objects.get(pk = pid)
+        return p.active
+    except:
+        return False      
 
 def playMusic(pid):
     
