@@ -54,6 +54,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SESSION_SAVE_EVERY_REQUEST = True
+
 ROOT_URLCONF = 'queue_it_up.urls'
 
 TEMPLATES = [
@@ -78,6 +80,7 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+##SQL Lite
 ##DATABASES = {
 ##    'default': {
 ##        'ENGINE': 'django.db.backends.sqlite3',
@@ -85,19 +88,21 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 ##    }
 ##}
 
-##DATABASES = {
-##    'default': {
-##        'ENGINE': 'django.db.backends.postgresql',
-##        'NAME': 'queue_it_up',
-##        'USER': 'admin',
-##        'PASSWORD': 'admin',
-##        'HOST': '127.0.0.1',
-##        'PORT': '',
-##    }
-##}
+##Local Postgresql
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'queue_it_up',
+        'USER': 'admin',
+        'PASSWORD': 'admin',
+        'HOST': '127.0.0.1',
+        'PORT': '',
+    }
+}
 
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+##Heroku Postgresql
+##DATABASES = {}
+##DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
