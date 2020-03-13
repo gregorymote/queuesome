@@ -39,9 +39,12 @@
 			<div class = "col text-right">
 				<form action="" method="post">
 					{% csrf_token %}
+					<button class="btn text-white bg-primary btn-lg" name = "code">QR <i class="fa fa-qrcode"></i></button>
 					{% if access %}
 						<input type="submit" class="btn btn-outline-primary btn-lg" value="Let's Go">
 					{% endif %}
+
+					
 				</form>
 			</div>
 			
@@ -69,5 +72,7 @@
 
 		</div>
 	</div>
+
+
 </html>
 {% endblock %}

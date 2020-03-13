@@ -34,20 +34,23 @@ def lobby(request, pid):
         form = blankForm(request.POST)
 
         if form.is_valid():
-            c = Category(name='Looks Like We Got A Lull',
-                         roundNum=0, party=p)
-            c.save()
-##            spotifyObject = spotipy.Spotify(auth=p.token)
-##            searchResults = spotifyObject.search("Kickstart my heart", 1, 0, 'track')
-##            tracks = searchResults['tracks']['items']
-##            ls = []
-##            for x in tracks:
-##                ls.append(x['uri'])
-##            try:    
-##                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
-##                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-##            except:
-            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+            if ('code' in request.POST):
+                return HttpResponseRedirect(reverse('code', kwargs={'pid':pid}))
+            else:
+                c = Category(name='Looks Like We Got A Lull',
+                             roundNum=0, party=p)
+                c.save()
+    ##            spotifyObject = spotipy.Spotify(auth=p.token)
+    ##            searchResults = spotifyObject.search("Kickstart my heart", 1, 0, 'track')
+    ##            tracks = searchResults['tracks']['items']
+    ##            ls = []
+    ##            for x in tracks:
+    ##                ls.append(x['uri'])
+    ##            try:    
+    ##                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+    ##                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+    ##            except:
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
         p = Party.objects.get(pk = pid)
@@ -76,6 +79,24 @@ def lobby(request, pid):
     
     return render(request, 'game/lobby.html', context)
 
+
+def code(request, pid):
+
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+   
+    if request.method == 'POST':
+        form = blankForm(request.POST)
+
+        if form.is_valid():
+            return HttpResponseRedirect(reverse('lobby', kwargs={'pid':pid}))
+    else:
+        form = blankForm(initial={'text':'blank',})
+
+    context = {
+                'form' : form,
+                }    
+    return render(request, 'game/code.html', context)
 
 
 def play(request, pid):

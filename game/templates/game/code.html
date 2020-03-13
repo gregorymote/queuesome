@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script>
+		$(document).ready(function () {
+			$("#myModal").modal('show');
+
+		});
+	</script>
+</head>
+
+<body>
+
+
+	<!-- Modal -->
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static"
+		aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="exampleModalCenterTitle"></h3>
+				</div>
+				<div class="modal-body text-center">
+					{% load staticfiles %}
+			        <img src="{% static 'images/qr_code.png' %}" class="img-thumbnail" width="200" height="200"  alt="" />
+				</div>
+				<div class="modal-footer">
+					<form action="" method="post">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-secondary" value="Close"></input>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
+{% endblock %}
