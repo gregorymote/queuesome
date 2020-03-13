@@ -28,8 +28,8 @@ my_IP='q-it-up.herokuapp.com'
 #my_IP='localhost'
 my_PORT='8000'
 secret='96427b36b111421c870825a239fe8c46'
-uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
-#uri = 'http://' + my_IP + '/party/auth/'
+#uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
+uri = 'http://' + my_IP + '/party/auth/'
 
 scope = 'user-read-playback-state user-modify-playback-state'
 cl_id='6de276d9e60548d5b05a7af92a5db3bb'
@@ -61,10 +61,10 @@ def login(request):
             u.save()
             
             try:
-                url = util.generateURL(uname, scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+                url = util.generateURL(uname, scope, client_id=cl_id, client_secret=secret, redirect_uri=uri)
             except (AttributeError, JSONDecodeError):
                 os.remove(f".cache-{username}")
-                url = util.generateURL(username, scope, client_id=cl_id ,client_secret=secret, redirect_uri= uri)
+                url = util.generateURL(username, scope, client_id=cl_id ,client_secret=secret, redirect_uri=uri)
 
             p.url_open = url
             p.save()
@@ -131,13 +131,13 @@ def auth(request):
     p.save()
 
     try:
-        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri, show_dialog=False)
         p.token = token_info['access_token']
         p.token_info = token_info
         p.save()
     except (AttributeError, JSONDecodeError):
         os.remove(f".cache-temp")
-        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
+        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri, show_dialog=False)
         p.token = token_info['access_token']
         p.token_info = token_info
         p.save()

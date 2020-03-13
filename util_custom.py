@@ -7,7 +7,7 @@ import spotipy.oauth2 as oauth2
 import spotipy
 
 def generateURL(username, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None):
+        client_secret = None, redirect_uri = None, cache_path = None, show_dialog=True):
     ''' prompts the user to login if necessary and returns
         the user token suitable for use with the spotipy.Spotify 
         constructor
@@ -22,7 +22,7 @@ def generateURL(username, scope=None, client_id = None,
          - cache_path - path to location to save tokens
 
     '''
-
+    
     if not client_id:
         client_id = os.getenv('SPOTIPY_CLIENT_ID')
 
@@ -48,16 +48,16 @@ def generateURL(username, scope=None, client_id = None,
 
     cache_path = cache_path or ".cache-" + username
     sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, 
-        scope=scope, cache_path=cache_path)
+        scope=scope, cache_path=cache_path,show_dialog=show_dialog)
 
     # try to get a valid token for this user, from the cache,
     # if not in the cache, the create a new (this will send
     # the user to a web page where they can authorize this app)
 
-    token_info = sp_oauth.get_cached_token()
+    #token_info = sp_oauth.get_cached_token()
 
     #if not token_info:
-    auth_url = sp_oauth.get_authorize_url(show_dialog=True)
+    auth_url = sp_oauth.get_authorize_url()
 
     return auth_url
 ##    try:
@@ -67,12 +67,12 @@ def generateURL(username, scope=None, client_id = None,
 ##        print("")
     
 def createToken(url, username, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None):
+        client_secret = None, redirect_uri = None, cache_path = None, show_dialog=True):
 
     cache_path = cache_path or ".cache-" + username
     
     sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, 
-        scope=scope, cache_path=cache_path)
+        scope=scope, cache_path=cache_path, show_dialog=show_dialog)
 
     
 
