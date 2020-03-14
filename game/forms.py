@@ -16,7 +16,6 @@ class chooseCategoryForm(forms.Form):
 class searchForm(forms.Form):
     search = forms.CharField(label = 'search', required = False)
     
-    choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
 
 class searchResultsForm(forms.Form):
     results = forms.ModelChoiceField(queryset=Searches.objects.all(), required=False)
