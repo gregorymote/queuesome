@@ -166,6 +166,7 @@ def play(request, pid):
         if form.is_valid():
             if ('like' in request.POST):
                 u.hasLiked = True
+                u.points = u.points + 1
                 u.save()
                 try:
                     current_song = Songs.objects.get(state='playing', category__party = p)
@@ -174,6 +175,18 @@ def play(request, pid):
                     l.save()
                 except Exception as e:
                     print(e)
+            elif ('dislike' in request.POST):
+                u.hasLiked = True
+                u.points = u.points - 1
+                u.save()
+                try:
+                    current_song = Songs.objects.get(state='playing', category__party = p)
+                    l = current_song.likes
+                    l.num = l.num - 1
+                    l.save()
+                except Exception as e:
+                    print(e)
+            
             elif ('results' in request.POST):
                  return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))
             elif('settings' in request.POST):
@@ -600,7 +613,10 @@ def playMusic(pid):
                 song.state = 'playing'
                 song.startTime = time.time()
                 song.save()
+               # num = len(list(Users.objects.filter(party = p))) * (-2/3)
                 while(time.time() - song.startTime < p.time):
+                    #if num >= song.likes.num:
+                       # break
                     continue
                 song.state= 'played'
                 song.save()
