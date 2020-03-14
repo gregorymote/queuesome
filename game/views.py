@@ -306,33 +306,21 @@ def pickSong(request, pid):
             spotifyObject = spotipy.Spotify(auth=p.token)
             
             search = form.cleaned_data['search']
-            choice =  form.cleaned_data['choice_field']
             if search != "":
-                if int(choice) == 1: #Search for Track
-                    searchResults = spotifyObject.search(search, 5, 0, 'track')
-                    tracks = searchResults['tracks']['items'] 
-                    for x in tracks:
-                        albumArt = x['album']['images'][0]['url']
-                        artistName = x['artists'][0]['name']  
-                        trackName = x['name']
-                        trackURI = x['uri']
-                        url = x['external_urls']['spotify']
-                        s = Searches(name = trackName + ", " + artistName,
-                                     uri=trackURI, art=albumArt, party=p, user=u, link=url)
-                        s.save()
-                    
-                else:
-                    searchResults = spotifyObject.search(search, 5, 0, "artist")
-                    artists = searchResults['artists']['items']
+                searchResults = spotifyObject.search(search, 15, 0, 'track')
+                tracks = searchResults['tracks']['items'] 
+                for x in tracks:
+                    albumArt = x['album']['images'][0]['url']
+                    artistName = x['artists'][0]['name']  
+                    trackName = x['name']
+                    trackURI = x['uri']
+                    url = x['external_urls']['spotify']
+                    s = Searches(name = trackName + ", " + artistName,
+                                    uri=trackURI, art=albumArt, party=p, user=u, link=url)
+                    s.save()
 
-                    for x in artists:
-                        s = Searches(name = x['name'], uri = x['id'], party=p, user=u)
-                        s.save()
-                    
+            return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
 
-                return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
-            else:
-                invalid = True
     else:
 
         form = searchForm(initial={'search':'',})
