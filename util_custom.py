@@ -75,7 +75,7 @@ def generateURL(username, scope=None, client_id = None,
 def createToken(url, username, scope=None, client_id = None,
         client_secret = None, redirect_uri = None, cache_path = None, show_dialog=False):
 
-    cache_path = cache_path or ".cache-" + username
+    cache_path = cache_path #or ".cache-" + username
     
     sp_oauth = oauth2.SpotifyOAuth(
         client_id,
