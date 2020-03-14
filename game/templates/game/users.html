@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<html lang="en">
+<div class="container">
+	<div class="text-center">
+		<h5>Users</h5>
+	</div>
+	<form action="" method="post">
+        {% csrf_token %}
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Picked Song?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{u.name}}</td>
+                    {% for key, value in decode.items %} 
+                    {% if key == u.turn %}
+                    <td>{{value}}</td>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% for key, value in decode.items %} 
+                    {% if key == "True" and u.hasPicked %}
+                    <td>{{value}}</td>
+                    {% elif key == "False" and not u.hasPicked %}
+                    <td>{{value}}</td>
+                    {% endif %}
+                    {% endfor %}
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+		<div class="text-right pt-3">
+            <input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
+            {% if isHost %}
+			<input type="submit" class="btn btn-outline-primary" name="skip" value="Skip to Next Round"></input>
+            {% endif %}
+        </div>
+
+		
+	</form>
+</div>
+
+</html>
+{% endblock %}

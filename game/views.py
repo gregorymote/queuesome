@@ -178,6 +178,8 @@ def play(request, pid):
                  return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))
             elif('settings' in request.POST):
                 return HttpResponseRedirect(reverse('settings', kwargs={'pid':pid}))
+            elif('users' in request.POST):
+                return HttpResponseRedirect(reverse('users', kwargs={'pid':pid}))
             else:
                 if p.state == 'choose_category':
                     return HttpResponseRedirect(reverse('choose_category', kwargs={'pid':pid}))
@@ -517,6 +519,60 @@ def settings(request, pid):
                 'invalid':invalid,
                 }    
     return render(request, 'game/settings.html', context)
+
+def users(request, pid):
+
+    p = Party.objects.get(pk = pid)
+    u = getUser(request, p)
+    if u.isHost:
+        isHost = True
+    else:
+        isHost = False
+    users = Users.objects.filter(party=p)
+
+    if not checkActive(pid):
+        return HttpResponseRedirect(reverse('start'))
+
+
+    if request.method == 'POST':
+        form = blankForm(request.POST)
+
+        if form.is_valid():
+            if ('back' in request.POST):
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+            elif ('skip' in request.POST):
+                not_picked = Users.objects.filter(party=p, hasPicked=False)
+                for u in not_picked:
+                    u.hasPicked=True
+                    u.save()
+                picking = Users.objects.filter(party=p, turn='picking')
+                if picking:
+                    for u in picking:
+                        u.turn='has_picked'
+                        u.save()
+                if p.state != 'pick_song':
+                    p.state = 'pick_song'
+                    p.save()
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+    else:
+        form = blankForm(initial={'text':'blank',})
+    
+    decode = {
+              'True':'Yes',
+              'False':'No',
+              'picking':'Picking',
+              'not_picked':'Not Picked',
+              'has_picked':'Has Picked'
+              }
+    
+    context = {
+                'form' : form,
+                'users':users,
+                'decode':decode,
+                'isHost':isHost,
+                
+                }    
+    return render(request, 'game/users.html', context)
 
 
 def getUser(request, p):

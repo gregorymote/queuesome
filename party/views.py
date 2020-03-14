@@ -27,7 +27,7 @@ from party.models import Devices
 #my_IP='q-it-up.herokuapp.com'
 my_IP='localhost'
 my_PORT='8000'
-secret='<your secret here>'
+secret='96427b36b111421c870825a239fe8c46'
 uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'
 #uri = 'http://' + my_IP + '/party/auth/'
 
@@ -64,7 +64,7 @@ def login(request):
                 url = util.generateURL(uname, scope, client_id=cl_id, client_secret=secret, redirect_uri=uri)
             except (AttributeError, JSONDecodeError):
                 os.remove(f".cache-{username}")
-                url = util.generateURL(username, scope, client_id=cl_id ,client_secret=secret, redirect_uri=uri)
+                url = util.generateURL(uname, scope, client_id=cl_id ,client_secret=secret, redirect_uri=uri)
 
             p.url_open = url
             p.save()
@@ -129,9 +129,9 @@ def auth(request):
     url = getURL(str(request.get_full_path))
     p.url = url
     p.save()
-
+    
     try:
-        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri, show_dialog=False)
+        token_info = util.createToken(p.url, 'temp', scope, client_id=cl_id, client_secret=secret, redirect_uri= uri)
         p.token = token_info['access_token']
         p.token_info = token_info
         p.save()
@@ -281,9 +281,9 @@ def checkPermission(pid, request):
     p = Party.objects.get(pk = pid)
     u = getUser(request, p)
 
-    queury = Users.objects.filter(party = p, pk=u.pk)
+    query = Users.objects.filter(party = p, pk=u.pk)
 
-    if queury:
+    if query:
         return True
     else:
         return False

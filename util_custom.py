@@ -47,8 +47,14 @@ def generateURL(username, scope=None, client_id = None,
         raise spotipy.SpotifyException(550, -1, 'no credentials set')
 
     cache_path = cache_path or ".cache-" + username
-    sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, 
-        scope=scope, cache_path=cache_path,show_dialog=show_dialog)
+    sp_oauth = oauth2.SpotifyOAuth(
+        client_id,
+        client_secret,
+        redirect_uri, 
+        scope=scope,
+        cache_path=cache_path,
+        show_dialog=show_dialog
+    )
 
     # try to get a valid token for this user, from the cache,
     # if not in the cache, the create a new (this will send
@@ -67,19 +73,22 @@ def generateURL(username, scope=None, client_id = None,
 ##        print("")
     
 def createToken(url, username, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None, show_dialog=True):
+        client_secret = None, redirect_uri = None, cache_path = None, show_dialog=False):
 
     cache_path = cache_path or ".cache-" + username
     
-    sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, 
-        scope=scope, cache_path=cache_path, show_dialog=show_dialog)
-
+    sp_oauth = oauth2.SpotifyOAuth(
+        client_id,
+        client_secret,
+        redirect_uri, 
+        scope=scope,
+        cache_path=cache_path,
+        show_dialog=show_dialog
+    )
     
-
-    response = url
-    
-    code = sp_oauth.parse_response_code(response)
+    code = sp_oauth.parse_response_code(url)
     token_info = sp_oauth.get_access_token(code)
+
     # Auth'ed API request
     if token_info:
         return token_info
