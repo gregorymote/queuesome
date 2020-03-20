@@ -75,7 +75,7 @@ def generateURL(username, scope=None, client_id = None,
 def createToken(url, username, scope=None, client_id = None,
         client_secret = None, redirect_uri = None, cache_path = None, show_dialog=False):
 
-    cache_path = cache_path or ".cache-" + username
+    cache_path = cache_path or ".cache-" + "doesnotexist"
     
     sp_oauth = oauth2.SpotifyOAuth(
         client_id,
@@ -87,7 +87,7 @@ def createToken(url, username, scope=None, client_id = None,
     )
     
     code = sp_oauth.parse_response_code(url)
-    token_info = sp_oauth.get_access_token(code)
+    token_info = sp_oauth.get_access_token(code, check_cache=False)
 
     # Auth'ed API request
     if token_info:

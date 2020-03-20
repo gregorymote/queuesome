@@ -22,6 +22,7 @@ import time
 import random
 import os
 import threading
+import math
 
 def lobby(request, pid):
 
@@ -174,6 +175,17 @@ def play(request, pid):
                     l.save()
                 except Exception as e:
                     print(e)
+            elif ('dislike' in request.POST):
+                u.hasLiked = True
+                u.save()
+                try:
+                    current_song = Songs.objects.get(state='playing', category__party = p)
+                    l = current_song.likes
+                    l.num = l.num - 1
+                    l.save()
+                except Exception as e:
+                    print(e)
+            
             elif ('results' in request.POST):
                  return HttpResponseRedirect(reverse('round_results', kwargs={'pid':pid}))
             elif('settings' in request.POST):
@@ -615,9 +627,18 @@ def playMusic(pid):
                 song.state = 'playing'
                 song.startTime = time.time()
                 song.save()
+
+                num = len(list(Users.objects.filter(party = p))) * (-1) + 1
+                if num == 0:
+                    num = -1
+                print("num: ", num, " likes: ", song.likes.num)
+
                 while(time.time() - song.startTime < p.time):
+                    if Songs.objects.filter(pk=song.pk, likes__num__lte=num):
+                        break
                     continue
                 song.state= 'played'
+
                 song.save()
             except Exception as e:
                 print("***********************")
@@ -629,6 +650,12 @@ def playMusic(pid):
             for x in users:
                 x.hasLiked = False
                 x.save()
+        songs = Songs.objects.filter(category__party=p, category__roundNum = rN)
+        for s in songs:
+            u = s.user
+            u.points = u.points + s.likes.num
+            u.save()
+            
         rN = rN + 1
 ##    searchResults = spotifyObject.search("Rockabye Baby!", 1, 0, "artist")
 ##    artist = searchResults['artists']['items'][0]['id']

@@ -40,6 +40,7 @@
 								<th>Name</th>
 								<th>Song</th>
 								<th>Likes</th>
+								<th>Total</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -48,6 +49,7 @@
 								<td>{{s.user.name}}</td>
 								<td>{{s.name}}</td>
 								<td>{{s.likes.num}}</td>
+								<td>{{s.user.points}}</td>
 							</tr>
 							{% endfor %}
 						</tbody>

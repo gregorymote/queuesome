@@ -89,20 +89,20 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 ##}
 
 ##Local Postgresql
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'queue_it_up',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': '127.0.0.1',
-        'PORT': '',
-    }
-}
+##DATABASES = {
+##    'default': {
+##        'ENGINE': 'django.db.backends.postgresql',
+##        'NAME': 'queue_it_up',
+##        'USER': 'admin',
+##        'PASSWORD': 'admin',
+##        'HOST': '127.0.0.1',
+##        'PORT': '',
+##    }
+##}
 
-##Heroku Postgresql
-##DATABASES = {}
-##DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+####Heroku Postgresql
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -139,8 +139,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-PROJECT_ROOT   =   os.path.join(os.path.abspath(__file__))
-#PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#PROJECT_ROOT   =   os.path.join(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(PROJECT_ROOT,'staticfiles')
 STATIC_URL = '/static/'
 

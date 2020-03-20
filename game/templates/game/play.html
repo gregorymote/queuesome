@@ -48,9 +48,10 @@
 				{% endif %}
 				
 				
-				{% if not user.hasLiked and song.art != "lull" %}
-				
+				{% if not user.hasLiked and song.art != "lull" and song.user != user %}
 				<button class="btn btn-outline-primary" name = "like"><i class="fa fa-thumbs-o-up"></i></button>
+				<button class="btn btn-outline-primary" name = "dislike"><i class="fa fa-thumbs-o-down"></i></button>
+				
 				
 				{% endif %}
 				</div>
