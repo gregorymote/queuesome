@@ -25,7 +25,7 @@ from party.models import Users
 from party.models import Devices
 
 #my_IP='q-it-up.herokuapp.com'
-my_IP='localhost'
+my_IP='192.168.1.8'
 my_PORT='8000'
 secret='96427b36b111421c870825a239fe8c46'
 uri = 'http://' + my_IP + ':' + my_PORT + '/party/auth/'

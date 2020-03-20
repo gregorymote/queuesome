@@ -1,65 +1,115 @@
 <!DOCTYPE html>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
-
 {% block page_content %}
 <html lang="en">
 
+<script type="text/javascript">
 	
+	$(document).ready(function() {
+		$('#id_results').change(function() {
+		var x = document.getElementById("id_results").selectedIndex;
+		var y = document.getElementById("id_results").options;		
+		var z = y[x].index;
+		if(z==0){
+			var album = "https://drive.google.com/uc?id=1U30oo8mIVzZnn4pIl06SH1StSsBpaq7F"
+		}
+		else if(z==1){
+			var album = '{{albumSearch.0.art}}';
+		}
+		else if(z==2){
+			var album = '{{albumSearch.1.art}}';
+		}
+		else if(z==3){
+			var album = '{{albumSearch.2.art}}';
+		}
+		else if(z==4){
+			var album = '{{albumSearch.3.art}}';
+		}
+		else if(z==5){
+			var album = '{{albumSearch.4.art}}';
+		}
+		else if(z==6){
+			var album = '{{albumSearch.5.art}}';
+		}
+		else if(z==7){
+			var album = '{{albumSearch.6.art}}';
+		}
+		else if(z==8){
+			var album = '{{albumSearch.7.art}}';
+		}
+		else if(z==9){
+			var album = '{{albumSearch.8.art}}';
+		}
+		else if(z==10){
+			var album = '{{albumSearch.9.art}}';
+		}
+		else if(z==11){
+			var album = '{{albumSearch.10.art}}';
+		}
+		else if(z==12){
+			var album = '{{albumSearch.11.art}}';
+		}
+		else if(z==13){
+			var album = '{{albumSearch.12.art}}';
+		}
+		else if(z==14){
+			var album = '{{albumSearch.13.art}}';
+		}
+		else if(z==15){
+			var album = '{{albumSearch.14.art}}';
+		}
+		else {
+			var album = "https://drive.google.com/uc?id=1U30oo8mIVzZnn4pIl06SH1StSsBpaq7F"
+		}
+		document.getElementById('output').innerHTML = '<img src="'+ album + '" class="img-thumbnail" width="200" height="200" alt="...">';
+		})
+	});
+
+</script>
 	<body>
-	
-		
-		<div class="container">
-			
-				<div>
-					<h4>Search Results</h4>
-					 <form action="" method="post">
-
-						{% csrf_token %}
-						<table>
-							<tbody>
-								
-								<tr>
-									<td>
-										
-										{{ form.results }}
-										
-									</td>
-
-								</tr>
-								
-							{% if invalid and isArtist %}
-								<div class="alert alert-info">
-									select a valid artist
-								</div>
-							
-							{% elif invalid and not isArtist  %}
-								<div class="alert alert-info">
-									select a valid song
-								</div>
-							{% endif %}
-			
-								<tr>
-									<td>
-									<div class = "pt-2">
-									<input type="submit" class="btn btn-outline-primary btn-sm" name="back"  value="Back">
-									{% if isArtist %}
-									<input type="submit" class="btn btn-outline-primary btn-sm" name="artist" value="Search Artist's Songs">
-									{% else %}
-									<input type="submit" class="btn btn-outline-primary btn-sm" name="add2q" value="Add to Queue">
-									{% endif %}
+		<div class="container text">	
+			<div>
+				<h4>Search Results</h4>
+				<form action="" method="post">
+					{% csrf_token %}
+					<table>
+						<tbody>
+							<tr>
+								<td>
+									<div class = "pt-1">
+										<div id="output"></div>																							
 									</div>
-									</td>
-								<tr>
-							</tbody>
-						</table>
-				
-					</form>
-				</div>
-			
+									{{ form.results }}	
+								</td>
+							</tr>
+						{% if invalid and isArtist %}
+							<div class="alert alert-info">
+								select a valid artist
+							</div>	
+						{% elif invalid and not isArtist  %}
+							<div class="alert alert-info">
+								select a valid song
+							</div>
+						{% endif %}
+							<tr>
+								<td>
+									<div class = "pt-2">
+										<input type="submit" class="btn btn-outline-primary btn-sm" name="back"  value="Back">
+										{% if isArtist %}
+										<input type="submit" class="btn btn-outline-primary btn-sm" name="artist" value="Search Artist's Songs">
+										{% else %}
+										<input type="submit" class="btn btn-outline-primary btn-sm" name="add2q" value="Add to Queue">
+										{% endif %}
+									</div>
+								</td>		
+							<tr>
+						</tbody>
+					</table>			
+				</form>
+			</div>	
 		</div>
-	
 	</body>
-	
 </html>
 {% endblock %}

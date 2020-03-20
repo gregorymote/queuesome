@@ -211,7 +211,7 @@ def play(request, pid):
         'party': p,
         'user' : u,
         'category' : c,
-        'song' : s,
+        'song' : s
         }
     
     return render(request, 'game/play.html', context)
@@ -306,7 +306,9 @@ def pickSong(request, pid):
             spotifyObject = spotipy.Spotify(auth=p.token)
             
             search = form.cleaned_data['search']
+            # choice =  form.cleaned_data['choice_field']
             if search != "":
+            # if int(choice) == 1: #Search for Track
                 searchResults = spotifyObject.search(search, 15, 0, 'track')
                 tracks = searchResults['tracks']['items'] 
                 for x in tracks:
@@ -318,9 +320,20 @@ def pickSong(request, pid):
                     s = Searches(name = trackName + ", " + artistName,
                                     uri=trackURI, art=albumArt, party=p, user=u, link=url)
                     s.save()
+                    
+                
+            # else:
+            #     searchResults = spotifyObject.search(search, 5, 0, "artist")
+            #     artists = searchResults['artists']['items']
+
+            #     for x in artists:
+            #         s = Searches(name = x['name'], uri = x['id'], party=p, user=u)
+            #         s.save()
+                
 
             return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
-
+            # else:
+            #     invalid = True
     else:
 
         form = searchForm(initial={'search':'',})
@@ -354,7 +367,7 @@ def searchResults(request, pid):
     if request.method == 'POST':
         
         form = searchResultsForm(request.POST, partyObject=p, userObject=u)
-
+        
         if form.is_valid():
 
             if ('add2q' in request.POST):
@@ -410,12 +423,14 @@ def searchResults(request, pid):
                     invalid = True
     else:
         form = searchResultsForm(partyObject=p, userObject=u, initial={'results':''})
-        
+   
+    albumSearch = list(Searches.objects.filter(party=p, user=u))
         
     context = {
                'form':form,
                'isArtist':isArtist,
                'invalid':invalid,
+               'albumSearch':albumSearch
                }
         
     return render(request, 'game/searchResults.html', context)
@@ -614,7 +629,6 @@ def playMusic(pid):
             for x in users:
                 x.hasLiked = False
                 x.save()
-
         rN = rN + 1
 ##    searchResults = spotifyObject.search("Rockabye Baby!", 1, 0, "artist")
 ##    artist = searchResults['artists']['items'][0]['id']
