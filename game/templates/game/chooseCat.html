@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
-
 {% block page_content %}
 <html lang="en">
+
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+		$('#id_cat_choice').change(function() {
+		var x = document.getElementById("id_cat_choice").selectedIndex;
+		var y = document.getElementById("id_cat_choice").options;		
+		var z = y[x].text;
+		if (z == 'custom'){
+			var box = '{{ form.custom }}';
+			var label = '{{ form.custom.label }}';
+		}
+		else{
+			var box = '';
+			var label = '';
+		}
+		document.getElementById('custom').innerHTML = box;
+		document.getElementById('label').innerHTML = label;
+		})
+	});
+
+</script>
 	<div class = "container">
 		<div class ="">
 			<h3>  </h3>
@@ -17,31 +39,13 @@
 							<h4>{{ form.cat_choice.label }}</h4>
 							</td>
 						</tr>
-						
 						<tr>
 							<td>
 							{{ form.cat_choice }}
-							</td>
-
-						</tr>
-						
-						{% if showCustom %}
-						<tr>
-							<td>
-							<div class = "pt-2">
-								<h6>{{ form.custom.label }}</h6>
-							</div>
+							<h6 id="label"></h6>
+							<div id="custom" ></div>
 							</td>
 						</tr>
-						
-						<tr>
-							<td>
-							{{ form.custom }}
-							</td>
-
-						</tr>
-						{% endif %}
-	
 						<tr>
 							<td>
 							<div class = "pt-2 , text-right">
