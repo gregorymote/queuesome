@@ -10,7 +10,7 @@ class blankForm(forms.Form):
     
 class chooseCategoryForm(forms.Form):
     cat_choice = forms.ModelChoiceField(label = 'Choose a Category', queryset=Library.objects.filter(visible=True)) 
-    custom = forms.CharField(label = 'create your own', required = False)
+    custom = forms.CharField(label = 'Create Your Own', required = False)
 
 class searchForm(forms.Form):
     search = forms.CharField(label = 'search', required = False)
