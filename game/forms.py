@@ -17,7 +17,7 @@ class searchForm(forms.Form):
 
 
 class searchResultsForm(forms.Form):
-    results = forms.ModelChoiceField(widget=forms.Select(attrs={'style':'width:300px'}),queryset=Searches.objects.all(), required=False)
+    results = forms.ModelChoiceField(widget=forms.Select(attrs={'style':'max-width:100%'}),queryset=Searches.objects.all(), required=False)
         
     def __init__(self,*args,**kwargs):
         

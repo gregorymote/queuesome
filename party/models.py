@@ -61,6 +61,8 @@ class Songs(models.Model):
     likes = models.ForeignKey('Likes',on_delete=models.CASCADE,)
     debug = models.CharField(max_length=1200, null=True)
     link = models.CharField(max_length=500, null=True)
+    duration=models.IntegerField(default=0, null=True)
+    duplicate=models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -83,5 +85,6 @@ class Searches(models.Model):
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
     user = models.ForeignKey('Users',on_delete=models.CASCADE,)
     link = models.CharField(max_length=500, null=True)
+    duration=models.IntegerField(default=0, null=True)
     def __str__(self):
         return self.name

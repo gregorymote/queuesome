@@ -15,7 +15,12 @@
 		{% if song.art != "lull" %}
 			<h5>{{category.name}}</h5>
 			<h6>{{category.leader}}'s Category</h6>
+			{% if song.art == 'duplicate' %}
+				{% load static %}
+				<img src="{% static 'images/quesome.png' %}" class="img-thumbnail" width="200" height="200" alt="...">
+			{% else %}
 			<img src={{song.art}} class="img-thumbnail" width="200" height="200" alt="...">
+			{% endif %}
 			<div class = "pt-1">
 				{% load static %}
 				<img src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">

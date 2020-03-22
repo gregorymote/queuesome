@@ -170,9 +170,10 @@ def play(request, pid):
                 u.save()
                 try:
                     current_song = Songs.objects.get(state='playing', category__party = p)
-                    l = current_song.likes
-                    l.num = l.num + 1
-                    l.save()
+                    if not current_song.duplicate:
+                        l = current_song.likes
+                        l.num = l.num + 1
+                        l.save()
                 except Exception as e:
                     print(e)
             elif ('dislike' in request.POST):
@@ -180,9 +181,10 @@ def play(request, pid):
                 u.save()
                 try:
                     current_song = Songs.objects.get(state='playing', category__party = p)
-                    l = current_song.likes
-                    l.num = l.num - 1
-                    l.save()
+                    if not current_song.duplicate:
+                        l = current_song.likes
+                        l.num = l.num - 1
+                        l.save()
                 except Exception as e:
                     print(e)
             
@@ -328,9 +330,17 @@ def pickSong(request, pid):
                     artistName = x['artists'][0]['name']  
                     trackName = x['name']
                     trackURI = x['uri']
+                    trackDuration = x['duration_ms']
                     url = x['external_urls']['spotify']
-                    s = Searches(name = trackName + ", " + artistName,
-                                    uri=trackURI, art=albumArt, party=p, user=u, link=url)
+                    s = Searches(
+                                    name = trackName + ", " + artistName,
+                                    uri=trackURI,
+                                    art=albumArt,
+                                    party=p,
+                                    user=u,
+                                    link=url,
+                                    duration=trackDuration
+                                )
                     s.save()
                     
                 
@@ -389,21 +399,23 @@ def searchResults(request, pid):
                     l = Likes()
                     l.save()
                 
-                    s = Songs(name=search.name,
+                    s = Songs(
+                              name=search.name,
                               uri=search.uri,
                               art=search.art,
                               user=u,
                               category=c,
                               played=False,
                               order=random.randint(1,101),
-                              state = 'not_played',
-                              likes = l,
+                              state='not_played',
+                              likes=l,
                               link=search.link,
+                              duration=search.duration,
                               )
                     s.save()
                     u.hasPicked = True
                     u.save()
-                    Searches.objects.filter(user=u).filter(party=p).delete()
+                    Searches.objects.filter(user=u, party=p).delete()
                     return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
                 else:
                     invalid = True
@@ -576,8 +588,8 @@ def users(request, pid):
               'True':'Yes',
               'False':'No',
               'picking':'Picking',
-              'not_picked':'Not Picked',
-              'has_picked':'Has Picked'
+              'not_picked':'No',
+              'has_picked':'Yes'
               }
     
     context = {
@@ -618,28 +630,55 @@ def playMusic(pid):
         print ('playing music for round:', rN)
         queue = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played').order_by('order'))
         for song in queue:
+            song = Songs.objects.get(pk=song.pk)
             ls = [song.uri]
             try:
-                check = checkToken(p.token_info, pid)
-                if check != None:
-                    spotifyObject = spotipy.Spotify(auth=check)
-                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
-                song.state = 'playing'
-                song.startTime = time.time()
-                song.save()
+                if not song.duplicate:
+                    p = Party.objects.get(pk = pid)
+                    dups = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', name=song.name))
+                    if len(dups) > 1:
+                        for d in dups:
+                            d.duplicate=True
+                            d.save()
+                            u = d.user
+                            u.hasLiked=True
+                            u.save()
+                        song.duplicate=True
+                        song.save()
+                    
+                    check = checkToken(p.token_info, pid)
+                    if check != None:
+                        spotifyObject = spotipy.Spotify(auth=check)
+                    
+                    spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
+                    song.state = 'playing'
+                    song.startTime = time.time()
+                    song.save()
 
-                num = len(list(Users.objects.filter(party = p))) * (-1) + 1
-                if num == 0:
-                    num = -1
-                print("num: ", num, " likes: ", song.likes.num)
+                    num = len(list(Users.objects.filter(party = p))) * (-1) + 1
+                    if num == 0:
+                        num = -1
+                    duration = song.duration / 1000
+                    
+                    if duration < p.time or song.duplicate:
+                        length = duration - 5
+                    else:
+                        length = p.time
+                    flag = True
+                    while(time.time() - song.startTime < length):
+                        if Songs.objects.filter(pk=song.pk, likes__num__lte=num):
+                            break
+                        if song.duplicate and (time.time() - song.startTime) >= p.time and flag:
+                            song.art= "duplicate"
+                            song.save()
+                            print(song.art)
+                            flag = False
+                            
+                        continue
 
-                while(time.time() - song.startTime < p.time):
-                    if Songs.objects.filter(pk=song.pk, likes__num__lte=num):
-                        break
-                    continue
                 song.state= 'played'
-
                 song.save()
+                
             except Exception as e:
                 print("***********************")
                 print(e)
