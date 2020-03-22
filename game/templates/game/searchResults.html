@@ -13,7 +13,9 @@
 		var y = document.getElementById("id_results").options;		
 		var z = y[x].index;
 		if(z==0){
-			var album = "https://drive.google.com/uc?id=1U30oo8mIVzZnn4pIl06SH1StSsBpaq7F"
+			//var album = "https://drive.google.com/uc?id=1U30oo8mIVzZnn4pIl06SH1StSsBpaq7F"
+			{% load static %}
+			var album = "{% static 'images/queue_it_to_it_brah.png' %}"
 		}
 		else if(z==1){
 			var album = '{{albumSearch.0.art}}';
@@ -61,52 +63,48 @@
 			var album = '{{albumSearch.14.art}}';
 		}
 		else {
-			var album = "https://drive.google.com/uc?id=1U30oo8mIVzZnn4pIl06SH1StSsBpaq7F"
+			{% load static %}
+			var album = "{% static 'images/queue_it_to_it_brah.png' %}"
 		}
 		document.getElementById('output').innerHTML = '<img src="'+ album + '" class="img-thumbnail" width="200" height="200" alt="...">';
 		})
 	});
 
 </script>
+	
 	<body>
-		<div class="container text">	
+		<div class="container text-center">	
 			<div>
 				<h4>Search Results</h4>
 				<form action="" method="post">
 					{% csrf_token %}
-					<table>
-						<tbody>
-							<tr>
-								<td>
-									<div class = "pt-1">
-										<div id="output"></div>																							
-									</div>
-									{{ form.results }}	
-								</td>
-							</tr>
-						{% if invalid and isArtist %}
-							<div class="alert alert-info">
-								select a valid artist
-							</div>	
-						{% elif invalid and not isArtist  %}
-							<div class="alert alert-info">
-								select a valid song
-							</div>
+					<div class = "pt-1">
+						<div id="output"></div>																							
+					</div>
+					
+					<div class = "pt-3">
+						{{ form.results }}	
+					</div>
+						
+					{% if invalid and isArtist %}
+						<div class="alert alert-info">
+							select a valid artist
+						</div>	
+					{% elif invalid and not isArtist  %}
+						<div class="alert alert-info">
+							select a valid song
+						</div>
+					{% endif %}
+					
+					<div class = "pt-2">
+						<input type="submit" class="btn btn-outline-primary btn-sm" name="back"  value="Back">
+						{% if isArtist %}
+						<input type="submit" class="btn btn-outline-primary btn-sm" name="artist" value="Search Artist's Songs">
+						{% else %}
+						<input type="submit" class="btn btn-outline-primary btn-sm" name="add2q" value="Add to Queue">
 						{% endif %}
-							<tr>
-								<td>
-									<div class = "pt-2">
-										<input type="submit" class="btn btn-outline-primary btn-sm" name="back"  value="Back">
-										{% if isArtist %}
-										<input type="submit" class="btn btn-outline-primary btn-sm" name="artist" value="Search Artist's Songs">
-										{% else %}
-										<input type="submit" class="btn btn-outline-primary btn-sm" name="add2q" value="Add to Queue">
-										{% endif %}
-									</div>
-								</td>		
-							<tr>
-						</tbody>
-					</table>			
+					</div>
+				
 				</form>
 			</div>	
 		</div>
