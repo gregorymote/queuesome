@@ -283,6 +283,9 @@ def createCategory(choice, request, p):
     u = getUser(request, p)
     u.turn = 'has_picked'
     u.save()
+
+    if choice == 'Scattergories':
+        choice = 'Songs that Begin with ' + getLetter()
     
     c = Category(name = choice,
                  roundNum = p.roundTotal + 1,
@@ -616,7 +619,12 @@ def checkActive(pid):
         p = Party.objects.get(pk = pid)
         return p.active
     except:
-        return False      
+        return False
+
+def getLetter():                                    
+    rand = random.randint(65,90)
+    letter = chr(rand)
+    return letter
 
 def playMusic(pid):
     
