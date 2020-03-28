@@ -26,7 +26,7 @@ import math
 
 def lobby(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
 
     p = Party.objects.get(pk = pid)
@@ -59,7 +59,7 @@ def lobby(request, pid):
         if p.started:
             return HttpResponseRedirect(reverse('play', kwargs={'pid': pid}))
 
-    guests = Users.objects.filter(party = pid)
+    guests = Users.objects.filter(party = pid, active=True)
     guests = list(guests)
 
     u = getUser(request, pid)
@@ -83,7 +83,7 @@ def lobby(request, pid):
 
 def code(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
    
     if request.method == 'POST':
@@ -102,14 +102,14 @@ def code(request, pid):
 
 def play(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
     
     p = Party.objects.get(pk = pid)
     u = getUser(request, pid)
     
     if p.state == 'assign' and u.isHost:
-        x = Users.objects.filter(party=p, turn='not_picked')
+        x = Users.objects.filter(party=p, turn='not_picked', active=True)
         print('****')
         print(x)
         print('****')
@@ -123,7 +123,7 @@ def play(request, pid):
             p.save()
             
         else:
-            users = Users.objects.filter(party=p)
+            users = Users.objects.filter(party=p, active=True)
             for user in users:
                 user.turn = 'not_picked'
                 user.save()
@@ -138,12 +138,12 @@ def play(request, pid):
             p.started = True
             p.save()       
     
-    if len(list(Users.objects.filter(party=p, hasPicked=False))) == 0 and p.state == 'pick_song':
+    if len(list(Users.objects.filter(party=p, hasPicked=False, active=True))) == 0 and p.state == 'pick_song':
         
         p.state = 'assign'
         p.save()
         
-        users = Users.objects.filter(party = p)
+        users = Users.objects.filter(party = p, active=True)
         for x in users:
             x.hasPicked = False
             x.save()
@@ -153,8 +153,8 @@ def play(request, pid):
             t = threading.Thread(target=playMusic, args=(pid,))
             t.start()
             
-    if p.state == 'choose_category' and Users.objects.filter(party=p, turn='not_picked') and not Users.objects.filter(party=p, turn='picking'):
-        x = Users.objects.filter(party=p, turn='not_picked')
+    if p.state == 'choose_category' and Users.objects.filter(party=p, turn='not_picked', active=True) and not Users.objects.filter(party=p, turn='picking', active=True):
+        x = Users.objects.filter(party=p, turn='not_picked', active=True)
         if x:
             x = list(x)
             lead = x[0]
@@ -234,7 +234,7 @@ def play(request, pid):
 
 def chooseCat(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
     
     default = ''
@@ -251,7 +251,7 @@ def chooseCat(request, pid):
 
         if form.is_valid():
 
-            if form.cleaned_data['cat_choice'].name != 'custom': 
+            if form.cleaned_data['cat_choice'].name != '*Custom*': 
                 createCategory(form.cleaned_data['cat_choice'].name, request, p)
 
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
@@ -302,7 +302,7 @@ def createCategory(choice, request, p):
 
 def pickSong(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
     
     invalid = False
@@ -372,7 +372,7 @@ def pickSong(request, pid):
 
 def searchResults(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
 
     invalid = False
@@ -464,7 +464,7 @@ def searchResults(request, pid):
 
 def roundResults(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
 
     p = Party.objects.get(pk=pid)
@@ -492,7 +492,7 @@ def roundResults(request, pid):
 
 def settings(request, pid):
 
-    if not checkActive(pid):
+    if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
     
     invalid = False
@@ -552,30 +552,29 @@ def settings(request, pid):
 
 def users(request, pid):
 
+    if not checkActive(pid, request):
+        return HttpResponseRedirect(reverse('start'))
+
     p = Party.objects.get(pk = pid)
     u = getUser(request, p)
     if u.isHost:
         isHost = True
     else:
         isHost = False
-    users = Users.objects.filter(party=p)
-
-    if not checkActive(pid):
-        return HttpResponseRedirect(reverse('start'))
-
+    users = Users.objects.filter(party=p, active=True)
 
     if request.method == 'POST':
         form = blankForm(request.POST)
-
+        print (request.POST)
         if form.is_valid():
             if ('back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             elif ('skip' in request.POST):
-                not_picked = Users.objects.filter(party=p, hasPicked=False)
+                not_picked = Users.objects.filter(party=p, hasPicked=False, active=True)
                 for u in not_picked:
                     u.hasPicked=True
                     u.save()
-                picking = Users.objects.filter(party=p, turn='picking')
+                picking = Users.objects.filter(party=p, turn='picking', active=True)
                 if picking:
                     for u in picking:
                         u.turn='has_picked'
@@ -584,6 +583,13 @@ def users(request, pid):
                     p.state = 'pick_song'
                     p.save()
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+            else:
+                for x in users:
+                    if (x.sessionID in request.POST):
+                        print("removing " + x.name + " from party")
+                        x.active=False
+                        x.save()
+                        return HttpResponseRedirect(reverse('users', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
     
@@ -614,10 +620,14 @@ def getUser(request, p):
         return HttpResponseRedirect(reverse('start'))
     return u
 
-def checkActive(pid):
+def checkActive(pid, request):
     try:
         p = Party.objects.get(pk = pid)
-        return p.active
+        if not p.active:
+            return False
+        else:
+            u = getUser(request, p)
+            return u.active
     except:
         return False
 
@@ -663,7 +673,7 @@ def playMusic(pid):
                     song.startTime = time.time()
                     song.save()
 
-                    num = len(list(Users.objects.filter(party = p))) * (-1) + 1
+                    num = len(list(Users.objects.filter(party = p, active=True))) * (-1) + 1
                     if num == 0:
                         num = -1
                     duration = song.duration / 1000
@@ -693,7 +703,7 @@ def playMusic(pid):
                 print("***********************")
                 song.state = "error, not played"
                 song.save()
-            users = Users.objects.filter(party = p)
+            users = Users.objects.filter(party = p, active=True)
             for x in users:
                 x.hasLiked = False
                 x.save()

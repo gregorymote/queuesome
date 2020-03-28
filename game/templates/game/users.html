@@ -15,8 +15,9 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Category</th>
+                    <th>Picked Category?</th>
                     <th>Picked Song?</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -36,7 +37,9 @@
                     <td>{{value}}</td>
                     {% endif %}
                     {% endfor %}
-                    
+                    {% if isHost and not u.isHost %}
+                    <td><button class="btn text-danger bg-white " name = {{u.sessionID}}> <i class="fa fa-times"></i></button></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

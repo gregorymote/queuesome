@@ -203,12 +203,18 @@ def create_user(request):
                 p = Party.objects.get(joinCode=form.cleaned_data['party_code'].upper())
                 if not p.active:
                     invalid = True
-                else:    
+                else:
+                    username = form.cleaned_data['user_name'];
                     q = Users.objects.filter(party=p, sessionID=request.session.session_key)
                     if q:
+                        q = list(q)[0]
+                        q.active=True
+                        q.name= username
+                        q.turn='not_picked'
+                        q.save()
                         return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
                     u = Users(
-                            name= form.cleaned_data['user_name'],
+                            name= username,
                             party = p,
                             sessionID = request.session.session_key,
                             points = 0,
@@ -271,7 +277,7 @@ def getURL(path):
 def getUser(request, p):
     
     sk = request.session.session_key
-    current_user = Users.objects.filter(sessionID = sk, party = p)
+    current_user = Users.objects.filter(sessionID = sk, party = p, active=True)
     current_user = list(current_user)
     u = current_user[0]
     return u
@@ -281,7 +287,7 @@ def checkPermission(pid, request):
     p = Party.objects.get(pk = pid)
     u = getUser(request, p)
 
-    query = Users.objects.filter(party = p, pk=u.pk)
+    query = Users.objects.filter(party = p, pk=u.pk, active=True)
 
     if query:
         return True
