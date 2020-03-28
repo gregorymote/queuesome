@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#lohko!akfg%$z#5l&3#apwna@&$r#)d0^f8@v0fq_6=d0(f9l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['192.168.1.209','localhost', '10.0.0.47', 'q-it-up.herokuapp.com']
 
@@ -81,12 +81,12 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 ##SQL Lite
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+##DATABASES = {
+##    'default': {
+##        'ENGINE': 'django.db.backends.sqlite3',
+##        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+##    }
+##}
 
 ##Local Postgresql
 ##DATABASES = {
@@ -101,8 +101,8 @@ DATABASES = {
 ##}
 
 ####Heroku Postgresql
-##DATABASES = {}
-##DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
