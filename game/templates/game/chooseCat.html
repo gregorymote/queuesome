@@ -12,7 +12,7 @@
 		var x = document.getElementById("id_cat_choice").selectedIndex;
 		var y = document.getElementById("id_cat_choice").options;		
 		var z = y[x].text;
-		if (z == '*Custom*'){
+		if (z == 'Custom'){
 			var box = '{{ form.custom }}';
 			var label = '{{ form.custom.label }}';
 		}

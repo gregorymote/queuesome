@@ -251,7 +251,7 @@ def chooseCat(request, pid):
 
         if form.is_valid():
 
-            if form.cleaned_data['cat_choice'].name != '*Custom*': 
+            if form.cleaned_data['cat_choice'].name != 'Custom': 
                 createCategory(form.cleaned_data['cat_choice'].name, request, p)
 
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
