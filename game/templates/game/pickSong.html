@@ -37,22 +37,20 @@
 
 						<tr>
 							<td>
-								<div class = "text-right">
+								<div class = "text-right pb-2">
+									<input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
 									<input type="submit" class="btn btn-outline-primary btn" value="Search">
 								</div>
 							</td>
-						<tr>
-						
-						{% if invalid %}
-							<div class="alert alert-info">
-								enter a track or artist
-							</div>
-							
-						{% endif %}
-						
+						<tr>						
 					</tbody>
 				</table>
 				
+				{% if invalid %}
+				<div class="alert alert-info">
+					enter a track or artist
+				</div>
+				{% endif %}
 			</form>
 		</div>	
 	</div>

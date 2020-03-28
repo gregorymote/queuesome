@@ -9,7 +9,7 @@ class blankForm(forms.Form):
     blank = forms.CharField(label='text', required=False)
     
 class chooseCategoryForm(forms.Form):
-    cat_choice = forms.ModelChoiceField(label = 'Choose a Category', queryset=Library.objects.filter(visible=True).order_by('order','name')) 
+    cat_choice = forms.ModelChoiceField(label = 'Choose a Category', queryset=Library.objects.filter(visible=True).order_by('order','name'), required=False) 
     custom = forms.CharField(label = 'Create Your Own', required = False)
 
 class searchForm(forms.Form):

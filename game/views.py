@@ -238,6 +238,7 @@ def chooseCat(request, pid):
         return HttpResponseRedirect(reverse('start'))
     
     default = ''
+    invalid=False
     p = Party.objects.get(pk=pid)
     u = getUser(request, pid)
 
@@ -250,19 +251,25 @@ def chooseCat(request, pid):
         form = chooseCategoryForm(request.POST)
 
         if form.is_valid():
-
-            if form.cleaned_data['cat_choice'].name != 'Custom': 
-                createCategory(form.cleaned_data['cat_choice'].name, request, p)
-
+            if ( 'back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
-                showCustom = True
+                try:
+                    choice = form.cleaned_data['cat_choice'].name
+                    if choice != 'Custom': 
+                        
+                        createCategory(choice, request, p)
+                        return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                    else:
+                        showCustom = True
 
-                if form.cleaned_data['custom'] != default:
-                    createCategory(form.cleaned_data['custom'], request, p)
-                    l = Library(name=form.cleaned_data['custom'])
-                    l.save()
-                    return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                        if form.cleaned_data['custom'] != default:
+                            createCategory(form.cleaned_data['custom'], request, p)
+                            l = Library(name=form.cleaned_data['custom'])
+                            l.save()
+                            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                except:
+                    invalid=True
     else:
 
         form = chooseCategoryForm(initial={
@@ -273,6 +280,7 @@ def chooseCat(request, pid):
     context = {
         'form':form,
         'showCustom':showCustom,
+        'invalid':invalid,
         }
     
     return render(request, 'game/chooseCat.html', context)
@@ -318,47 +326,50 @@ def pickSong(request, pid):
         form = searchForm(request.POST)
 
         if form.is_valid():
-            
-            checkToken(p.token_info, pid)
-            spotifyObject = spotipy.Spotify(auth=p.token)
-            
-            search = form.cleaned_data['search']
-            # choice =  form.cleaned_data['choice_field']
-            if search != "":
-            # if int(choice) == 1: #Search for Track
-                searchResults = spotifyObject.search(search, 15, 0, 'track')
-                tracks = searchResults['tracks']['items'] 
-                for x in tracks:
-                    albumArt = x['album']['images'][0]['url']
-                    artistName = x['artists'][0]['name']  
-                    trackName = x['name']
-                    trackURI = x['uri']
-                    trackDuration = x['duration_ms']
-                    url = x['external_urls']['spotify']
-                    s = Searches(
-                                    name = trackName + ", " + artistName,
-                                    uri=trackURI,
-                                    art=albumArt,
-                                    party=p,
-                                    user=u,
-                                    link=url,
-                                    duration=trackDuration
-                                )
-                    s.save()
+            if ( 'back' in request.POST):
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+            else:
+                checkToken(p.token_info, pid)
+                spotifyObject = spotipy.Spotify(auth=p.token)
+                
+                search = form.cleaned_data['search']
+                # choice =  form.cleaned_data['choice_field']
+                if search != "":
+                # if int(choice) == 1: #Search for Track
+                    searchResults = spotifyObject.search(search, 15, 0, 'track')
+                    tracks = searchResults['tracks']['items'] 
+                    for x in tracks:
+                        albumArt = x['album']['images'][0]['url']
+                        artistName = x['artists'][0]['name']  
+                        trackName = x['name']
+                        trackURI = x['uri']
+                        trackDuration = x['duration_ms']
+                        url = x['external_urls']['spotify']
+                        s = Searches(
+                                        name = trackName + ", " + artistName,
+                                        uri=trackURI,
+                                        art=albumArt,
+                                        party=p,
+                                        user=u,
+                                        link=url,
+                                        duration=trackDuration
+                                    )
+                        s.save()
+                        
                     
-                
-            # else:
-            #     searchResults = spotifyObject.search(search, 5, 0, "artist")
-            #     artists = searchResults['artists']['items']
+                # else:
+                #     searchResults = spotifyObject.search(search, 5, 0, "artist")
+                #     artists = searchResults['artists']['items']
 
-            #     for x in artists:
-            #         s = Searches(name = x['name'], uri = x['id'], party=p, user=u)
-            #         s.save()
-                
+                #     for x in artists:
+                #         s = Searches(name = x['name'], uri = x['id'], party=p, user=u)
+                #         s.save()
+                    
 
-            return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
-            # else:
-            #     invalid = True
+                    return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
+                else:
+                    invalid=True
+
     else:
 
         form = searchForm(initial={'search':'',})
