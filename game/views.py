@@ -16,6 +16,7 @@ from game.forms import chooseCategoryForm
 from game.forms import searchForm
 from game.forms import searchResultsForm
 from game.forms import settingsForm
+from queue_it_up.settings import DRIVER
 
 import spotipy
 import time
@@ -56,7 +57,7 @@ def lobby(request, pid):
     ##                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
     ##                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     ##            except:
-                webbrowser.open(_url + "/sesh/" + str(pid) +  "/play?user=system")
+                DRIVER.get(_url + "/sesh/" + str(pid) +  "/play?user=system")
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
