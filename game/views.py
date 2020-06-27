@@ -23,6 +23,11 @@ import random
 import os
 import threading
 import math
+import webbrowser
+
+system='system'
+_url='http://q-it-up.herokuapp.com'
+#_url='http://localhost:8000'
 
 def lobby(request, pid):
 
@@ -51,6 +56,7 @@ def lobby(request, pid):
     ##                spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
     ##                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     ##            except:
+                webbrowser.open(_url + "/sesh/" + str(pid) +  "/play?user=system")
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -101,19 +107,24 @@ def code(request, pid):
 
 
 def play(request, pid):
+    p = Party.objects.get(pk = pid)
+    url = str(request.get_full_path)
+    
+    if 'user=' + system in url:
+        sys=Users.objects.filter(party=p, name=system)
+        if not sys:
+            sys=Users(party=p, name=system, sessionID=request.session.session_key, active=False)
+            sys.save()
 
     if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
     
-    p = Party.objects.get(pk = pid)
+    
     u = getUser(request, pid)
     
     if p.state == 'assign' and u.isHost:
         x = Users.objects.filter(party=p, turn='not_picked', active=True)
-        print('****')
-        print(x)
-        print('****')
-        
+       
         if x:
             x = list(x)
             lead = x[0]
@@ -138,7 +149,7 @@ def play(request, pid):
             p.started = True
             p.save()       
     
-    if len(list(Users.objects.filter(party=p, hasPicked=False, active=True))) == 0 and p.state == 'pick_song':
+    if  p.state == 'pick_song' and not Users.objects.filter(party=p, hasPicked=False, active=True):
         
         p.state = 'assign'
         p.save()
@@ -148,10 +159,10 @@ def play(request, pid):
             x.hasPicked = False
             x.save()
 
-        isPlaying = Songs.objects.filter(category__party=p, state='playing')
-        if not isPlaying:
-            t = threading.Thread(target=playMusic, args=(pid,))
-            t.start()
+        #isPlaying = Songs.objects.filter(category__party=p, state='playing')
+        #if not isPlaying:
+            #t = threading.Thread(target=playMusic, args=(pid,))
+            #t.start()
             
     if p.state == 'choose_category' and Users.objects.filter(party=p, turn='not_picked', active=True) and not Users.objects.filter(party=p, turn='picking', active=True):
         x = Users.objects.filter(party=p, turn='not_picked', active=True)
@@ -160,6 +171,14 @@ def play(request, pid):
             lead = x[0]
             lead.turn = 'picking'
             lead.save()
+
+    print(Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played', category__full=True))
+    if u.name == system and Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played', category__full=True):
+        isPlaying = Songs.objects.filter(category__party=p, state='playing')
+        print(isPlaying)
+        if not isPlaying:
+            t = threading.Thread(target=playMusic, args=(pid,))
+            t.start()
         
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -215,7 +234,7 @@ def play(request, pid):
         s = Songs(art='lull')
         c = Category.objects.get(party=p, roundNum=0)
         n = Songs.objects.filter(category__party=p, state='played').order_by('-category__roundNum')
-        if len(list(n)) != 0:
+        if n:
             if p.roundNum != n[0].category.roundNum + 1:
                 p.roundNum = n[0].category.roundNum + 1
                 p.save()
@@ -430,6 +449,13 @@ def searchResults(request, pid):
                     u.hasPicked = True
                     u.save()
                     Searches.objects.filter(user=u, party=p).delete()
+
+                    not_picked = Users.objects.filter(party=p, active=True, hasPicked=False)
+                    #print(not_picked)
+                    if not not_picked:
+                        c.full = True
+                        c.save()
+
                     return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
                 else:
                     invalid = True
@@ -438,27 +464,27 @@ def searchResults(request, pid):
                 Searches.objects.filter(user=u).filter(party=p).delete()
                 return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
 
-            elif('artist' in request.POST):
-                checkToken(p.token_info, pid)
-                spotifyObject = spotipy.Spotify(auth=p.token)
-                search = form.cleaned_data['results']
-                if search != None:
-                    Searches.objects.filter(user=u).filter(party=p).delete()
-                    topTracks = spotifyObject.artist_top_tracks(search.uri)
-                    tracks = topTracks['tracks'] 
-
-                    for x in tracks:
-                        albumArt = x['album']['images'][0]['url']
-                        artistName = x['artists'][0]['name']  
-                        trackName = x['name']
-                        trackURI = x['uri']
-                        s = Searches(name = trackName + ", " + artistName,
-                                     uri=trackURI, art=albumArt, party=p, user=u)
-                        s.save()
-                    
-                    return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
-                else:
-                    invalid = True
+##            elif('artist' in request.POST):
+##                checkToken(p.token_info, pid)
+##                spotifyObject = spotipy.Spotify(auth=p.token)
+##                search = form.cleaned_data['results']
+##                if search != None:
+##                    Searches.objects.filter(user=u).filter(party=p).delete()
+##                    topTracks = spotifyObject.artist_top_tracks(search.uri)
+##                    tracks = topTracks['tracks'] 
+##
+##                    for x in tracks:
+##                        albumArt = x['album']['images'][0]['url']
+##                        artistName = x['artists'][0]['name']  
+##                        trackName = x['name']
+##                        trackURI = x['uri']
+##                        s = Searches(name = trackName + ", " + artistName,
+##                                     uri=trackURI, art=albumArt, party=p, user=u)
+##                        s.save()
+##                    
+##                    return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
+##                else:
+##                    invalid = True
     else:
         form = searchResultsForm(partyObject=p, userObject=u, initial={'results':''})
    
@@ -505,6 +531,9 @@ def settings(request, pid):
 
     if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
+
+    if not checkPermission(pid, request):
+        return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
     invalid = False
     p = Party.objects.get(pk = pid)
@@ -638,7 +667,10 @@ def checkActive(pid, request):
             return False
         else:
             u = getUser(request, p)
-            return u.active
+            if u.name != system:
+                return u.active
+            else:
+                return True
     except:
         return False
 
@@ -647,6 +679,24 @@ def getLetter():
     letter = chr(rand)
     return letter
 
+def checkPermission(pid, request):
+    try:
+        p = Party.objects.get(pk=pid, active=True)
+    except:
+        return False
+
+    sk = request.session.session_key
+    try:
+        u = Users.objects.get(sessionID = sk, party = p)
+    except:
+        return False
+
+    if not u.isHost:
+        return False
+    else:
+        return True
+        
+
 def playMusic(pid):
     
     p = Party.objects.get(pk = pid)
@@ -654,10 +704,11 @@ def playMusic(pid):
     print ('rN:', rN)
     checkToken(p.token_info, pid)
     spotifyObject = spotipy.Spotify(auth=p.token)
-    while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played')):
+    print(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True))
+    while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True)):
        
         print ('playing music for round:', rN)
-        queue = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played').order_by('order'))
+        queue = Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True).order_by('order')
         for song in queue:
             song = Songs.objects.get(pk=song.pk)
             ls = [song.uri]

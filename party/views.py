@@ -24,6 +24,7 @@ from party.models import Party
 from party.models import Users
 from party.models import Devices
 
+
 my_IP='q-it-up.herokuapp.com'
 #my_IP='localhost'
 my_PORT='8000'
@@ -82,7 +83,10 @@ def login(request):
 
 
 def choose_device(request, pid):
-    
+
+    if not checkPermission(pid, request):
+        return HttpResponseRedirect(reverse('start'))
+                                     
     p = Party.objects.get(pk = pid)
     checkToken(p.token_info, pid)
     spotifyObject = spotipy.Spotify(auth=p.token)
@@ -112,7 +116,6 @@ def choose_device(request, pid):
             device = form.cleaned_data['device']
             p.deviceID=device.deviceID
             p.save()
-
             return HttpResponseRedirect(reverse('start_party', kwargs={'pid':p.pk,}))
 
     else:
@@ -124,7 +127,10 @@ def choose_device(request, pid):
 
 
 def auth(request):
-    u = Users.objects.get(sessionID=request.session.session_key)
+    try:
+        u = Users.objects.get(sessionID=request.session.session_key)
+    except:
+         return HttpResponseRedirect(reverse('start'))
     p = u.party
     url = getURL(str(request.get_full_path))
     p.url = url
@@ -147,10 +153,13 @@ def auth(request):
 
 def name_party(request, pid):
 
+    if not checkPermission(pid, request):
+        return HttpResponseRedirect(reverse('start'))
+    
     p = Party.objects.get(pk = pid)
     u = getUser(request, p)
+
     if p.started:
-        
         return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
 
     if request.method == 'POST':
@@ -204,7 +213,7 @@ def create_user(request):
                 if not p.active:
                     invalid = True
                 else:
-                    username = form.cleaned_data['user_name'];
+                    username = form.cleaned_data['user_name']
                     q = Users.objects.filter(party=p, sessionID=request.session.session_key)
                     if q:
                         q = list(q)[0]
@@ -274,12 +283,15 @@ def getURL(path):
 
     return url
 
+
 def getUser(request, p):
     
     sk = request.session.session_key
-    current_user = Users.objects.filter(sessionID = sk, party = p, active=True)
-    current_user = list(current_user)
-    u = current_user[0]
+    try:
+        current_user = Users.objects.get(sessionID = sk, party = p, active=True)
+    except:
+        return HttpResponseRedirect(reverse('start'))
+    u = current_user
     return u
 
 def checkPermission(pid, request):
@@ -297,7 +309,7 @@ def checkPermission(pid, request):
 def checkToken(token_info, pid):
 
     token_info = literal_eval(token_info)
-    print('Expires in: ', token_info['expires_at'] - time.time())
+    #print('Expires in: ', token_info['expires_at'] - time.time())
     p = Party.objects.get(pk = pid)
     
     cache_path = ".cache-" + 'temp'
@@ -307,14 +319,33 @@ def checkToken(token_info, pid):
     
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
-        print('token_info:', token_info)
+        #print('token_info:', token_info)
         p.token = token_info['access_token'] ##
         p.token_info = token_info
         p.save()
-        print("TOKEN REFRESHED")
+        #print("TOKEN REFRESHED")
         return p.token
     else:
-        print("TOKEN STILL VALID")
+        #print("TOKEN STILL VALID")
         return None
+
+def checkPermission(pid, request):
+    try:
+        p = Party.objects.get(pk=pid, active=True)
+    except:
+        return False
+
+    sk = request.session.session_key
+    try:
+        u = Users.objects.get(sessionID = sk, party = p)
+    except:
+        return False
+
+    if not u.isHost:
+        return False
+    else:
+        return True
+        
+    
                               
                                            

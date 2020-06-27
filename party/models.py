@@ -24,9 +24,9 @@ class Users(models.Model):
     name = models.CharField(max_length=35)
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
     sessionID = models.CharField(max_length = 200, null = True)
-    points = models.IntegerField()
-    isHost = models.BooleanField()
-    hasSkip = models.BooleanField()
+    points = models.IntegerField(default=0)
+    isHost = models.BooleanField(default=False)
+    hasSkip = models.BooleanField(default=False)
     hasLiked = models.BooleanField(default=False)
     hasPicked = models.BooleanField(default = False)
     turn = models.CharField(max_length=20)
@@ -39,6 +39,7 @@ class Category(models.Model):
     roundNum = models.PositiveIntegerField(default = 0)
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
     leader = models.ForeignKey('Users',on_delete=models.SET_NULL, null=True)
+    full = models.BooleanField(null=True, default=False)
     def __str__(self):
         return self.name
 
@@ -71,6 +72,9 @@ class Songs(models.Model):
 
 class Likes(models.Model):
     num = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.pk)
 
 class Devices(models.Model):
     name = models.CharField(max_length=100)

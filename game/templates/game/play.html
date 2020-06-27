@@ -42,7 +42,7 @@
 			
 			<div class = "row">
 				<div class = "col text-center pb-2">
-				{% if user.turn == "picking" %}
+				{% if user.turn == "picking" and party.state == "choose_category" %}
 					
 					<input type="submit" class="btn btn-outline-primary" value="Choose Category">
 					
