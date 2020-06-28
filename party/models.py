@@ -31,7 +31,7 @@ class Users(models.Model):
     hasPicked = models.BooleanField(default = False)
     turn = models.CharField(max_length=20)
     active = models.BooleanField(default = True)
-    refreshRate = models.IntegerField(default=5)
+    refreshRate = models.IntegerField(default=5, null=True)
     def __str__(self):
         return self.name
 
