@@ -109,77 +109,75 @@ def code(request, pid):
 
 def play(request, pid):
     p = Party.objects.get(pk = pid)
-    url = str(request.get_full_path)
     
+    url = str(request.get_full_path)
     if 'user=' + system in url:
         sys=Users.objects.filter(party=p, name=system)
         if not sys:
-            sys=Users(party=p, name=system, sessionID=request.session.session_key, active=False)
+            sys=Users(party=p, name=system, sessionID=request.session.session_key, active=False, refreshRate=1)
             sys.save()
 
     if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('start'))
     
-    
     u = getUser(request, pid)
     
-    if p.state == 'assign' and u.isHost:
-        x = Users.objects.filter(party=p, turn='not_picked', active=True)
-       
-        if x:
-            x = list(x)
-            lead = x[0]
-            lead.turn = 'picking'
-            lead.save()
-            p.state = 'choose_category'
+    if u.name == system:
+        if p.state == 'assign':
+            x = Users.objects.filter(party=p, turn='not_picked', active=True)
+        
+            if x:
+                x = list(x)
+                lead = x[0]
+                lead.turn = 'picking'
+                lead.save()
+                p.state = 'choose_category'
+                p.save()
+                
+            else:
+                users = Users.objects.filter(party=p, active=True)
+                for user in users:
+                    user.turn = 'not_picked'
+                    user.save()
+                x = list(users)
+                lead = x[0]
+                lead.turn = 'picking'
+                lead.save()
+                p.state = 'choose_category'
+                p.save()        
+
+            if not p.started:
+                p.started = True
+                p.save()       
+        
+        if  p.state == 'pick_song' and not Users.objects.filter(party=p, hasPicked=False, active=True):
+            
+            p.state = 'assign'
             p.save()
             
-        else:
-            users = Users.objects.filter(party=p, active=True)
-            for user in users:
-                user.turn = 'not_picked'
-                user.save()
-            x = list(users)
-            lead = x[0]
-            lead.turn = 'picking'
-            lead.save()
-            p.state = 'choose_category'
-            p.save()        
+            users = Users.objects.filter(party = p, active=True)
+            for x in users:
+                x.hasPicked = False
+                x.save()
 
-        if not p.started:
-            p.started = True
-            p.save()       
-    
-    if  p.state == 'pick_song' and not Users.objects.filter(party=p, hasPicked=False, active=True):
-        
-        p.state = 'assign'
-        p.save()
-        
-        users = Users.objects.filter(party = p, active=True)
-        for x in users:
-            x.hasPicked = False
-            x.save()
+            #isPlaying = Songs.objects.filter(category__party=p, state='playing')
+            #if not isPlaying:
+                #t = threading.Thread(target=playMusic, args=(pid,))
+                #t.start()
+                
+        if p.state == 'choose_category' and Users.objects.filter(party=p, turn='not_picked', active=True) and not Users.objects.filter(party=p, turn='picking', active=True):
+            x = Users.objects.filter(party=p, turn='not_picked', active=True)
+            if x:
+                x = list(x)
+                lead = x[0]
+                lead.turn = 'picking'
+                lead.save()
 
-        #isPlaying = Songs.objects.filter(category__party=p, state='playing')
-        #if not isPlaying:
-            #t = threading.Thread(target=playMusic, args=(pid,))
-            #t.start()
-            
-    if p.state == 'choose_category' and Users.objects.filter(party=p, turn='not_picked', active=True) and not Users.objects.filter(party=p, turn='picking', active=True):
-        x = Users.objects.filter(party=p, turn='not_picked', active=True)
-        if x:
-            x = list(x)
-            lead = x[0]
-            lead.turn = 'picking'
-            lead.save()
-
-    print(Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played', category__full=True))
-    if u.name == system and Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played', category__full=True):
-        isPlaying = Songs.objects.filter(category__party=p, state='playing')
-        print(isPlaying)
-        if not isPlaying:
-            t = threading.Thread(target=playMusic, args=(pid,))
-            t.start()
+        if Songs.objects.filter(category__party=p, category__roundNum = p.roundNum, state='not_played', category__full=True):
+            isPlaying = Songs.objects.filter(category__party=p, state='playing')
+            if not isPlaying:
+                t = threading.Thread(target=playMusic, args=(pid,))
+                t.start()
         
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -227,7 +225,7 @@ def play(request, pid):
         s = Songs.objects.get(category__party=p, state='playing')
         c = s.category
 
-        if p.roundNum != c.roundNum:
+        if u.name == system and p.roundNum != c.roundNum:
             p.roundNum = c.roundNum
             p.save()
         
@@ -236,7 +234,8 @@ def play(request, pid):
         c = Category.objects.get(party=p, roundNum=0)
         n = Songs.objects.filter(category__party=p, state='played').order_by('-category__roundNum')
         if n:
-            if p.roundNum != n[0].category.roundNum + 1:
+            n = list(n)
+            if u.name == system and p.roundNum != n[0].category.roundNum + 1:
                 p.roundNum = n[0].category.roundNum + 1
                 p.save()
         
@@ -249,7 +248,6 @@ def play(request, pid):
         }
     
     return render(request, 'game/play.html', context)
-
 
 
 def chooseCat(request, pid):
@@ -322,7 +320,7 @@ def createCategory(choice, request, p):
                 )
     c.save()
 
-    print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
+    #print("\n\nnew category created for round:" + str(p.roundTotal) +"\n\n")
 
     p.state = 'pick_song'
     p.roundTotal = p.roundTotal + 1
@@ -606,7 +604,7 @@ def users(request, pid):
 
     if request.method == 'POST':
         form = blankForm(request.POST)
-        print (request.POST)
+        #print (request.POST)
         if form.is_valid():
             if ('back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
@@ -627,7 +625,7 @@ def users(request, pid):
             else:
                 for x in users:
                     if (x.sessionID in request.POST):
-                        print("removing " + x.name + " from party")
+                        #print("removing " + x.name + " from party")
                         x.active=False
                         x.save()
                         return HttpResponseRedirect(reverse('users', kwargs={'pid':pid}))
@@ -705,10 +703,10 @@ def playMusic(pid):
     print ('rN:', rN)
     checkToken(p.token_info, pid)
     spotifyObject = spotipy.Spotify(auth=p.token)
-    print(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True))
+    #print(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True))
     while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True)):
        
-        print ('playing music for round:', rN)
+        #print ('playing music for round:', rN)
         queue = Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True).order_by('order')
         for song in queue:
             song = Songs.objects.get(pk=song.pk)
