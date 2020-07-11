@@ -1,31 +1,25 @@
 <!DOCTYPE html>
 
 {% extends "base.html" %}
-
 {% block page_content %}
-<html lang="en">
 <div class="container">
 	<div class="text-center">
 		<h5>Settings</h5>
 	</div>
 	<form action="" method="post">
 		{% csrf_token %}
-
 		<div class="row">
 			<h6>Time <small>(seconds)</small></h6>
 		</div>
 		<div class="row">
 			{{ form.time }}
 		</div>
-
 		<div class="row pt-3">
 			<h6>Device</h6>
 		</div>
-
 		<div class="row">
 			{{ form.device }}
 		</div>
-
 		{% if invalid %}
 		<div class="pt-2">
 			<div class="alert alert-info">

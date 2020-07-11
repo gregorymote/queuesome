@@ -3,56 +3,18 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-<html lang="en">
 	<div class = "container">
-		<div class ="">
-			<h3>     </h3>
-			<form action="" method="post">
-
-				{% csrf_token %}
-				<table>
-					<tbody>
-						<tr>
-							<td>
-							<h6>{{ form.party_name.label }}</h6>
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-							{{ form.party_name }}
-							</td>
-
-						</tr>
-						
-						
-						<tr>
-							<td>
-								<div class = "pt-2">
-									<h6>{{ form.user_name.label }}</h6>
-								</div>
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-							{{ form.user_name }}
-							</td>
-
-						</tr>
-	
-						<tr>
-							<td>
-								<div class = "pt-2 text-right">
-									<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
-								</div>
-							</td>
-						<tr>
-					</tbody>
-				</table>
-				
-			</form>
-		</div>	
+		<form action="" method="post">
+			{% csrf_token %}
+			<h6>{{ form.party_name.label }}</h6>
+			{{ form.party_name }}
+			<div class = "pt-2">
+				<h6>{{ form.user_name.label }}</h6>
+				{{ form.user_name }}
+			</div>
+			<div class = "pt-2 text-right">
+				<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+			</div>
+		</form>	
 	</div>
-</html>
 {% endblock %}

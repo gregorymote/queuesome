@@ -1,71 +1,47 @@
 <!DOCTYPE html>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
 {% block page_content %}
-<html lang="en">
 
-<script type="text/javascript">
-	
-	$(document).ready(function() {
-		$('#id_cat_choice').change(function() {
-		var x = document.getElementById("id_cat_choice").selectedIndex;
-		var y = document.getElementById("id_cat_choice").options;		
-		var z = y[x].text;
-		if (z == 'Custom'){
-			var box = '{{ form.custom }}';
-			var label = '{{ form.custom.label }}';
-		}
-		else{
-			var box = '';
-			var label = '';
-		}
-		document.getElementById('custom').innerHTML = box;
-		document.getElementById('label').innerHTML = label;
-		})
-	});
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			$('#id_cat_choice').change(function() {
+			var x = document.getElementById("id_cat_choice").selectedIndex;
+			var y = document.getElementById("id_cat_choice").options;		
+			var z = y[x].text;
+			if (z == 'Custom'){
+				var box = '{{ form.custom }}';
+				var label = '{{ form.custom.label }}';
+			}
+			else{
+				var box = '';
+				var label = '';
+			}
+			document.getElementById('custom').innerHTML = box;
+			document.getElementById('label').innerHTML = label;
+			})
+		});
+	</script>
 
-</script>
 	<div class = "container">
-		<div class ="">
-			<h3>  </h3>
-			<form action="" method="post">
-
-				{% csrf_token %}
-				<table>
-					<tbody>
-						<tr>
-							<td>
-							
-							<h4>{{ form.cat_choice.label }}</h4>
-							
-							</td>
-						</tr>
-						<tr>
-							<td>
-							{{ form.cat_choice }}
-							<h6 class="pt-2" id="label"></h6>
-							<div id="custom" ></div>
-							</td>
-						</tr>
-						<tr>
-							<td>
-							<div class = "pt-2 pb-2 text-right">
-							<input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
-							<input type="submit" class="btn btn-outline-primary btn" value="Submit">
-							</div>
-							</td>
-						<tr>
-					</tbody>
-				</table>
-				{% if invalid %}
-				<div class="alert alert-info">
-					select a category before submitting
-				</div>
-				{% endif %}
+		<form action="" method="post">
+			{% csrf_token %}
+			<h6>{{ form.cat_choice.label }}</h6>			
+			{{ form.cat_choice }}
+			<h6 class="pt-2" id="label"></h6>
+			<div id="custom" ></div>
+			
+			<div class = "pt-2 pb-2 text-right">
+				<input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
+				<input type="submit" class="btn btn-outline-primary btn" value="Submit">
+			</div>
 				
-			</form>
-		</div>	
+			{% if invalid %}
+			<div class="alert alert-info">
+				select a category before submitting
+			</div>
+			{% endif %}
+		</form>	
 	</div>
-</html>
 {% endblock %}

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+
+{% load static %}
+
+	<div class = "container text-center">
+        <h1>404 Page Not Found</h1>
+        <img src="{% static 'images/404.jpg' %}" class="img-thumbnail" width="300" height="300" alt="...">
+        <p>Sorry...We Can't Seem to Find That One</p>
+	</div>
+{% endblock %}

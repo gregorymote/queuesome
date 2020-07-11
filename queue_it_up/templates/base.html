@@ -4,15 +4,29 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-
+<style>
+html, body {
+    height: 100%;
+}
+.main {
+    height: 100%;
+    width: 100%;
+    display: table;
+}
+.wrapper {
+    display: table-cell;
+    height: 100%;
+    vertical-align: middle;
+}
+</style>
 
 <html lang="en">
 
 	<head>
 		<meta charset="utf-8">
 		<meta name= "viewport" content="width=device-width, initial-scale=1">
-
-	
+		<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
+		<title>Queue it Up</title>
 	</head>
 	
 	<nav class="navbar navbar-dark bg-primary">
@@ -22,11 +36,11 @@
 		</a>
 	</nav>
 	
-	
-	<div class="container pt-3">
-		{% block page_content %}{% endblock %}
-	</div>
-	
+	<body>
+		<div class="container pt-3">
+			{% block page_content %}{% endblock %}
+		</div>
+	</body>
 	
 </html>
 

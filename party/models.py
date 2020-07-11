@@ -15,7 +15,9 @@ class Party(models.Model):
     deviceID = models.CharField(max_length=200, null=True)
     time = models.IntegerField(default=80)
     joinCode = models.CharField(max_length=10, null = True)
+    thread = models.BooleanField(default=False)
     active = models.BooleanField(default = True)
+    last_updated = models.DateTimeField(auto_now=True, null=True)
     
     def __str__(self):
         return self.name

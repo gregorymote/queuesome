@@ -208,15 +208,14 @@ def create_user(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            try:
-                p = Party.objects.get(joinCode=form.cleaned_data['party_code'].upper())
+            p = Party.objects.filter(joinCode=form.cleaned_data['party_code'].upper()).first()
+            if p:
                 if not p.active:
                     invalid = True
                 else:
                     username = form.cleaned_data['user_name']
-                    q = Users.objects.filter(party=p, sessionID=request.session.session_key)
+                    q = Users.objects.filter(party=p, sessionID=request.session.session_key, active=True).first()
                     if q:
-                        q = list(q)[0]
                         q.active=True
                         q.name= username
                         q.turn='not_picked'
@@ -235,8 +234,7 @@ def create_user(request):
                     u.save()
 
                     return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
-
-            except:
+            else:
                 invalid = True
     else:
         form = CreateUserForm(initial={
