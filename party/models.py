@@ -1,6 +1,17 @@
 from django.db import models
 import spotipy
 
+STRUCTURE_CHOICES = (
+    ("{} in the Title", "{} in the Title"),
+    ("Songs that {}", "Songs that {}"),
+    ("Songs where {}", "Songs where {}"),
+    ("{} Songs", "{} Songs"),
+    ("Songs with {}","Songs with {}"),
+    ("Songs from {}","Songs from {}"),
+    ("Songs by {}","Songs by {}"),
+    ("{}", "{}")
+) 
+
 class Party(models.Model):
     name = models.CharField(max_length=100, null = True)
     token = models.CharField(max_length=1000, null = True)
@@ -43,16 +54,24 @@ class Category(models.Model):
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
     leader = models.ForeignKey('Users',on_delete=models.SET_NULL, null=True)
     full = models.BooleanField(null=True, default=False)
+    
     def __str__(self):
         return self.name
+    
 
 class Library(models.Model):
     name = models.CharField(max_length=100)
+    display = models.CharField(max_length=120, default="No display name avaialable")
+    structure = models.CharField(max_length=64, choices=STRUCTURE_CHOICES, default="{}")
     visible = models.BooleanField(default = False)
     order = models.IntegerField(default = 100)
+    
+    def save(self, *args, **kwargs): 
+        self.display = self.structure.format(self.name) 
+        super(Library, self).save(*args, **kwargs) 
 
     def __str__(self):
-        return self.name
+        return self.display
     
 class Songs(models.Model):
     name = models.CharField(max_length=500)

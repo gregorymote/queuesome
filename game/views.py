@@ -48,7 +48,7 @@ def lobby(request, pid):
                              roundNum=0, party=p)
                 c.save()
                 DRIVER.get(_url + "/sesh/" + str(pid) +  "/play?user="+ system)
-                #webbrowser.open("http://localhost:8000" + "/sesh/" + str(pid) +  "/play?user=system")
+                #webbrowser.open("http://localhost:8000" + "/sesh/" + str(pid) +  "/play?user="+ system)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -251,7 +251,7 @@ def chooseCat(request, pid):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
                 try:
-                    choice = form.cleaned_data['cat_choice'].name
+                    choice = form.cleaned_data['cat_choice'].display
                     if choice != 'Custom': 
                         
                         createCategory(choice, request, p)
