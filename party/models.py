@@ -10,7 +10,7 @@ STRUCTURE_CHOICES = (
     ("Songs from {}","Songs from {}"),
     ("Songs by {}","Songs by {}"),
     ("Songs {}", "Songs {}"),
-    ("Songs about {}"),
+    ("Songs about {}", "Songs about {}"),
     ("{}", "{}")
 ) 
 
