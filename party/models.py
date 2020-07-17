@@ -29,6 +29,7 @@ class Party(models.Model):
     time = models.IntegerField(default=80)
     joinCode = models.CharField(max_length=10, null = True)
     thread = models.BooleanField(default=False)
+    device_error = models.BooleanField(default=False)
     active = models.BooleanField(default = True)
     last_updated = models.DateTimeField(auto_now=True, null=True)
     

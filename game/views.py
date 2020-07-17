@@ -99,11 +99,13 @@ def code(request, pid):
 
 def play(request, pid):
     p = Party.objects.get(pk = pid)
+    #print(p.thread)
+    
     url = str(request.get_full_path)
     if 'user=' + system in url:
         sys=Users.objects.filter(party=p, name=system)
         if not sys:
-            sys=Users(party=p, name=system, sessionID=request.session.session_key, active=False, refreshRate=1.5)
+            sys=Users(party=p, name=system, sessionID=request.session.session_key, active=False, refreshRate=1)
             sys.save()
 
     if not checkActive(pid, request):
@@ -208,6 +210,7 @@ def play(request, pid):
             p.save()
         
     except:
+        p = Party.objects.get(pk = pid)
         s = Songs(art='lull')
         c = Category.objects.filter(party=p, roundNum=0).first()
         n = Songs.objects.filter(category__party=p, state='played').order_by('-category__roundNum')
@@ -301,6 +304,7 @@ def createCategory(choice, request, p):
     p.roundTotal = p.roundTotal + 1
     p.save()
 
+
 def pickSong(request, pid):
 
     if not checkActive(pid, request):
@@ -364,6 +368,7 @@ def pickSong(request, pid):
         }
     return render(request, 'game/pickSong.html', context)
 
+
 def searchResults(request, pid):
 
     if not checkActive(pid, request):
@@ -384,18 +389,13 @@ def searchResults(request, pid):
         isArtist = True
         
     if request.method == 'POST':
-        
         form = searchResultsForm(request.POST, partyObject=p, userObject=u)
-        
         if form.is_valid():
-
             if ('add2q' in request.POST):
-                
                 search = form.cleaned_data['results']
                 if search != None:
                     l = Likes()
                     l.save()
-                
                     s = Songs(
                               name=search.name,
                               uri=search.uri,
@@ -415,7 +415,6 @@ def searchResults(request, pid):
                     Searches.objects.filter(user=u, party=p).delete()
 
                     not_picked = Users.objects.filter(party=p, active=True, hasPicked=False)
-                    #print(not_picked)
                     if not not_picked:
                         c.full = True
                         c.save()
@@ -427,28 +426,6 @@ def searchResults(request, pid):
             elif ('back' in request.POST):
                 Searches.objects.filter(user=u).filter(party=p).delete()
                 return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
-
-##            elif('artist' in request.POST):
-##                checkToken(p.token_info, pid)
-##                spotifyObject = spotipy.Spotify(auth=p.token)
-##                search = form.cleaned_data['results']
-##                if search != None:
-##                    Searches.objects.filter(user=u).filter(party=p).delete()
-##                    topTracks = spotifyObject.artist_top_tracks(search.uri)
-##                    tracks = topTracks['tracks'] 
-##
-##                    for x in tracks:
-##                        albumArt = x['album']['images'][0]['url']
-##                        artistName = x['artists'][0]['name']  
-##                        trackName = x['name']
-##                        trackURI = x['uri']
-##                        s = Searches(name = trackName + ", " + artistName,
-##                                     uri=trackURI, art=albumArt, party=p, user=u)
-##                        s.save()
-##                    
-##                    return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
-##                else:
-##                    invalid = True
     else:
         form = searchResultsForm(partyObject=p, userObject=u, initial={'results':''})
    
@@ -490,6 +467,7 @@ def roundResults(request, pid):
                 'category': category,
                 }    
     return render(request, 'game/roundResults.html', context)
+
 
 def settings(request, pid):
 
@@ -541,6 +519,7 @@ def settings(request, pid):
                     p.deviceID=device.deviceID
                     time = form.cleaned_data['time']
                     p.time = time
+                    p.device_error = False
                     p.save()
                     return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
                 else:
@@ -553,6 +532,7 @@ def settings(request, pid):
                 'invalid':invalid,
                 }    
     return render(request, 'game/settings.html', context)
+
 
 def users(request, pid):
 
@@ -569,30 +549,41 @@ def users(request, pid):
 
     if request.method == 'POST':
         form = blankForm(request.POST)
-        #print (request.POST)
         if form.is_valid():
+            p = Party.objects.get(pk = pid)
             if ('back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             elif ('skip' in request.POST):
-                not_picked = Users.objects.filter(party=p, hasPicked=False, active=True)
-                for u in not_picked:
-                    u.hasPicked=True
-                    u.save()
-                picking = Users.objects.filter(party=p, turn='picking', active=True)
-                if picking:
-                    for u in picking:
-                        u.turn='has_picked'
-                        u.save()
-                if p.state != 'pick_song':
-                    p.state = 'pick_song'
+                if p.roundNum == p.roundTotal:
+                    c = Category.objects.filter(party=p, roundNum=p.roundNum).first()
+                    c.full = True
+                    c.save()
+                    users = Users.objects.filter(party=p, active=True)
+                    for x in users:
+                        x.hasPicked = False
+                        x.save()
+                    p.state = 'assign'
                     p.save()
+                elif p.roundNum > p.roundTotal:
+                    lead = Users.objects.filter(party=p, turn='picking', active=True).first()
+                    if lead:
+                        lead.turn='picked'
+                        lead.save()
+                    p.state = 'assign'
+                    p.save()
+
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
                 for x in users:
                     if (x.sessionID in request.POST):
-                        #print("removing " + x.name + " from party")
                         x.active=False
+                        x.sessionID = ""
                         x.save()
+                        not_picked = Users.objects.filter(party=p, active=True, hasPicked=False)
+                        if not not_picked:
+                            c = Category.objects.filter(party=p, roundNum=p.roundTotal).first()
+                            c.full = True
+                            c.save()
                         return HttpResponseRedirect(reverse('users', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -624,6 +615,7 @@ def getUser(request, p):
         return HttpResponseRedirect(reverse('start'))
     return u
 
+
 def checkActive(pid, request):
     try:
         p = Party.objects.get(pk = pid)
@@ -638,10 +630,12 @@ def checkActive(pid, request):
     except:
         return False
 
+
 def getLetter():                                    
     rand = random.randint(65,90)
     letter = chr(rand)
     return letter
+
 
 def checkPermission(pid, request):
     try:
@@ -662,9 +656,10 @@ def checkPermission(pid, request):
         
 
 def playMusic(pid):
-    
     p = Party.objects.get(pk = pid)
     p.thread = True
+    if p.device_error:
+        p.device_error = False
     p.save()
     rN = p.roundNum
     print ('rN:', rN)
@@ -715,19 +710,20 @@ def playMusic(pid):
                         if song.duplicate and (time.time() - song.startTime) >= p.time and flag:
                             song.art= "duplicate"
                             song.save()
-                            print(song.art)
                             flag = False
-                            
                         continue
-
                 song.state= 'played'
                 song.save()
             except Exception as e:
                 print("***********************")
                 print(e)
                 print("***********************")
-                song.state = "error, not played"
-                song.save()
+                p = Party.objects.get(pk = pid)
+                if 'Device not found' in str(e):
+                    p.device_error = True
+                p.thread  = False
+                p.save()
+                return
             users = Users.objects.filter(party = p, active=True)
             for x in users:
                 x.hasLiked = False
@@ -738,6 +734,8 @@ def playMusic(pid):
             u.points = u.points + s.likes.num
             u.save()   
         rN = rN + 1
+    p = Party.objects.get(pk = pid)
+    print(p.roundTotal)
     p.thread=False
     p.save()
     print('EXITING THREAD')

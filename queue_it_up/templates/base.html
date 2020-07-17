@@ -4,22 +4,6 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<style>
-html, body {
-    height: 100%;
-}
-.main {
-    height: 100%;
-    width: 100%;
-    display: table;
-}
-.wrapper {
-    display: table-cell;
-    height: 100%;
-    vertical-align: middle;
-}
-</style>
-
 <html lang="en">
 
 	<head>
@@ -30,7 +14,7 @@ html, body {
 	</head>
 	
 	<nav class="navbar navbar-dark bg-primary">
-		<a class="navbar-brand" href="/">
+		<a class="navbar-brand" href="/index">
 			<img src="{% static 'images/qiulogo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="" />
 			Queue it Up
 		</a>
@@ -41,7 +25,6 @@ html, body {
 			{% block page_content %}{% endblock %}
 		</div>
 	</body>
-	
 </html>
 
 

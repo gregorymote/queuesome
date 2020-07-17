@@ -15,7 +15,6 @@ class chooseCategoryForm(forms.Form):
 class searchForm(forms.Form):
     search = forms.CharField(label = 'search', required = False,widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Search Songs or Artists',}))
 
-
 class searchResultsForm(forms.Form):
     results = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control'}),queryset=Searches.objects.all(), required=False)
         

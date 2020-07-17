@@ -7,6 +7,11 @@
 <meta name="refresh" http-equiv="refresh" content="{{ user.refreshRate }}"/>
 	
 	<div class = "container text-center">
+		{% if party.device_error and user.isHost %}
+		<div class="alert alert-danger">
+			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device 
+		</div>
+		{% endif %}
 		{% if song.art != "lull" %}
 			<h5>{{category.name}}</h5>
 			<h6>{{category.leader}}'s Category</h6>
@@ -34,7 +39,6 @@
 	
 		<form action="" method="post">
 			{% csrf_token %}
-			
 			<div class = "row">
 				<div class = "col text-center pb-2">
 					{% if user.turn == "picking" and party.state == "choose_category" %}
