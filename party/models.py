@@ -1,4 +1,5 @@
 from django.db import models
+from django_mysql.models import SetTextField
 import spotipy
 
 STRUCTURE_CHOICES = (
@@ -32,7 +33,9 @@ class Party(models.Model):
     device_error = models.BooleanField(default=False)
     active = models.BooleanField(default = True)
     last_updated = models.DateTimeField(auto_now=True, null=True)
-    
+    lib_repo = SetTextField(base_field=models.CharField(max_length=32), null=True)
+    indices = SetTextField(base_field=models.CharField(max_length=32), null=True)
+
     def __str__(self):
         return self.name
 
@@ -67,6 +70,7 @@ class Library(models.Model):
     display = models.CharField(max_length=120, default="No display name avaialable")
     structure = models.CharField(max_length=64, choices=STRUCTURE_CHOICES, default="{}")
     visible = models.BooleanField(default = False)
+    special = models.BooleanField(default=False)
     order = models.IntegerField(default = 100)
     
     def save(self, *args, **kwargs): 

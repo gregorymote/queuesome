@@ -47,6 +47,12 @@ def lobby(request, pid):
                 c = Category(name='Looks Like We Got A Lull',
                              roundNum=0, party=p)
                 c.save()
+                temp = set()
+                libraries = Library.objects.filter(visible=True).exclude(name='Custom').exclude(name='Scattergories')
+                for l in libraries:
+                    temp.add(l.id)
+                p.lib_repo = temp
+                p.save()
                 DRIVER.get(_url + "/sesh/" + str(pid) +  "/play?user="+ system)
                 #webbrowser.open("http://localhost:8000" + "/sesh/" + str(pid) +  "/play?user="+ system)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
@@ -245,18 +251,32 @@ def chooseCat(request, pid):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
 
     showCustom = False
-    
+    print(len(p.lib_repo) )
+    if request.method != 'POST' and p.indices is None:
+        num = 8
+        if len(p.lib_repo) < num:
+            num = len(p.lib_repo)
+        p.indices = get_numbers(8, len(p.lib_repo)) 
+        p.save() 
+    repo = set()
+    list_repo = list(p.lib_repo)
+    for i in p.indices:
+        repo.add(list_repo[int(i)])
+        
     if request.method == 'POST':
-        form = chooseCategoryForm(request.POST)
-
+        form = chooseCategoryForm(request.POST, repo=repo)
         if form.is_valid():
             if ( 'back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
                 try:
+                    p.indices = None
+                    if not form.cleaned_data['cat_choice'].special:
+                        choice_pk = str(form.cleaned_data['cat_choice'].pk)
+                        p.lib_repo.remove(choice_pk)   
+                    p.save()
                     choice = form.cleaned_data['cat_choice'].display
                     if choice != 'Custom': 
-                        
                         createCategory(choice, request, p)
                         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
                     else:
@@ -267,10 +287,11 @@ def chooseCat(request, pid):
                             l = Library(name=form.cleaned_data['custom'])
                             l.save()
                             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-                except:
+                except Exception as e:
+                    print(e)
                     invalid=True
     else:
-        form = chooseCategoryForm(initial={
+        form = chooseCategoryForm(repo=repo, initial={
                                            'cat_choice':'',
                                            'custom':default,
                                            }
@@ -635,6 +656,13 @@ def getLetter():
     rand = random.randint(65,90)
     letter = chr(rand)
     return letter
+
+
+def get_numbers(amount, length):
+    l = set()
+    while len(l) < amount:
+        l.add(random.randint(0, length - 1))
+    return l
 
 
 def checkPermission(pid, request):
