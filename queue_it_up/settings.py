@@ -14,6 +14,8 @@ import os
 import dj_database_url
 from selenium import webdriver
 
+PROD = True
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,10 +24,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#lohko!akfg%$z#5l&3#apwna@&$r#)d0^f8@v0fq_6=d0(f9l'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_Q")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = not PROD
 ALLOWED_HOSTS = ['192.168.1.209','localhost', '10.0.0.47', 'q-it-up.herokuapp.com']
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
@@ -88,21 +90,22 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 ##    }
 ##}
 
-##Local Postgresql
-##DATABASES = {
-##    'default': {
-##        'ENGINE': 'django.db.backends.postgresql',
-##        'NAME': 'queue_it_up',
-##        'USER': 'admin',
-##        'PASSWORD': 'admin',
-##        'HOST': '127.0.0.1',
-##        'PORT': '',
-##    }
-##}
-
-####Heroku Postgresql
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+if PROD:
+    ####Heroku Postgresql
+    DATABASES = {}
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+else:
+    ##Local Postgresql
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'queue_it_up',
+            'USER': 'admin',
+            'PASSWORD': 'admin',
+            'HOST': '127.0.0.1',
+            'PORT': '',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -157,6 +160,21 @@ chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
-DRIVER = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 
-#DRIVER = "DRIVER"
+PORT='8000'
+if PROD:
+    IP='q-it-up.herokuapp.com'
+    URI = 'http://' + IP + '/party/auth/'
+    URL='http://q-it-up.herokuapp.com'
+    DRIVER = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+else:
+    IP='localhost'
+    URI = 'http://' + IP + ':' + PORT + '/party/auth/'
+    URL='http://localhost:8000'
+    DRIVER = "DRIVER"
+
+CLIENT_SECRET=os.environ.get("SPOTIFY_CLIENT_SECRET")
+SCOPE = 'user-read-playback-state user-modify-playback-state'
+CLIENT_ID='6de276d9e60548d5b05a7af92a5db3bb'
+SYSTEM=os.environ.get("SYSTEM_USER_ID")
+

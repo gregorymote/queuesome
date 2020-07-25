@@ -16,7 +16,7 @@ from game.forms import chooseCategoryForm
 from game.forms import searchForm
 from game.forms import searchResultsForm
 from game.forms import settingsForm
-from queue_it_up.settings import DRIVER
+from queue_it_up.settings import DRIVER, SYSTEM, PROD, URL
 from datetime import datetime, timedelta, timezone
 import spotipy
 import time
@@ -26,9 +26,6 @@ import threading
 import math
 import webbrowser
 
-system='K8hgfSloHRH544tYYdxctvu6984'
-_url='http://q-it-up.herokuapp.com'
-#_url='http://localhost:8000'
 
 def lobby(request, pid):
 
@@ -53,8 +50,10 @@ def lobby(request, pid):
                     temp.add(l.id)
                 p.lib_repo = temp
                 p.save()
-                DRIVER.get(_url + "/sesh/" + str(pid) +  "/play?user="+ system)
-                #webbrowser.open("http://localhost:8000" + "/sesh/" + str(pid) +  "/play?user="+ system)
+                if PROD:
+                    DRIVER.get(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                else:
+                    webbrowser.open(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -108,10 +107,10 @@ def play(request, pid):
     #print(p.thread)
     
     url = str(request.get_full_path)
-    if 'user=' + system in url:
-        sys=Users.objects.filter(party=p, name=system)
+    if 'user=' + SYSTEM in url:
+        sys=Users.objects.filter(party=p, name=SYSTEM)
         if not sys:
-            sys=Users(party=p, name=system, sessionID=request.session.session_key, active=False, refreshRate=1)
+            sys=Users(party=p, name=SYSTEM, sessionID=request.session.session_key, active=False, refreshRate=1)
             sys.save()
 
     if not checkActive(pid, request):
@@ -119,7 +118,7 @@ def play(request, pid):
     
     u = getUser(request, pid)
     
-    if u.name == system:
+    if u.name == SYSTEM:
         inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
         if inactivity >= 20:
             p.active=False
@@ -211,7 +210,7 @@ def play(request, pid):
         s = Songs.objects.get(category__party=p, state='playing')
         c = s.category
 
-        if u.name == system and p.roundNum != c.roundNum:
+        if u.name == SYSTEM and p.roundNum != c.roundNum:
             p.roundNum = c.roundNum
             p.save()
         
@@ -222,7 +221,7 @@ def play(request, pid):
         n = Songs.objects.filter(category__party=p, state='played').order_by('-category__roundNum')
         if n:
             n = list(n)
-            if u.name == system and p.roundNum != n[0].category.roundNum + 1:
+            if u.name == SYSTEM and p.roundNum != n[0].category.roundNum + 1:
                 p.roundNum = n[0].category.roundNum + 1
                 p.save()
         
@@ -644,7 +643,7 @@ def checkActive(pid, request):
             return False
         else:
             u = getUser(request, p)
-            if u.name != system:
+            if u.name != SYSTEM:
                 return u.active
             else:
                 return True
