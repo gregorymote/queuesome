@@ -25,7 +25,7 @@ class searchForm(forms.Form):
 
 
 class searchResultsForm(forms.Form):
-    results = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control'}),queryset=Searches.objects.all(), required=False)
+    results = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control'}),queryset=Searches.objects.all().order_by('pk'), required=False)
         
     def __init__(self,*args,**kwargs):
         
