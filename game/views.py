@@ -449,7 +449,7 @@ def searchResults(request, pid):
     else:
         form = searchResultsForm(partyObject=p, userObject=u, initial={'results':''})
    
-    albumSearch = list(Searches.objects.filter(party=p, user=u))
+    albumSearch = list(Searches.objects.filter(party=p, user=u).order_by('pk'))
         
     context = {
                'form':form,
