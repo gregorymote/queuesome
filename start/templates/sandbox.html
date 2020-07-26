@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block page_content %}
+<script>
+	setTimeout(function() {
+	var logo = document.getElementById("content");
+	logo.classList.remove("slide-up-fade-in");
+    logo.classList.add("spin");
+    var outline = document.getElementById("outline");
+    outline.classList.remove("slide-up-fade-in");
+    outline.classList.add("spin");
+	}, 1500);
+    setTimeout(function() {
+	var logo = document.getElementById("content");
+    logo.style.WebkitTransition = 'opacity 2s ease-in-out';
+    logo.style.opacity = '0';
+    },2000);
+    setTimeout(function() {
+    var logo = document.getElementById("content");
+    logo.classList.add("rotate");
+    var outline = document.getElementById("outline");
+    outline.classList.add("rotate");
+    outline.style.opacity = '1';
+	}, 2500);
+</script>
+
+<style>
+    .test {
+        position: fixed;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    background-color: #0275d8;
+	    z-index: 999999;
+    }
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+        
+    }
+    .logo{
+        width: 100px;
+	    height: 100px;
+  
+	    position: relative;
+	    position: absolute;
+	    top: 41%;
+	    left: 37%;
+    }
+
+    .guide{
+        width: 1px;
+	    height: 1px;
+  
+	    position: relative;
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+    }
+
+    .fade-in {
+        animation: fadeIn ease 2.5s;
+        -webkit-animation: fadeIn ease 2.5s;
+        -moz-animation: fadeIn ease 2.5s;
+        -o-animation: fadeIn ease 2.5s;
+        -ms-animation: fadeIn ease 2.5s;
+    }
+    .rotate{
+        transform:          rotate(135deg);
+        -ms-transform:      rotate(135deg);
+        -moz-transform:     rotate(135deg);
+        -webkit-transform:  rotate(135deg);
+        -o-transform:       rotate(135deg);
+    }
+
+    .spin{
+        -webkit-animation:spin 1s linear;
+        -moz-animation:spin 1s linear;
+        animation:spin 1s linear;
+    }
+    .hidden{
+        opacity:0;
+    }   
+@-moz-keyframes spin {
+     100% { -moz-transform: rotate(135deg);}
+    }
+@-webkit-keyframes spin {
+    100% { -webkit-transform: rotate(135deg); }
+    }
+@keyframes spin {
+    100% { -webkit-transform: rotate(135deg);
+            transform:rotate(135deg); }
+    }
+
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+    }
+
+@-moz-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+0% {opacity:0;}
+100% {opacity:1;}
+}
+.slide-up-fade-in{
+    animation: slide-up-fade-in ease 1.5s;
+    animation-iteration-count: 1;
+    transform-origin: 50% 50%;
+   
+    -webkit-animation: slide-up-fade-in ease 1.5s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-transform-origin: 50% 50%;
+
+    -moz-animation: slide-up-fade-in ease 1.5s;
+    -moz-animation-iteration-count: 1;
+    -moz-transform-origin: 50% 50%;
+
+    -o-animation: slide-up-fade-in ease 1.5s;
+    -o-animation-iteration-count: 1;
+    -o-transform-origin: 50% 50%;
+
+    -ms-animation: slide-up-fade-in ease 1.5s;
+    -ms-animation-iteration-count: 1;
+    -ms-transform-origin: 50% 50%;
+
+
+    opacity:0;
+    opacity: 1\9;
+
+}
+
+@keyframes slide-up-fade-in{
+    0% {
+        opacity:0;
+        transform:  translate(0px,-40px)  ;
+    }
+    100% {
+        opacity:1;
+        transform:  translate(0px,0px)  ;
+    }
+}
+
+@-moz-keyframes slide-up-fade-in{
+    0% {
+        opacity:0;
+        -moz-transform:  translate(0px,-40px)  ;
+    }
+    100% {
+        opacity:1;
+        -moz-transform:  translate(0px,0px)  ;
+    }
+}
+
+@-webkit-keyframes slide-up-fade-in {
+    0% {
+        opacity:0;
+        -webkit-transform:  translate(0px,-40px)  ;
+    }
+    100% {
+        opacity:1;
+        -webkit-transform:  translate(0px,0px)  ;
+    }
+}
+
+@-o-keyframes slide-up-fade-in {
+    0% {
+        opacity:0;
+        -o-transform:  translate(0px,-40px)  ;
+    }
+    100% {
+        opacity:1;
+        -o-transform:  translate(0px,0px)  ;
+    }
+}
+
+@-ms-keyframes slide-up-fade-in {
+    0% {
+        opacity:0;
+        -ms-transform:  translate(0px,-40px)  ;
+    }
+    100% {
+        opacity:1;
+        -ms-transform:  translate(0px,0px)  ;
+    }
+}
+
+</style>
+
+<div class="test">
+    {% load static %}
+    <img src="{% static 'images/disco.png' %}" class="logo slide-up-fade-in" id="content" alt="...">
+    <img src="{% static 'images/disco_outline.png' %}" class="logo slide-up-fade-in" id="outline" alt="...">
+    <!--<img src="{% static 'images/dot.png' %}" class="guide" alt="...">-->
+</div>
+
+
+{% endblock %}

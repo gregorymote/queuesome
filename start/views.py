@@ -13,3 +13,8 @@ def index(request):
     sk = request.session.session_key
        
     return render(request, 'index.html', {})
+
+def sandbox(request):
+
+    return render(request, 'sandbox.html', {})
+
