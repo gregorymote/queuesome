@@ -79,8 +79,10 @@ def choose_device(request, pid):
         return HttpResponseRedirect(reverse('start'))
                                      
     p = Party.objects.get(pk = pid)
-    checkToken(p.token_info, pid)
-    spotifyObject = spotipy.Spotify(auth=p.token)
+    token = checkToken(p.token_info, pid)
+    if token is None:
+        token = p.token
+    spotifyObject = spotipy.Spotify(auth=token)
     deviceResults = spotifyObject.devices()
     deviceResults = deviceResults['devices']
     curr_devices = []

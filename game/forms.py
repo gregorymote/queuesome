@@ -25,14 +25,14 @@ class searchForm(forms.Form):
 
 
 class searchResultsForm(forms.Form):
-    results = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control'}),queryset=Searches.objects.all().order_by('pk'), required=False)
+    results = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control'}),queryset=Searches.objects.all(), required=False)
         
     def __init__(self,*args,**kwargs):
         
         self.partyObject = kwargs.pop('partyObject')
         self.userObject = kwargs.pop('userObject')
         super(searchResultsForm,self).__init__(*args,**kwargs)
-        self.fields['results'].queryset = Searches.objects.filter(party=self.partyObject).filter(user=self.userObject)
+        self.fields['results'].queryset = Searches.objects.filter(party=self.partyObject, user=self.userObject).order_by('pk')
 
 
 class settingsForm(forms.Form):

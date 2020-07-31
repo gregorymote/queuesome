@@ -78,8 +78,6 @@ def lobby(request, pid):
         'access': access,
         'form': form,
         }
-
-    
     return render(request, 'game/lobby.html', context)
 
 
@@ -104,8 +102,6 @@ def code(request, pid):
 
 def play(request, pid):
     p = Party.objects.get(pk = pid)
-    #print(p.thread)
-    
     url = str(request.get_full_path)
     if 'user=' + SYSTEM in url:
         sys=Users.objects.filter(party=p, name=SYSTEM)
@@ -250,7 +246,6 @@ def chooseCat(request, pid):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
 
     showCustom = False
-    print(len(p.lib_repo) )
     if request.method != 'POST' and p.indices is None:
         num = 8
         if len(p.lib_repo) < num:
@@ -294,7 +289,7 @@ def chooseCat(request, pid):
                                            'cat_choice':'',
                                            'custom':default,
                                            }
-                                  )
+        )
     context = {
         'form':form,
         'showCustom':showCustom,
@@ -346,9 +341,10 @@ def pickSong(request, pid):
             if ( 'back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
-                checkToken(p.token_info, pid)
-                spotifyObject = spotipy.Spotify(auth=p.token)
-                
+                token = checkToken(p.token_info, pid)
+                if token is None:
+                    token = p.token
+                spotifyObject = spotipy.Spotify(auth=token)               
                 search = form.cleaned_data['search']
                 # choice =  form.cleaned_data['choice_field']
                 if search != "":
@@ -428,7 +424,7 @@ def searchResults(request, pid):
                               likes=l,
                               link=search.link,
                               duration=search.duration,
-                              )
+                    )
                     s.save()
                     u.hasPicked = True
                     u.save()
@@ -449,7 +445,7 @@ def searchResults(request, pid):
     else:
         form = searchResultsForm(partyObject=p, userObject=u, initial={'results':''})
    
-    albumSearch = list(Searches.objects.filter(party=p, user=u).order_by('-pk'))
+    albumSearch = list(Searches.objects.filter(party=p, user=u).order_by('pk'))
         
     context = {
                'form':form,
@@ -499,8 +495,12 @@ def settings(request, pid):
     
     invalid = False
     p = Party.objects.get(pk = pid)
-    checkToken(p.token_info, pid)
-    spotifyObject = spotipy.Spotify(auth=p.token)
+    
+    token = checkToken(p.token_info, pid)
+    if token is None:
+        token = p.token
+    spotifyObject = spotipy.Spotify(auth=token)
+
     deviceResults = spotifyObject.devices()
     deviceResults = deviceResults['devices']
     curr_devices = []
@@ -690,8 +690,10 @@ def playMusic(pid):
     p.save()
     rN = p.roundNum
     print ('rN:', rN)
-    checkToken(p.token_info, pid)
-    spotifyObject = spotipy.Spotify(auth=p.token)
+    token = checkToken(p.token_info, pid)
+    if token is None:
+        token = p.token
+    spotifyObject = spotipy.Spotify(auth=token)
     #print(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True))
     while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True)):
         queue = Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True).order_by('order')
@@ -712,9 +714,9 @@ def playMusic(pid):
                         song.duplicate=True
                         song.save()
                     
-                    check = checkToken(p.token_info, pid)
-                    if check != None:
-                        spotifyObject = spotipy.Spotify(auth=check)
+                    token = checkToken(p.token_info, pid)
+                    if token != None:
+                        spotifyObject = spotipy.Spotify(auth=token)
                     
                     spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
                     song.state = 'playing'
