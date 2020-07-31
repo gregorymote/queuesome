@@ -12,7 +12,9 @@ class blankForm(forms.Form):
 class chooseCategoryForm(forms.Form):
     cat_choice = forms.ModelChoiceField(label = 'Choose a Category', queryset=Library.objects.all(), required=False, widget=forms.Select(attrs={'class':'form-control'})) 
     custom = forms.CharField(label = 'Create Your Own',  required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR OWN CATEGORY',}) )
-    
+    CHOICES=[('Artist','Artist'),( 'Song','Song')]
+    scatt_radio = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect(attrs={'class':'form-check form-check-inline'}), initial='Song')
+
     def __init__(self,*args,**kwargs):
         self.repo = kwargs.pop('repo')
         super(chooseCategoryForm,self).__init__(*args,**kwargs)

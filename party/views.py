@@ -27,6 +27,10 @@ from queue_it_up.settings import IP, PORT, URI, SCOPE, CLIENT_ID, CLIENT_SECRET
 
 
 def login(request):
+    if not request.session.session_key:
+        sk = request.session.create()
+    else:
+        sk = request.session.session_key
     url = ''
     if request.method == 'POST':
 
@@ -37,13 +41,18 @@ def login(request):
             
             p = Party(name='creating party')
             p.save()
-
-            Users.objects.filter(sessionID=request.session.session_key).delete()
+            old_users = Users.objects.filter(sessionID=sk, active=True)
+            for u in old_users:
+                old_party = u.party
+                old_party.active=False
+                old_party.save()
+                u.active = False
+                u.save()
             
             u = Users(
                 name = 'Host',
                 party = p,
-                sessionID = request.session.session_key,
+                sessionID = sk,
                 points = 0,
                 isHost = True,
                 hasSkip = True,
@@ -74,9 +83,8 @@ def login(request):
 
 
 def choose_device(request, pid):
-
     if not checkPermission(pid, request):
-        return HttpResponseRedirect(reverse('start'))
+        return HttpResponseRedirect(reverse('index'))
                                      
     p = Party.objects.get(pk = pid)
     token = checkToken(p.token_info, pid)
@@ -121,9 +129,9 @@ def choose_device(request, pid):
 
 def auth(request):
     try:
-        u = Users.objects.get(sessionID=request.session.session_key)
+        u = Users.objects.get(sessionID=request.session.session_key, active=True)
     except:
-         return HttpResponseRedirect(reverse('start'))
+         return HttpResponseRedirect(reverse('index'))
     p = u.party
     url = getURL(str(request.get_full_path))
     p.url = url
@@ -147,7 +155,7 @@ def auth(request):
 def name_party(request, pid):
 
     if not checkPermission(pid, request):
-        return HttpResponseRedirect(reverse('start'))
+        return HttpResponseRedirect(reverse('index'))
     
     p = Party.objects.get(pk = pid)
     u = getUser(request, p)
@@ -201,6 +209,7 @@ def create_user(request):
     if not request.session.session_key:
         request.session.create()
     sk = request.session.session_key
+
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
@@ -210,7 +219,7 @@ def create_user(request):
                     invalid = True
                 else:
                     username = form.cleaned_data['user_name']
-                    q = Users.objects.filter(party=p, sessionID=request.session.session_key, active=True).first()
+                    q = Users.objects.filter(party=p, sessionID=sk, active=True).first()
                     if q:
                         q.active=True
                         q.name= username
@@ -220,13 +229,13 @@ def create_user(request):
                     u = Users(
                             name= username,
                             party = p,
-                            sessionID = request.session.session_key,
+                            sessionID = sk,
                             points = 0,
                             isHost = False,
                             hasSkip = True,
                             hasPicked = False,
                             turn = "not_picked",
-                            )
+                    )
                     u.save()
 
                     return HttpResponseRedirect(reverse('lobby', kwargs={'pid':p.pk}))
@@ -235,7 +244,9 @@ def create_user(request):
     else:
         form = CreateUserForm(initial={
                                         'party_choice': '',
-                                        'user_name': ''})
+                                        'user_name': ''
+                                    }
+        )
 
     context = {
         'form' : form,
@@ -261,7 +272,6 @@ def isValid(num):
         return True
     
 
-    
 def getURL(path):
     print('path:', path)
     i = 0
@@ -284,7 +294,7 @@ def getUser(request, p):
     try:
         current_user = Users.objects.get(sessionID = sk, party = p, active=True)
     except:
-        return HttpResponseRedirect(reverse('start'))
+        return HttpResponseRedirect(reverse('index'))
     u = current_user
     return u
 
@@ -322,6 +332,7 @@ def checkToken(token_info, pid):
     else:
         #print("TOKEN STILL VALID")
         return None
+
 
 def checkPermission(pid, request):
     try:

@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+
 <html lang="en">
 
 	<head>
@@ -12,7 +13,6 @@
 		<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
 		<title>Queue it Up</title>
 	</head>
-	
 	<nav class="navbar navbar-dark bg-primary">
 		<a class="navbar-brand" href="/index">
 			<img src="{% static 'images/qiulogo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="" />
@@ -21,10 +21,11 @@
 	</nav>
 	
 	<body>
-		<div class="container pt-3">
+		<div class="pt-3">
 			{% block page_content %}{% endblock %}
 		</div>
 	</body>
+
 </html>
 
 
