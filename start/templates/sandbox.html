@@ -27,12 +27,16 @@
     setTimeout(function() {
         var main = document.getElementById("main");
         main.classList.add("slide-up-fade-in");
-	}, 2700);
+	}, 3500);
     setTimeout(function() {
         var main = document.getElementById("main");
         main.classList.remove("slide-up-fade-in");
         main.style.opacity = '1';
-	}, 3700);
+	}, 4500);
+    setTimeout(function() {
+        var outline = document.getElementById("outline");
+        outline.style.opacity = '0';
+    }, 5000);
 </script>
 
 <style>
@@ -64,8 +68,9 @@
     }
     .main{
         position: fixed;
-        width: 100%;
+        width: 80%;
         top: 30%;
+        left: 10%;
 
     }
 
@@ -309,16 +314,16 @@
     <img src="{% static 'images/disco_outline.png' %}" class="logo slide-down-fade-in" id="outline" alt="...">
 
 
-<div class="bg-primary hidden text-center main" id="main">
-    <h1 style="color:white;">Queue it Up</h1>
-    <p>Let's get something going</p>
-    <div class="row center">		
-        <a href ="party/login/" class ="btn btn-outline-light btn-lg"  role="button" style="width: 100%; display:block;">Start Party</a>
+    <div class="bg-primary hidden text-center main" id="main">
+        <h1 style="color:white;">Queue it Up</h1>
+        <p>Let's get something going</p>
+        <div class="row">		
+            <a href ="party/login/" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;">Start Party</a>
+        </div>
+        <div class="row pt-2">
+            <a href ="party/join_party/" class ="btn btn-light btn-lg block" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Party</a>
+        </div>
     </div>
-    <div class="row center pt-2">
-        <a href ="party/join_party/" class ="btn btn-light btn-lg" role="button" style="width: 100%;">Join Party</a>
-    </div>
-</div>
 </div>
 
 {% endblock %}
