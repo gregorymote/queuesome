@@ -1,4 +1,10 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from party.models import Party, Users
+from queue_it_up.settings import CLIENT_ID, CLIENT_SECRET, SCOPE, URI
+from game.forms import blankForm
+import util_custom as util
 
 def start(request):
     if not request.session.session_key:
@@ -15,6 +21,55 @@ def index(request):
     return render(request, 'index.html', {})
 
 def sandbox(request):
+    if not request.session.session_key:
+        sk = request.session.create()
+    else:
+        sk = request.session.session_key
+    url = ''
+    if request.method == 'POST':
 
-    return render(request, 'sandbox.html', {})
+        form = blankForm(request.POST)
+        if form.is_valid():
+            uname = 'temp'
+            
+            p = Party(name='creating party')
+            p.save()
+            old_users = Users.objects.filter(sessionID=sk, active=True)
+            for u in old_users:
+                old_party = u.party
+                old_party.active=False
+                old_party.save()
+                u.active = False
+                u.save()
+            
+            u = Users(
+                name = 'Host',
+                party = p,
+                sessionID = sk,
+                points = 0,
+                isHost = True,
+                hasSkip = True,
+                hasPicked = False,
+                turn = "not_picked",
+                )
+            u.save()
+            
+            try:
+                url = util.generateURL(uname, SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=URI)
+            except (AttributeError, JSONDecodeError):
+                os.remove(f".cache-{username}")
+                url = util.generateURL(uname, SCOPE, client_id=CLIENT_ID ,client_secret=CLIENT_SECRET, redirect_uri=URI)
+
+            p.url_open = url
+            p.save()
+            return HttpResponseRedirect(url)
+            
+    else:
+        form = blankForm(initial= {'blank' : ''})
+    
+    context = {
+        'form' : form,
+        }
+
+    return render(request, 'sandbox.html', context)
 

@@ -313,17 +313,19 @@
     <img src="{% static 'images/disco.png' %}" class="logo slide-down-fade-in" id="logo" alt="...">
     <img src="{% static 'images/disco_outline.png' %}" class="logo slide-down-fade-in" id="outline" alt="...">
 
-
+    <form action="" method="post">
+    {% csrf_token %}	
     <div class="bg-primary hidden text-center main" id="main">
-        <h1 style="color:white; text-shadow: 2px 2px #79d6e2;">Queue it Up</h1>
+        <h1 style="color:white; text-shadow: 2px 2px #1169ec; font-size:50px;">Queue it Up</h1>
         <p style="color:white;">Let's get something going</p>
-        <div class="row">		
-            <a href ="party/login/" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;">Start Party</a>
+        <div class="row">
+            <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Log in to Spotify Premium">
         </div>
         <div class="row pt-2">
             <a href ="party/join_party/" class ="btn btn-light btn-lg block text-primary" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Party</a>
         </div>
     </div>
+    </form>
 </div>
 
 {% endblock %}
