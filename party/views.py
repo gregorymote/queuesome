@@ -206,10 +206,10 @@ def name_party(request, pid):
 
 def create_user(request):
     invalid = False
-    if not request.session.session_key:
-        request.session.create()
     sk = request.session.session_key
-
+    if not sk:
+        sk = request.session.create()
+    
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():

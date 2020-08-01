@@ -343,7 +343,7 @@ def pickSong(request, pid):
     if u.hasPicked:
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
-    c = Category.objects.get(party=p, roundNum=p.roundTotal) 
+    c = Category.objects.filter(party=p, roundNum=p.roundTotal).first()
 
     if request.method == 'POST':
         form = searchForm(request.POST)
@@ -409,7 +409,7 @@ def searchResults(request, pid):
     if u.hasPicked:
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
-    c = Category.objects.get(party=p, roundNum=p.roundTotal) 
+    c = Category.objects.filter(party=p, roundNum=p.roundTotal).first() 
     try:
         isArtist = (list(Searches.objects.filter(party=p).filter(user=u))[0].art == None)
     except:
