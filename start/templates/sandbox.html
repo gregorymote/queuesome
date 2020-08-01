@@ -315,17 +315,87 @@
 
     <form action="" method="post">
     {% csrf_token %}	
-    <div class="bg-primary hidden text-center main" id="main">
-        <h1 style="color:white; text-shadow: 2px 2px #1169ec; font-size:50px;">Queue it Up</h1>
-        <p style="color:white;">Let's get something going</p>
-        <div class="row">
-            <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Log in to Spotify Premium">
+        <div class="bg-primary hidden text-center main" id="main">
+            <h1 style="color:white; text-shadow: 2px 2px #1169ec; font-size:50px;">Queue it Up</h1>
+            <p style="color:white;">Let's get something going</p>
+            <div class="row">
+                <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Log in to Spotify Premium">
+            </div>
+            <div class="row pt-2">
+                <a href ="party/join_party/" class ="btn btn-light btn-lg block text-primary" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Party</a>
+            </div>
+            <div class = "pt-5 text-right">
+                <button type="button" class="btn btn-link text-white" data-toggle="modal" data-target="#myModal">
+                    What is this?
+                </button>
+            </div>
         </div>
-        <div class="row pt-2">
-            <a href ="party/join_party/" class ="btn btn-light btn-lg block text-primary" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Party</a>
+    </form>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Queuenopsis</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active" style="filter: invert(100%);"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="1" style="filter: invert(100%);"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="2" style="filter: invert(100%);"></li>
+                    </ol>
+                    {% load static %}
+                    <div class="carousel-inner">
+                      <div class="carousel-item active">
+                        <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
+                            <h6 style="color:black;">Queue it Up, an interactive way to listen to music together...</h6>
+                          </div>
+                        <img class="d-block w-100" src="{% static 'images/headphones.jpg' %}" alt="First slide">
+                        <div class="text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
+                            <a class="text-secondary" href='https://www.freepik.com/vectors/music' style="font-size:14px;"><small>Music vector created by pch.vector - www.freepik.com</small></a>
+                        </div>
+                      </div>
+                      <div class="carousel-item">
+                        <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
+                            <h6 style="color:black;">...take turns choosing categories and picking songs that fit...</h6>
+                          </div>
+                        <img class="d-block w-100" src="{% static 'images/people_phones.jpg' %}" alt="Second slide">
+                        <div class="text-center text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
+                            <a class="text-secondary" href="https://www.freepik.com/vectors/people" style="font-size:14px;"><small>People vector created by pikisuperstar - www.freepik.com</small></a>
+                        </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
+                                <h6 style="color:black;">...Log in to Spotify to get something started or join another party</h6>
+                              </div>
+                            <img class="d-block w-100" src="{% static 'images/dancing.jpg' %}" alt="Third slide">
+                            <div class="text-center text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
+                                <a class="text-secondary" href='https://www.freepik.com/vectors/music' style="font-size:14px;"><small>Music vector created by pch.vector - www.freepik.com</small></a>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="carousel-control-prev" style="filter: invert(100%);" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" style="filter: invert(100%);" href="#carouselExampleIndicators" role="button" data-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
         </div>
     </div>
-    </form>
 </div>
+  
+
 
 {% endblock %}
