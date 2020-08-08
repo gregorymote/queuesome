@@ -32,7 +32,11 @@
 			{% load static %}
 			<img src="{% static 'images/queue_it_to_it_brah.png' %}" class="img-thumbnail" width="200" height="200"  alt="" />
 			<div class = "pt-1">
-				<h6>Someone Needs to Choose a Category or Pick a Song</h6>
+				{% if party.state == "pick_song" %}
+					<h6> Someone Needs to Pick a Song</h6>
+				{% else %}
+					<h6>Someone Needs to Choose a Category</h6>
+				{% endif %}
 			</div>
 		{% endif %}
 		

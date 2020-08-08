@@ -8,18 +8,29 @@
 			var x = document.getElementById("id_cat_choice").selectedIndex;
 			var y = document.getElementById("id_cat_choice").options;		
 			var z = y[x].text;
+			var box = '';
+			var label = '';
 			var info = '';
 			var radio0 = document.getElementById('radio0');
 			var radio1 = document.getElementById('radio1');
 			radio0.style.display = 'none';
 			radio1.style.display = 'none';
-
-			if (z == 'Scattergories'){
+			if (z == 'Custom'){
+				box = '{{ form.custom }}';
+				label = '{{ form.custom.label }}';
+			}
+			else if(z == 'Songs by this Artist'){
+				box = '{{ form.artist }}';
+				label = '{{ form.artist.label }}';
+			}
+			else if (z == 'Scattergories'){
 				info = 'Songs where the Song or Artist name begins with a Randomly Generated Letter';
 				radio0.style.display = 'initial';
 				radio1.style.display = 'initial';
 			}
 			document.getElementById('info').innerHTML = info;
+			document.getElementById('custom').innerHTML = box;
+			document.getElementById('label').innerHTML = label;
 		};
 		$(document).ready(function() {
 			$('#id_cat_choice').change(function() {
@@ -37,6 +48,10 @@
 			if (z == 'Custom'){
 				box = '{{ form.custom }}';
 				label = '{{ form.custom.label }}';
+			}
+			else if(z == 'Songs by this Artist'){
+				box = '{{ form.artist }}';
+				label = '{{ form.artist.label }}';
 			}
 			else if (z == 'Scattergories'){
 				info = 'Songs where the Song or Artist name begins with a Randomly Generated Letter';

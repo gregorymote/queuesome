@@ -235,8 +235,8 @@ def chooseCat(request, pid):
     if not checkActive(pid, request):
         return HttpResponseRedirect(reverse('index'))
     
-    default = ''
     invalid=False
+    ARTIST='Songs by this Artist'
     p = Party.objects.get(pk=pid)
     u = getUser(request, pid)
 
@@ -268,7 +268,7 @@ def chooseCat(request, pid):
                         p.lib_repo.remove(choice_pk)   
                     p.save()
                     choice = form.cleaned_data['cat_choice'].display
-                    if choice != 'Custom': 
+                    if choice != 'Custom' and choice != ARTIST: 
                         createCategory(
                                         choice=choice,
                                         request=request,
@@ -276,10 +276,18 @@ def chooseCat(request, pid):
                                         sc_type=form.cleaned_data['scatt_radio']
                         )
                         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                    elif choice == ARTIST:
+                        if form.cleaned_data['artist'] != '':
+                            createCategory(
+                                choice='Songs by ' + form.cleaned_data['artist'],
+                                request=request,
+                                p=p
+                            )
+                            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
                     else:
                         showCustom = True
 
-                        if form.cleaned_data['custom'] != default:
+                        if form.cleaned_data['custom'] != '':
                             createCategory(
                                 choice=form.cleaned_data['custom'],
                                 request=request,
@@ -294,7 +302,7 @@ def chooseCat(request, pid):
     else:
         form = chooseCategoryForm(repo=repo, initial={
                                            'cat_choice':'',
-                                           'custom':default,
+                                           'custom':'',
                                            }
         )
     context = {
