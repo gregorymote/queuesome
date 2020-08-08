@@ -1,78 +1,108 @@
-<h2> Queue it Up </h2>
-Spotipy/Django Web Application Game
+<h1> Queue it Up </h1>
 
-Try it yourself at q-it-up.herokuapp.com
+   A Django Web Application Powered By Spotipy
 
-<h3>Create virtual environment and install django</h3>
+   Try it yourself at <a href="http://q-it-up.herokuapp.com">q-it-up.herokuapp.com</a>
 
-In desired directory run (This only needs to be done the first time)
 
-<I>python -m venv venv</I>
+
+   <h3>What is It?</h3>
+
+   Queue it Up is a Fun and Interactive way to Listen to Music Together
+
+   Take Turns Selecting and Creating Different Song Categories
+
+   Pick Songs that Fit Each Category
+
+   Listen to Everyone's Picks and Give Likes to the Songs that Fit the Best 
+
+   While you Listen, Continue to Select Categories, Pick Songs, and Give Out Likes to the Best Picks
+
+
+
+   <h3> Local Dev </h3>
+
+   <h4>Create Virtual Environment</h4>
+
+   In Desired Directory Run
+
+   <I>python -m venv venv</I>
+
+
+   <h4>Activate Virutal Environment</h4>
  
-Activate Virutal Environment (You'll need to do this every time you reopen cmd)
- 
-<I>C:\> venv\Scripts\activate.bat</I>
-
-Install Django
-
-<I>(venv) $ pip install Django</I>
-
-Useful Django tutorial for additional help https://realpython.com/get-started-with-django-1/
+   <I>C:\> venv\Scripts\activate.bat</I>
 
 
-<h3>Additional libraries needed</h3>
+   <h4> Install Dependencies </h4>
 
-install spotipy
-
-<I>pip install spotipy</I>
-
-<I>pip install git+https://github.com/plamere/spotipy.git --upgrade</I>
-
-add util_custom to \Lib\site-packages\spotipy
-
-add value of client secret to client secret variable at the top of party/views.py
-
-Note: client secret has been removed from github for security purposes
+   <I>pip install -r requirements.txt</I>
 
 
-<h3>To Create Access to other Devices from Your IP Address</h3>
+   <h4> Edit <I>queue_it_up/settings.py</I> </h4>
 
-edit party/view and change my_IP and my_PORT at the top of the page
+   line 17: PROD = False
 
-edit queue_it_up/settings and add IP address to ALLOWED_HOSTS
+   line 90: Configure Local Database
 
-From cmd line run
-
-<I>python manage.py runserver 0.0.0.0:value of my_PORT</I>
+   line 177: <YOUR-SPOTIFY-CLIENT-ID>
 
 
-<h3>Add More Categories</h3>
+   <h4> Add The Following Environment Variables </h4>
 
-Open the Python Shell by Entering:
+   You can also hardcode your own values. Line numbers refer to <I>queue_it_up/settings.py</I>
 
-<I>python manage.py shell</I>
+   line 27: DJANGO_SECRET_Q
 
-Paste the Following code with new Categories in the cat list
+   line 175: SPOTIFY_CLIENT_SECRET
 
-<I>from party.Models import Library
+   line 178: SYSTEM_USER_ID
 
-cats = ["new cat1", "new cat2"]
 
-for x in cats:
-l = Library(name = x)
-l.save()</I>
+   <h4> Migrate Database </h4>
 
-<h3>Clean Out Old Parties</h3>
+   <I>python manage.py makemigrations</I>
 
-Open the Python Shell by Entering:
+   <I>python manage.py migrate</I>
 
-<I>python manage.py shell</I>
 
-Paste the Following code
+   <h4> Collect Static Images </h4>
 
-<I>from party.Models import Party
- 
- Party.objects.all().delete()</I>
+   <I>python manage.py collectstatic</I>
+
+
+   <h4>Add Categories via Python Shell</h4>
+
+   Open the Python Shell by Entering:
+
+   <I>python manage.py shell</I>
+
+   Paste the Following code with new Categories in the cats list
+
+   <I>from party.Models import Library</I>
+
+   <I>cats = ["new cat1", "new cat2"]</I>
+
+   <I>for x in cats:</I>
+       <I>l = Library(name = x)</I>
+       <I>l.save()</I>
+
+
+   <h4> Run Server </h4>
+
+   <I>python manage.py runserver</I>
+
+   visit <a href="http://localhost:8000">http://localhost:8000</a> to view application
+
+
+   <h4>To Create Access to other Devices from Your IP Address</h4>
+
+   Edit queue_it_up/settings.py and add IP address to ALLOWED_HOSTS
+
+   <I>python manage.py runserver 0.0.0.0:<PORT></I>
+   
+   Note: You also need to add your IP address to the list of allowed addresses in your Spotify Developer Account
+
 
 
 
