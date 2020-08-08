@@ -5,17 +5,19 @@
    Try it yourself at <a href="http://q-it-up.herokuapp.com">q-it-up.herokuapp.com</a>
 
 
+
    <h3>What is It?</h3>
 
    Queue it Up is a Fun and Interactive way to Listen to Music Together
 
    Take Turns Selecting and Creating Different Song Categories
 
-   Pick Songs that Best Fit Each Category
+   Pick Songs that Fit Each Category
 
    Listen to Everyone's Picks and Give Likes to the Songs that Fit the Best 
 
-   While you Listen, Continue to Select Categories, Pick Songs and Give Out Likes 
+   While you Listen, Continue to Select Categories, Pick Songs, and Give Out Likes to the Best Picks
+
 
 
    <h3> Local Dev </h3>
@@ -77,13 +79,13 @@
 
    Paste the Following code with new Categories in the cats list
 
-   <I>from party.Models import Library
+   <I>from party.Models import Library</I>
 
-   cats = ["new cat1", "new cat2"]
+   <I>cats = ["new cat1", "new cat2"]</I>
 
-   for x in cats:
-       l = Library(name = x)
-       l.save()</I>
+   <I>for x in cats:</I>
+       <I>l = Library(name = x)</I>
+       <I>l.save()</I>
 
 
    <h4> Run Server </h4>
