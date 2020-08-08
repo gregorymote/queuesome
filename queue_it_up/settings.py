@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_Q")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PROD
-ALLOWED_HOSTS = ['192.168.1.209','localhost', '10.0.0.47', 'q-it-up.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', 'q-it-up.herokuapp.com']
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Application definition
@@ -82,14 +82,6 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-##SQL Lite
-##DATABASES = {
-##    'default': {
-##        'ENGINE': 'django.db.backends.sqlite3',
-##        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-##    }
-##}
-
 if PROD:
     ####Heroku Postgresql
     DATABASES = {}
@@ -106,6 +98,13 @@ else:
             'PORT': '',
         }
     }
+    ##Local SQL Lite
+    ##DATABASES = {
+    ##    'default': {
+    ##        'ENGINE': 'django.db.backends.sqlite3',
+    ##        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    ##    }
+    ##}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
