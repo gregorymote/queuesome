@@ -21,6 +21,8 @@
 
 
    <h3> Set Up Local Dev </h3>
+   
+   Requires Python 3.7 or Higher
 
    <h4>Create Virtual Environment</h4>
 
