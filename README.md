@@ -1,17 +1,18 @@
 <h2> Queue it Up </h2>
 A Django Web Application Powered By Spotipy
 
-Try it yourself at q-it-up.herokuapp.com
+Try it yourself at <a href="http://q-it-up.herokuapp.com">q-it-up.herokuapp.com</a>
 
 
 <h3>What is It?</h3>
+
 Queue it Up is a Fun and Interctive way to Listen to Music Together
 
-Take Turns Selecting and Creating Different Song Categories.
+Take Turns Selecting and Creating Different Song Categories
 
-Then Pick Songs that Best Fit the Category.
+Pick Songs that Best Fit Each Category
 
-Listen to Everyone's Picks and Give Likes to Songs that Fit the Best 
+Listen to Everyone's Picks and Give Likes to the Songs that Fit the Best 
 
 While you Listen, Continue to Select Categories, Pick Songs and Give Out Likes 
 
