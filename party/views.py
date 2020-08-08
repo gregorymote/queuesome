@@ -14,15 +14,9 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from party.forms import LoginForm
-from party.forms import NamePartyForm
-from party.forms import CreateUserForm
-from party.forms import AuthForm
-from party.forms import ChooseDeviceForm
+from party.forms import LoginForm, NamePartyForm, CreateUserForm, AuthForm, ChooseDeviceForm
 from game.forms import blankForm
-from party.models import Party
-from party.models import Users
-from party.models import Devices
+from party.models import Party, Users, Devices
 from queue_it_up.settings import IP, PORT, URI, SCOPE, CLIENT_ID, CLIENT_SECRET 
 
 
@@ -117,6 +111,7 @@ def choose_device(request, pid):
             device = form.cleaned_data['device']
             p.deviceID=device.deviceID
             p.save()
+            Devices.objects.filter(party=p).all().delete()
             return HttpResponseRedirect(reverse('start_party', kwargs={'pid':p.pk,}))
 
     else:

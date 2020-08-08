@@ -2,20 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from party.models import Party
-from party.models import Users
-from party.models import Category
-from party.models import Library
-from party.models import Likes
-from party.models import Songs
-from party.models import Searches
-from party.models import Devices
+from party.models import Party, Users, Category, Library, Likes, Songs, Searches, Devices
 from party.views import checkToken
-from game.forms import blankForm
-from game.forms import chooseCategoryForm
-from game.forms import searchForm
-from game.forms import searchResultsForm
-from game.forms import settingsForm
+from game.forms import blankForm, chooseCategoryForm, searchForm, searchResultsForm, settingsForm
 from queue_it_up.settings import DRIVER, SYSTEM, PROD, URL
 from datetime import datetime, timedelta, timezone
 import spotipy
@@ -33,6 +22,12 @@ def lobby(request, pid):
         return HttpResponseRedirect(reverse('index'))
 
     p = Party.objects.get(pk = pid)
+
+    inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
+    if inactivity >= 20:
+        p.active=False
+        p.save()
+        clean_up_party(p.pk)
     
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -119,6 +114,7 @@ def play(request, pid):
         if inactivity >= 20:
             p.active=False
             p.save()
+            clean_up_party(p.pk)
         if p.state == 'assign':
             lead = Users.objects.filter(party=p, turn='not_picked', active=True).first()
             if lead:
@@ -535,13 +531,14 @@ def settings(request, pid):
         form = settingsForm(request.POST, partyObject=p)
 
         if form.is_valid():
-            
+            Devices.objects.filter(party=p).all().delete()
             if ('back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
 
             elif ('kill' in request.POST):
                 p.active = False
                 p.save()
+                clean_up_party(p.pk)
                 return HttpResponseRedirect(reverse('index'))
                 
             else:
@@ -694,21 +691,21 @@ def checkPermission(pid, request):
         return False
     else:
         return True
-        
+
 
 def playMusic(pid):
     p = Party.objects.get(pk = pid)
     p.thread = True
+    if not p.active:
+        return
     if p.device_error:
         p.device_error = False
     p.save()
     rN = p.roundNum
-    print ('rN:', rN)
     token = checkToken(p.token_info, pid)
     if token is None:
         token = p.token
     spotifyObject = spotipy.Spotify(auth=token)
-    #print(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True))
     while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True)):
         queue = Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True).order_by('order')
         for song in queue:
@@ -716,7 +713,9 @@ def playMusic(pid):
             ls = [song.uri]
             try:
                 if not song.duplicate:
-                    p = Party.objects.get(pk = pid)
+                    p = Party.objects.get(pk=pid)
+                    if not p.active:
+                        return
                     dups = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', name=song.name))
                     if len(dups) > 1:
                         for d in dups:
@@ -758,9 +757,6 @@ def playMusic(pid):
                 song.state= 'played'
                 song.save()
             except Exception as e:
-                print("***********************")
-                print(e)
-                print("***********************")
                 p = Party.objects.get(pk = pid)
                 if 'Device not found' in str(e):
                     p.device_error = True
@@ -778,7 +774,17 @@ def playMusic(pid):
             u.save()   
         rN = rN + 1
     p = Party.objects.get(pk = pid)
-    print(p.roundTotal)
     p.thread=False
     p.save()
     print('EXITING THREAD')
+
+
+def clean_up_party(pid):
+    p = Party.objects.get(pk=pid)
+    p.token = ""
+    p.token_info = ""
+    p.url = ""
+    p.url_open = ""
+    p.deviceID = ""
+    p.save()
+

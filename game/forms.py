@@ -1,8 +1,6 @@
 from django import forms
 from django.utils.safestring import mark_safe
-from party.models import Library
-from party.models import Searches
-from party.models import Devices
+from party.models import Library, Searches, Devices
 
 
 class blankForm(forms.Form):
