@@ -100,6 +100,8 @@
    Edit queue_it_up/settings.py and add IP address to ALLOWED_HOSTS
 
    <I>python manage.py runserver 0.0.0.0:<PORT></I>
+   
+   Note: You also need to add your IP address to the list of allowed addresses in your Spotify Developer Account
 
 
 
