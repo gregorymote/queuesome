@@ -101,7 +101,18 @@
 
    <I>python manage.py runserver 0.0.0.0:<PORT></I>
    
-   Note: You also need to add your IP address to the list of allowed addresses in your Spotify Developer Account
+   
+   <h3> Edit Spotify Developer Settings </h>
+   
+   Under Edit Settings Add
+   
+   http://localhost:8000/party/auth/
+   
+   or
+   
+   http://<your_ip>:<your_port>/party/auth/
+   
+   to Redirect URI's
 
 
 
