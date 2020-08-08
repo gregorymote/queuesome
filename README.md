@@ -1,78 +1,101 @@
 <h2> Queue it Up </h2>
-Spotipy/Django Web Application Game
+A Django Web Application Powered By Spotipy
 
 Try it yourself at q-it-up.herokuapp.com
 
-<h3>Create virtual environment and install django</h3>
 
-In desired directory run (This only needs to be done the first time)
+<h3>What is It?</h3>
+Queue it Up is a Fun and Interctive way to Listen to Music Together
+
+Take Turns Selecting and Creating Different Song Categories.
+
+Then Pick Songs that Best Fit the Category.
+
+Listen to Everyone's Picks and Give Likes to Songs that Fit the Best 
+
+While you Listen, Continue to Select Categories, Pick Songs and Give Out Likes 
+
+
+<h3> Local Dev </h3>
+
+<h4>Create Virtual Environment</h4>
+
+In Desired Directory Run
 
 <I>python -m venv venv</I>
  
-Activate Virutal Environment (You'll need to do this every time you reopen cmd)
+Activate Virutal Environment
  
 <I>C:\> venv\Scripts\activate.bat</I>
 
-Install Django
 
-<I>(venv) $ pip install Django</I>
+<h4> Install Dependencies </h4>
 
-Useful Django tutorial for additional help https://realpython.com/get-started-with-django-1/
-
-
-<h3>Additional libraries needed</h3>
-
-install spotipy
-
-<I>pip install spotipy</I>
-
-<I>pip install git+https://github.com/plamere/spotipy.git --upgrade</I>
-
-add util_custom to \Lib\site-packages\spotipy
-
-add value of client secret to client secret variable at the top of party/views.py
-
-Note: client secret has been removed from github for security purposes
+<I>pip install -r requirements.txt</I>
 
 
-<h3>To Create Access to other Devices from Your IP Address</h3>
+<h4> Edit <I>queue_it_up/settings.py</I> </h4>
 
-edit party/view and change my_IP and my_PORT at the top of the page
+line 17: PROD = False
 
-edit queue_it_up/settings and add IP address to ALLOWED_HOSTS
+line 90: Configure Local Database
 
-From cmd line run
-
-<I>python manage.py runserver 0.0.0.0:value of my_PORT</I>
+line 177: <YOUR-SPOTIFY-CLIENT-ID>
 
 
-<h3>Add More Categories</h3>
+<h4> Add The Following Environment Variables </h4>
+
+You can also hardcode your own values. Line numbers refer to <I>queue_it_up/settings.py</I>
+
+line 27: DJANGO_SECRET_Q
+
+line 175: SPOTIFY_CLIENT_SECRET
+
+line 178: SYSTEM_USER_ID
+
+
+<h4> Migrate Database </h4>
+
+<I>python manage.py makemigrations</I>
+
+<I>python manage.py migrate</I>
+
+
+<h4> Collect Static Images </h4>
+
+<I>python manage.py collectstatic</I>
+
+
+<h4>Add Categories via Python Shell</h4>
 
 Open the Python Shell by Entering:
 
 <I>python manage.py shell</I>
 
-Paste the Following code with new Categories in the cat list
+Paste the Following code with new Categories in the cats list
 
 <I>from party.Models import Library
 
 cats = ["new cat1", "new cat2"]
 
 for x in cats:
-l = Library(name = x)
-l.save()</I>
+    l = Library(name = x)
+    l.save()</I>
 
-<h3>Clean Out Old Parties</h3>
 
-Open the Python Shell by Entering:
+<h4> Run Server </h4>
 
-<I>python manage.py shell</I>
+<I>python manage.py runserver</I>
 
-Paste the Following code
+visit http://localhost:8000 to view application
 
-<I>from party.Models import Party
- 
- Party.objects.all().delete()</I>
+
+<h4>To Create Access to other Devices from Your IP Address</h4>
+
+Edit queue_it_up/settings.py and add IP address to ALLOWED_HOSTS
+
+<I>python manage.py runserver 0.0.0.0:<PORT></I>
+
 
 
 
