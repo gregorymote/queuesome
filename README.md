@@ -7,7 +7,7 @@ Try it yourself at <a href="http://q-it-up.herokuapp.com">q-it-up.herokuapp.com<
 
 <h3>What is It?</h3>
 
-Queue it Up is a Fun and Interctive way to Listen to Music Together
+Queue it Up is a Fun and Interactive way to Listen to Music Together
 
 Take Turns Selecting and Creating Different Song Categories
 
