@@ -104,7 +104,7 @@
    <I>python manage.py runserver 0.0.0.0:<PORT></I>
    
    
-   <h3> Edit Spotify Developer Settings </h>
+   <h3> Edit Spotify Developer Settings </h3>
    
    Under Edit Settings Add
    
