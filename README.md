@@ -20,7 +20,7 @@
 
 
 
-   <h3> Local Dev </h3>
+   <h3> Set Up Local Dev </h3>
 
    <h4>Create Virtual Environment</h4>
 
