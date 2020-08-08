@@ -47,7 +47,7 @@
 
    line 90: Configure Local Database
 
-   line 177: <YOUR-SPOTIFY-CLIENT-ID>
+   line 177: YOUR-SPOTIFY-CLIENT-ID
 
 
    <h4> Add The Following Environment Variables </h4>
@@ -112,7 +112,7 @@
    
    or
    
-   http://<your_ip>:<your_port>/party/auth/
+   http://YOUR_IP:YOUR_PORT/party/auth/
    
    to Redirect URI's
 
