@@ -20,7 +20,9 @@
 
 
 
-   <h3> Local Dev </h3>
+   <h3> Set Up Local Dev </h3>
+   
+   Requires Python 3.7 or Higher
 
    <h4>Create Virtual Environment</h4>
 
@@ -45,7 +47,7 @@
 
    line 90: Configure Local Database
 
-   line 177: <YOUR-SPOTIFY-CLIENT-ID>
+   line 177: YOUR-SPOTIFY-CLIENT-ID
 
 
    <h4> Add The Following Environment Variables </h4>
@@ -101,7 +103,18 @@
 
    <I>python manage.py runserver 0.0.0.0:<PORT></I>
    
-   Note: You also need to add your IP address to the list of allowed addresses in your Spotify Developer Account
+   
+   <h3> Edit Spotify Developer Settings </h3>
+   
+   Under Edit Settings Add
+   
+   http://localhost:8000/party/auth/
+   
+   or
+   
+   http://YOUR_IP:YOUR_PORT/party/auth/
+   
+   to Redirect URI's
 
 
 
