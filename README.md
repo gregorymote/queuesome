@@ -1,4 +1,4 @@
-<h2> Queue it Up </h2>
+<h1> Queue it Up </h1>
 
    A Django Web Application Powered By Spotipy
 
