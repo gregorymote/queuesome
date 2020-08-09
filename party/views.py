@@ -124,7 +124,7 @@ def choose_device(request, pid):
 
 def auth(request):
     try:
-        u = Users.objects.get(sessionID=request.session.session_key, active=True)
+        u = Users.objects.filter(sessionID=request.session.session_key, active=True).first()
     except:
          return HttpResponseRedirect(reverse('index'))
     p = u.party
