@@ -5,7 +5,7 @@ from django.urls import reverse
 from party.models import Party, Users, Category, Library, Likes, Songs, Searches, Devices
 from party.views import checkToken
 from game.forms import blankForm, chooseCategoryForm, searchForm, searchResultsForm, settingsForm
-from queue_it_up.settings import DRIVER, SYSTEM, PROD, URL
+from queue_it_up.settings import DRIVER, SYSTEM, PROD, URL, IP
 from datetime import datetime, timedelta, timezone
 import spotipy
 import time
@@ -46,7 +46,7 @@ def lobby(request, pid):
                 p.lib_repo = temp
                 p.save()
                 if PROD:
-                    DRIVER.get(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                    DRIVER.get('http://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
                 else:
                     webbrowser.open(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
