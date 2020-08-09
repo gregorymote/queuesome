@@ -40,7 +40,9 @@ def start(request):
                 turn = "not_picked",
                 )
             u.save()
-            
+            print("******************")
+            print("**** "+URI+" ******")
+            print("******************")
             try:
                 url = util.generateURL(uname, SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=URI)
             except (AttributeError, JSONDecodeError):

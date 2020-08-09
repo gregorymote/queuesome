@@ -123,6 +123,9 @@ def choose_device(request, pid):
 
 
 def auth(request):
+    print("******************")
+    print("****   AUTH ******")
+    print("******************")
     try:
         u = Users.objects.filter(sessionID=request.session.session_key, active=True).first()
     except:
