@@ -87,6 +87,8 @@ def createToken(url, username, scope=None, client_id = None,
     )
     
     code = sp_oauth.parse_response_code(url)
+    print('****url:'url)
+    print('****code:'code)
     token_info = sp_oauth.get_access_token(code, check_cache=False)
 
     # Auth'ed API request
