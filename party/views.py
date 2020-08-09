@@ -17,7 +17,7 @@ from django.urls import reverse
 from party.forms import LoginForm, NamePartyForm, CreateUserForm, AuthForm, ChooseDeviceForm
 from game.forms import blankForm
 from party.models import Party, Users, Devices
-from queue_it_up.settings import IP, PORT, URI, SCOPE, CLIENT_ID, CLIENT_SECRET 
+from queue_it_up.settings import IP, PORT, URI, SCOPE, CLIENT_ID, CLIENT_SECRET, PROD
 
 
 def login(request):
@@ -280,9 +280,10 @@ def getURL(path):
     while path[i] != '\'':
         i = i + 1
     end = i
-
-    url = IP + ':' + PORT + path[start:end]
-
+    if PROD:
+        url = IP + path[start:end]
+    else:
+        url = IP + ':' + PORT + path[start:end]
     return url
 
 
