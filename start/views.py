@@ -51,6 +51,9 @@ def start(request):
 
             p.url_open = url
             p.save()
+            print("******************")
+            print("**** "+url+" ******")
+            print("******************")
             return HttpResponseRedirect(url)
             
     else:
