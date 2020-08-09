@@ -140,15 +140,21 @@ def auth(request):
     
     try:
         token_info = util.createToken(p.url, 'temp', SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri= URI)
-        p.token = token_info['access_token']
-        p.token_info = token_info
-        p.save()
+        if token_info:
+            p.token = token_info['access_token']
+            p.token_info = token_info
+            p.save()
+        else:
+            return HttpResponseRedirect(reverse('index'))
     except (AttributeError, JSONDecodeError):
         os.remove(f".cache-temp")
         token_info = util.createToken(p.url, 'temp', SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri= URI, show_dialog=False)
-        p.token = token_info['access_token']
-        p.token_info = token_info
-        p.save()
+        if token_info:
+            p.token = token_info['access_token']
+            p.token_info = token_info
+            p.save()
+        else:
+            return HttpResponseRedirect(reverse('index'))
    
     return HttpResponseRedirect(reverse('choose_device', kwargs={'pid':p.pk,}))
 
