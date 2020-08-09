@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_Q")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PROD
-ALLOWED_HOSTS = ['localhost', 'q-it-up.herokuapp.com', 'qitup.us']
+ALLOWED_HOSTS = ['localhost', 'q-it-up.herokuapp.com', '.qitup.us']
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Application definition
