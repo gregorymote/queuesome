@@ -91,7 +91,6 @@ def createToken(url, username, scope=None, client_id = None,
         token_info = sp_oauth.get_access_token(code, check_cache=False)
     else:
         return None
-
     # Auth'ed API request
     if token_info:
         return token_info
