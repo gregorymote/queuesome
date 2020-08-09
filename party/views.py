@@ -123,16 +123,10 @@ def choose_device(request, pid):
 
 
 def auth(request):
-    print("******************")
-    print("****   AUTH ******")
-    print("******************")
     try:
         u = Users.objects.get(sessionID=request.session.session_key, active=True)
     except:
          return HttpResponseRedirect(reverse('index'))
-    print("******************")
-    print("****"+ request.session.session_key +"******")
-    print("******************")
     p = u.party
     url = getURL(str(request.get_full_path))
     p.url = url
