@@ -163,7 +163,7 @@ chrome_options.add_argument("--no-sandbox")
 PORT='8000'
 if PROD:
     IP='qitup.us'
-    URL='https://' + IP
+    URL='http://' + IP
     URI = URL + '/party/auth/'
     DRIVER = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 else:
