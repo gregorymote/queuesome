@@ -46,7 +46,7 @@ def lobby(request, pid):
                 p.lib_repo = temp
                 p.save()
                 if PROD:
-                    DRIVER.get('http://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                    DRIVER.get('https://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
                 else:
                     webbrowser.open(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
