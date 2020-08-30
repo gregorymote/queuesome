@@ -769,7 +769,7 @@ def playMusic(pid):
                 if 'Device not found' in str(e):
                     p.device_error = True
                 p.thread  = False
-                p.debug = str(e)
+                p.debug = str(e) + '****' + p.debug
                 p.save()
                 print('**************************')
                 print(e)

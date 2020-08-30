@@ -35,7 +35,7 @@ class Party(models.Model):
     last_updated = models.DateTimeField(auto_now=True, null=True)
     lib_repo = SetTextField(base_field=models.CharField(max_length=32), null=True)
     indices = SetTextField(base_field=models.CharField(max_length=32), null=True)
-    debug = models.CharField(max_length=4000, null=True)
+    debug = models.CharField(max_length=4000, default="")
 
     def __str__(self):
         return self.name
