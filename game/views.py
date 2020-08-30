@@ -771,6 +771,9 @@ def playMusic(pid):
                 p.thread  = False
                 p.debug = str(e)
                 p.save()
+                print('**************************')
+                print(e)
+                print('**************************')
                 return
             users = Users.objects.filter(party = p, active=True)
             for x in users:
