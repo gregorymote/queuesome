@@ -10,4 +10,5 @@ admin.site.register(Library)
 admin.site.register(Songs)
 admin.site.register(Devices)
 admin.site.register(Searches)
+admin.site.register(Likes)
 

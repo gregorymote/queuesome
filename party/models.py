@@ -35,6 +35,7 @@ class Party(models.Model):
     last_updated = models.DateTimeField(auto_now=True, null=True)
     lib_repo = SetTextField(base_field=models.CharField(max_length=32), null=True)
     indices = SetTextField(base_field=models.CharField(max_length=32), null=True)
+    debug = models.CharField(max_length=4000, null=True)
 
     def __str__(self):
         return self.name
@@ -91,7 +92,7 @@ class Songs(models.Model):
     state = models.CharField(max_length=10, default='not_played')
     startTime= models.FloatField(default=0)
     likes = models.ForeignKey('Likes',on_delete=models.CASCADE,)
-    debug = models.CharField(max_length=1200, null=True)
+    debug = models.CharField(max_length=4000, null=True)
     link = models.CharField(max_length=500, null=True)
     duration=models.IntegerField(default=0, null=True)
     duplicate=models.BooleanField(default=False)

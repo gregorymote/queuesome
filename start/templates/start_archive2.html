@@ -3,6 +3,42 @@
 
 {% block page_content %}
 
+<script>
+	setTimeout(function() {
+        var logo = document.getElementById("logo");
+        logo.classList.remove("slide-down-fade-in");
+        logo.classList.add("spin");
+        var outline = document.getElementById("outline");
+        outline.classList.remove("slide-down-fade-in");
+        outline.classList.add("spin");
+	}, 1500);
+    setTimeout(function() {
+        var logo = document.getElementById("logo");
+        logo.style.WebkitTransition = 'opacity 2s ease-in-out';
+        logo.style.opacity = '0';
+    },2000);
+    setTimeout(function() {
+        var logo = document.getElementById("logo");
+        logo.classList.add("rotate");
+        var outline = document.getElementById("outline");
+        outline.classList.add("rotate");
+        outline.style.opacity = '1';
+	}, 2500);
+    setTimeout(function() {
+        var main = document.getElementById("main");
+        main.classList.add("slide-up-fade-in");
+	}, 3500);
+    setTimeout(function() {
+        var main = document.getElementById("main");
+        main.classList.remove("slide-up-fade-in");
+        main.style.opacity = '1';
+	}, 4500);
+    setTimeout(function() {
+        var outline = document.getElementById("outline");
+        outline.style.opacity = '0';
+    }, 5000);
+</script>
+
 <style>
     .test {
         position: fixed;
@@ -21,39 +57,15 @@
         width: 50%;
         
     }
-
-    .boundary{
-        width: 175px;
-	    height: 117px;
+    .logo{
+        width: 100px;
+	    height: 100px;
+  
 	    position: relative;
 	    position: absolute;
-	    top: 38%;
-	    left: 27%;
+	    top: 41%;
+	    left: 37%;
     }
-
-    .logo{
-        width: 175px;
-	    height: 117px;
-	    position: absolute;
-	    top: 0%;
-	    left: 0%;
-    }
-    .reel_1{
-        width: 81px;
-	    height: 81px;   
-	    position: absolute;
-	    top: 0%;
-	    left: 1%;
-    }
-
-    .reel_2{
-        width: 81px;
-	    height: 81px;
-	    position: absolute;
-	    top: 0%;
-	    left: 53%;
-    }
-
     .main{
         position: fixed;
         width: 80%;
@@ -63,8 +75,9 @@
     }
 
     .guide{
-        width: 5px;
-	    height: 5px;
+        width: 1px;
+	    height: 1px;
+  
 	    position: relative;
 	    position: absolute;
 	    top: 50%;
@@ -79,30 +92,30 @@
         -ms-animation: fadeIn ease 2.5s;
     }
     .rotate{
-        transform:          rotate(90deg);
-        -ms-transform:      rotate(90deg);
-        -moz-transform:     rotate(90deg);
-        -webkit-transform:  rotate(90deg);
-        -o-transform:       rotate(90deg);
+        transform:          rotate(135deg);
+        -ms-transform:      rotate(135deg);
+        -moz-transform:     rotate(135deg);
+        -webkit-transform:  rotate(135deg);
+        -o-transform:       rotate(135deg);
     }
 
     .spin{
-        -webkit-animation:spin 2.5s linear;
-        -moz-animation:spin 2.5s linear;
-        animation:spin 2.5s linear;
+        -webkit-animation:spin 1s linear;
+        -moz-animation:spin 1s linear;
+        animation:spin 1s linear;
     }
     .hidden{
         opacity:0;
     }   
 @-moz-keyframes spin {
-     100% { -moz-transform: rotate(720deg);}
+     100% { -moz-transform: rotate(135deg);}
     }
 @-webkit-keyframes spin {
-    100% { -webkit-transform: rotate(720deg); }
+    100% { -webkit-transform: rotate(135deg); }
     }
 @keyframes spin {
-    100% { -webkit-transform: rotate(720deg);
-            transform:rotate(720deg); }
+    100% { -webkit-transform: rotate(135deg);
+            transform:rotate(135deg); }
     }
 
 @keyframes fadeIn {
@@ -295,18 +308,21 @@
 
 </style>
 
-<div class="test" style="background-image: linear-gradient(0deg, rgba(252,70,107,1) 1%, rgba(0,123,255,1) 77%);">
+<div class="bg-primary test">
     {% load static %}
+    <img src="{% static 'images/disco.png' %}" class="logo slide-down-fade-in" id="logo" alt="...">
+    <img src="{% static 'images/disco_outline.png' %}" class="logo slide-down-fade-in" id="outline" alt="...">
+
     <form action="" method="post">
     {% csrf_token %}	
-        <div class="text-center main" id="main">
-            <h1 style="color:white; text-shadow: 2px 2px #fc466b; font-size:50px; font-family: 'Righteous', cursive;">friyay vibes</h1>
+        <div class="bg-primary hidden text-center main" id="main">
+            <h1 style="color:white; text-shadow: 2px 2px #1169ec; font-size:50px;">Queue it Up</h1>
             <p style="color:white;">Let's get something going</p>
             <div class="row">
-                <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Start Sesh">
+                <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Start Party">
             </div>
             <div class="row pt-2">
-                <a href ="party/join_party/" class ="btn btn-light btn-lg block text-primary" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Sesh</a>
+                <a href ="party/join_party/" class ="btn btn-light btn-lg block text-primary" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Party</a>
             </div>
             <div class = "pt-5 text-right">
                 <button type="button" class="btn btn-link text-white" data-toggle="modal" data-target="#myModal">
@@ -320,7 +336,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="myModalLabel">What is this? <a style="color:black;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md"><i class="fa fa-github" style="font-size:24px"></i></a></h5>
+            <h5 class="modal-title" id="myModalLabel">Queuenopsis <a style="color:black;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md"><i class="fa fa-github" style="font-size:24px"></i></a></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -336,7 +352,7 @@
                     <div class="carousel-inner">
                       <div class="carousel-item active">
                         <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
-                            <h6 style="color:black;">Friyay Vibes, curate songs together based on whatever the vibe is...</h6>
+                            <h6 style="color:black;">Queue it Up, a fun and interactive way to listen to music together...</h6>
                           </div>
                         <img class="d-block w-100" src="{% static 'images/headphones.jpg' %}" alt="Music vector created by pch.vector - www.freepik.com">
                         <div class="text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
@@ -345,7 +361,7 @@
                       </div>
                       <div class="carousel-item">
                         <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
-                            <h6 style="color:black;">...take turns choosing vibes and picking songs that fit...</h6>
+                            <h6 style="color:black;">...take turns choosing categories and picking songs that fit each category the best...</h6>
                           </div>
                         <img class="d-block w-100" src="{% static 'images/people_phones.jpg' %}" alt="People vector created by pikisuperstar - www.freepik.com">
                         <div class="text-center text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
@@ -372,11 +388,8 @@
                     </a>
                   </div>
             </div>
-            <div class="text-right pr-3">
-                <a href="about">Learn More</a>
-            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
         </div>

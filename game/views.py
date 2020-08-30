@@ -769,6 +769,7 @@ def playMusic(pid):
                 if 'Device not found' in str(e):
                     p.device_error = True
                 p.thread  = False
+                p.debug = str(e)
                 p.save()
                 return
             users = Users.objects.filter(party = p, active=True)
