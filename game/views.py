@@ -245,10 +245,10 @@ def chooseCat(request, pid):
 
     showCustom = False
     if request.method != 'POST' and p.indices is None:
-        num = 8
+        num = 12
         if len(p.lib_repo) < num:
             num = len(p.lib_repo)
-        p.indices = get_numbers(8, len(p.lib_repo)) 
+        p.indices = get_numbers(num, len(p.lib_repo)) 
         p.save() 
     repo = set()
     list_repo = list(p.lib_repo)

@@ -35,7 +35,7 @@
 				{% if party.state == "pick_song" %}
 					<h6> Someone Needs to Pick a Song</h6>
 				{% else %}
-					<h6>Someone Needs to Choose a Vibe</h6>
+					<h6>Someone Needs to Curate the Vibe</h6>
 				{% endif %}
 			</div>
 		{% endif %}
@@ -47,7 +47,7 @@
 				<div class = "col text-center pb-2">
 					{% if user.turn == "picking" and party.state == "choose_category" %}
 						
-						<input type="submit" class="btn btn-outline-primary" value="Choose a Vibe">
+						<input type="submit" class="btn btn-outline-primary" value="Curate the Vibe">
 						
 					{% elif party.state == "pick_song" and not user.hasPicked %}
 						
