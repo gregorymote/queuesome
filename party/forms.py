@@ -8,7 +8,7 @@ class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":34,"style": "resize: none"}),label = 'Email Address or Username', required=True)
 
 class NamePartyForm(forms.Form):
-    party_name = forms.CharField(label='Party Name', required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER A PARTY NAME',}))
+    party_name = forms.CharField(label='Sesh Name', required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER A SESH NAME',}))
     user_name = forms.CharField(label = 'Name', required = True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR NAME',}))
 
 class CreateUserForm(forms.Form):
