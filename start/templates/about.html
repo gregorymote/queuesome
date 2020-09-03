@@ -3,10 +3,189 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-<div class="container">
-    <h1 class="text-center">About</h1>
-    <hr>
-    <p>About to Write an About Page</p>
+<style>
+.img {
+    max-width: 90%;
+    height: auto;
+  }
+</style>
 
+<div class="container" style="width:90%">
+    <h1 class="display-4 text-center">About</h1>
+    <div class= "text-center">
+    <a href="/about#going">Getting Things Going</a> | <a href="/about#flow">Game Flow</a> | <a href="/about#special">Special Features</a> | <a href="/about#settings">Settings</a>
+    </div>
+    <hr>
+    <div>
+        <p>Oh sup, thanks for looking at the about page. We definitely didn't just throw this together yesterday. That's why everything is spelled correctly...</p>
+        <p>Here at friyay vibes we're all about giving people a way to listen to music together in a fun and interactive way.</p>
+        <p>You take turns choosing different vibes and everyone submits a song that they think fits the best.</p>
+        <p>You can throw fam some likes if you thought their choice was choice too... And that's it!</p>
+        <p>To play you just need one person with a Spotify Premium account to kick things off and the rest can join in.</p>
+        <p>If you want s'more info about other features and how it works, take a look below at the next section. </p>
+        <br>
+    </div>
+    <p class="text-center">Thanks again for checking us out!</p>
+    <br>
+    <hr>
+    <br>
+    <h3 class="text-center" id="going">Getting Things Going</h3>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/choose_device.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    
+    <p>Kick things off by starting your own sesh. Once you log in to a Spotify Premium account, you'll be prompted to choose a playback device... </p>
+    <p>A playback device is anything linked to your Spotify account. Could be a phone, laptop, smart speaker, etc... </p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/start_sesh.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    
+    <p>Enter a fun name for your sesh and give yourself a name people will know you by</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/lobby.jpg' %}" class=" img rounded img-fluid" alt="...">
+    </div>
+    
+    <p>When you're all set, share your room code with everyone else so they can join.</p>
+    <p>And if they're too lazy to type the url in, hit the QR button and they can scan it and come right to the join page</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/join_sesh.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    
+    <p>If you're looking to join someone else's sesh, type in the sesh's room code and give yourself a name</p> 
+    <hr>
+    <br>
+    <div class="text-center">
+        <span type="submit" class="btn btn-outline-primary btn-lg">Lets'Go</spam>
+    </div>
+    <br>
+    <p>Once everyone is in, hit the <i>Let's Go</i> to get things going, and if anyone wants to join later, that's okay too!</p>
+    <hr>
+    <br>
+
+    <h3 class="text-center" id="flow">Game Flow</h3>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/choose_cat.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>When the game starts, a person is randomly chosen to select the vibe for the round</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/category.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>You can choose one of the vibes from our list or...</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/custom.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>...create your own vibe with the custom option</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/pick_song.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>When the vibe is submitted for the round, everyone get's to pick a song to match the current vibe</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/search_song.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>You can type in the name of a song you want or... be more generic and type in an artist's name to search their popular songs</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/search_results.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>Take a look through the results and pick the song you searched for... if it's not there or you want something else, hit back and try again</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/song_example.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>When everyone submits their song choice, each song will play for 80 seconds <i>(the host can always change this in Settings)</i></p>
+    <p>Throw the song a thumbs up if you like it or a thumbs down if you're not really feeling it</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/results.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>When the round is over, check out the results page to see which songs were totally a <i>vibe</i></p>
+    <hr>
+    <br>
+    <p>and that's usually how it goes. Once everyone submits their picks for the round, someone else will get to choose the next vibe and the rest of the rounds will seamlessly flow together</p>
+    <br>
+    <hr>
+    <br>
+
+    <h3 class="text-center" id="special">Special Features</h3>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/quesome_example.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <h5>queuesome twosome</h5>
+    <p>If two or more people choose the same song for a vibe, that's called a queuesome twosome. This means that the whole song will play and nobody will get credit if other people like it</p>
+    <hr>
+    <br>
+    <h5>song skip</h5>
+    <p>If everyone in the sesh isn't feeling it and they all thumbs down the song, then the song will stop and the next song will play</p>
+    <br>
+    <hr>
+    <br>
+
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/scattergories.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <h5>Scattergories</h5>
+    <p>Pick the Scattergories vibe to randomly generate a letter and everyone will have to pick a song that starts with that letter.</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/artist.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <h5>By Artist</h5>
+    <p>Get more specific with the vibe and enter in an artist for everyone to submit a song by</p> 
+    <hr>
+    <br>
+
+    <h3 class="text-center" id="settings">Settings</h3>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/settings.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>If you created the sesh you can go to the settings page to change how long songs should play and what device to play from</p>
+    <p>If things die down or you just got something else better to do, hit the Kill Party button to close out the party. And if you forget, don't worry, we'll close it out for you after nothing has been done for a while</p>
+    <hr>
+    <br>
+    <div class="text-center">
+        {% load static %}
+        <img src="{% static 'images/users.jpg' %}" class="img rounded img-fluid" alt="...">
+    </div>
+    <p>You can check out the user page to see who's in the party and who may be holding up the line. If you started the sesh, you can remove users from the sesh if they left or you can skip ahead if they'll be back but didn't pick a song yet</p>
+    <hr>
+    <br>
 </div>
 {% endblock %}
