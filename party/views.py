@@ -11,7 +11,7 @@ from ast import literal_eval
 from spotipy import oauth2
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 
 from party.forms import LoginForm, NamePartyForm, CreateUserForm, AuthForm, ChooseDeviceForm
@@ -117,9 +117,39 @@ def choose_device(request, pid):
     else:
         form = ChooseDeviceForm( partyObject=p, initial = {'device':''})
         
-    context = {'form': form,}
+    context = {
+        'form': form,
+        'party': p,
+        }
             
     return render(request, 'party/choose_device.html',context)
+
+
+def check_devices(request):
+
+    pid = request.GET.get('pid', None)
+    p = Party.objects.get(pk = pid)
+    token = checkToken(p.token_info, pid)
+    if token is None:
+        token = p.token
+    spotifyObject = spotipy.Spotify(auth=token)
+    deviceResults = spotifyObject.devices()
+    deviceResults = deviceResults['devices']
+    curr_devices = []
+    for x in deviceResults:
+        curr_devices.append(x['id'])
+    refresh = False
+    devices = Devices.objects.filter(party=p)
+    for device in devices:
+        if device.deviceID not in curr_devices:
+            refresh = True
+            break
+    if not refresh and len(devices) != len(deviceResults):
+        refresh = True    
+    data = {
+        'refresh': refresh
+    }
+    return JsonResponse(data)
 
 
 def auth(request):

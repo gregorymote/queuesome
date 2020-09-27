@@ -376,6 +376,7 @@ def pickSong(request, pid):
                         trackURI = x['uri']
                         trackDuration = x['duration_ms']
                         url = x['external_urls']['spotify']
+                        trackName = (trackName[:255] + '..') if len(trackName) > 255 else trackName
                         s = Searches(
                                         name = trackName + ", " + artistName,
                                         uri=trackURI,
@@ -738,7 +739,7 @@ def playMusic(pid):
                     token = checkToken(p.token_info, pid)
                     if token != None:
                         spotifyObject = spotipy.Spotify(auth=token)
-                    
+                    activate_device(p.id)
                     spotifyObject.start_playback(device_id=p.deviceID , uris=ls)
                     song.state = 'playing'
                     song.startTime = time.time()
@@ -790,6 +791,24 @@ def playMusic(pid):
     p.save()
     print('EXITING THREAD')
 
+def activate_device(pid):
+    p = Party.objects.get(pk = pid)
+    token = checkToken(p.token_info, pid)
+    if token is None:
+        token = p.token
+    spotifyObject = spotipy.Spotify(auth=token)
+    deviceResults = spotifyObject.devices()
+    deviceResults = deviceResults['devices']
+    flag = True
+    for device in deviceResults:
+        if device["id"] == p.deviceID:
+            if not device["is_active"]:
+                spotifyObject.transfer_playback(device_id=p.deviceID, force_play=False)
+            else:
+                flag = False
+    if flag:
+        p.debug = p.debug + " **!!!** Device Not Found"
+        p.save()
 
 def clean_up_party(pid):
     p = Party.objects.get(pk=pid)

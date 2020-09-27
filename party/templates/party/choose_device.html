@@ -3,6 +3,26 @@
 {% extends "base.html" %}
 
 {% block page_content %}
+
+	<script>
+		setInterval(function () {
+
+			$.ajax({
+				url: '/party/check_devices',
+				data: {
+				'pid': {{ party.pk }}
+				},
+				dataType: 'json',
+				success: function (data) {
+					if (data.refresh) {
+						location.reload();
+					}
+				}
+			});
+
+		}, 5000);
+	</script>
+
 	<div class="container">				
 		<form action="" method="post">
 			{% csrf_token %}
@@ -19,7 +39,7 @@
 		<!-- Button to Open the Modal -->
 		<div class = "pt-5 text-right">
 			<button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
-				Help
+				Not Seeing Your Device?
 			</button>
 		</div>
 	</div>
@@ -37,7 +57,8 @@
 					</div>
 					<!-- Modal body -->
 					<div class="modal-body">
-						<p>In order for your device to be recognized, Spotify needs to be open on your device. Try opening Spotify on your device and then refresh the page.</p>
+						<p>Try opening the Spotify app.</p>
+						<p>In order for your device to be recognized, Spotify needs to be open on your device.</p>
 						<p>A device can be anything that is compatible with Spotify. It could be a phone, laptop, web-player, or a smart speaker</p>
 					</div>
 					<!-- Modal footer -->

@@ -7,5 +7,6 @@ urlpatterns = [
     path('join_party/', views.create_user, name='join_party'),
     path('auth/', views.auth, name='auth'),
     path('<int:pid>/choose_device/', views.choose_device, name='choose_device'),
+    path('check_devices', views.check_devices, name='check_devices'),
     
 ]
