@@ -9,6 +9,7 @@ import util_custom as util
 from json.decoder import JSONDecodeError
 from ast import literal_eval
 from spotipy import oauth2
+from datetime import datetime, timedelta, timezone
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
@@ -145,9 +146,16 @@ def check_devices(request):
             refresh = True
             break
     if not refresh and len(devices) != len(deviceResults):
-        refresh = True    
+        refresh = True
+
+    stop = False
+    inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
+    if inactivity >= 2:
+        stop = True
+
     data = {
-        'refresh': refresh
+        'refresh': refresh,
+        'stop': stop
     }
     return JsonResponse(data)
 

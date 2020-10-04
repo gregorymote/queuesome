@@ -4,7 +4,24 @@
 
 {% block page_content %}
 
-	<meta http-equiv="refresh" content="5"/>
+	<script>
+		var size = {{size}};
+		setInterval(function () {
+			$.ajax({
+				url: '/sesh/update_lobby',
+				data: {
+					'pid': {{ party.pk }}
+				},
+				dataType: 'json',
+				success: function (data) {
+					if (data.size != size || data.started) {
+						location.reload();
+					}
+				}
+			});
+		}, 5000);
+			
+	</script>
 	
 	<div class = "container">	
 		<h2><span class="badge badge-pill badge-primary">{{party.name}}</span></h2>

@@ -5,22 +5,26 @@
 {% block page_content %}
 
 	<script>
+		var inactivity = false;
+
 		setInterval(function () {
-
-			$.ajax({
-				url: '/party/check_devices',
-				data: {
-				'pid': {{ party.pk }}
-				},
-				dataType: 'json',
-				success: function (data) {
-					if (data.refresh) {
-						location.reload();
+			if (!inactivity){
+				$.ajax({
+					url: '/party/check_devices',
+					data: {
+					'pid': {{ party.pk }}
+					},
+					dataType: 'json',
+					success: function (data) {
+						if (data.refresh) {
+							location.reload();
+						}
+						inactivity = data.stop;
 					}
-				}
-			});
-
+				});
+			}
 		}, 5000);
+			
 	</script>
 
 	<div class="container">				

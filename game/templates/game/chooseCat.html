@@ -13,8 +13,10 @@
 			var info = '';
 			var radio0 = document.getElementById('radio0');
 			var radio1 = document.getElementById('radio1');
+
 			radio0.style.display = 'none';
 			radio1.style.display = 'none';
+			
 			if (z == 'Custom'){
 				box = '{{ form.custom }}';
 				label = '{{ form.custom.label }}';
@@ -76,8 +78,8 @@
 			</div>
 
 			<div class="row">
-				<div id="radio0">{{ form.scatt_radio.0 }}</div>
-				<div class = "pl-4" id="radio1">{{ form.scatt_radio.1 }}</div>			
+				<div id="radio0" style='display:none;'>{{ form.scatt_radio.0 }}</div>
+				<div class = "pl-4" id="radio1" style='display:none;'>{{ form.scatt_radio.1 }}</div>			
 			</div> 
 
 			<div class="row">

@@ -1,77 +1,191 @@
 <!DOCTYPE html>
-
-<!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>-->
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
-{% block page_content %}	
-<meta name="refresh" http-equiv="refresh" content="{{ user.refreshRate }}"/>
+{% block page_content %}
+
+<script type="text/javascript">
+	var refresh_rate = {{user.refreshRate}} * 1000;
+	var party = {
+		"device_error" : "{{party.device_error}}",
+		"name" : "{{party.name}}",
+		"state": "{{party.state}}",
+		"joinCode" : "{{party.joinCode}}",
+
+	}
+	var user = {
+		"isHost":"{{ user.isHost }}",
+		"hasPicked": "{{user.hasPicked}}",
+		"turn": "{{user.turn}}",
+		"hasLiked": "{{user.hasLiked}}",
+		"user": "{{user.pk}}",
+		"name": "{{user.name}}"
+	}
+	var category = {
+		"name": "{{category.name}}",
+		"leader": "{{category.leader.name}}",
+	}
+	var song = {
+		"name": "{{song.name}}",
+		"link": "{{song.link}}",
+		"user": "{{song.user.pk}}",
+		"art": "{{song.art}}"
+	}
+
+	window.onload = function() {
+		updatePage(party, user, category, song)
+	};
+
+	setInterval(function () {
+		if(user.name != '{{system}}'){
+			$.ajax({
+				url: '/sesh/update_play',
+				data: {
+				'pid': {{ party.pk }}
+				},
+				dataType: 'json',
+				success: function (data) {
+					updatePage(data.party, data.user, data.category, data.song);			
+			} });
+		}
+		else{
+			$.ajax({
+				url: '/sesh/update_game',
+				data: {
+				'pid': {{ party.pk }}
+				},
+				dataType: 'json',
+				success: function (data) {
+								
+			} });
+		}
+	}, refresh_rate);
+
+	function updatePage(party, user, category, song){
+
+		var device_error = document.getElementById('device_error');
+		var isError = decodeBool(party.device_error);
+		var isHost = decodeBool(user.isHost);
+		if (isError && isHost){
+			device_error.style.display = 'block';			
+		}
+		else {
+			device_error.style.display = 'none';
+		}
+		var category_name = document.getElementById('category_name');
+		var category_leader = document.getElementById('category_leader');
+		var artwork = document.getElementById('artwork');
+		var logo = document.getElementById('logo');
+		var song_name = document.getElementById('song_name');
+		var song_link = document.getElementById('song_link');
+		
+		category_name.innerHTML=category.name;
+		
+		if (song.art != "lull"){
+			category_leader.innerHTML=category.leader+"'s Vibe";
+			logo.style.display='initial';
+			song_link.href=song.link;
+			song_name.innerHTML= song.name;
+
+			if(song.art == 'duplicate'){
+				{% load static %}
+				artwork.src = "{% static 'images/quesome.png' %}";
+			}
+			else{
+				artwork.src = song.art;
+			}
+		}
+		else{
+			category_leader.innerHTML=party.name;
+			logo.style.display='none';
+			song_link.removeAttribute("href");
+			{% load static %}
+			artwork.src = "{% static 'images/queue_it_to_it_brah.png' %}";
+			
+			if (party.state == 'pick_song'){
+				song_name.innerHTML="Someone Needs to Pick a Song";
+			}
+			else{
+				song_name.innerHTML="Someone Needs to Curate the Vibe";
+			}
+		}
+		var action = document.getElementById('action');
+		var hasPicked = decodeBool(user.hasPicked)
+		if (user.turn == "picking" && party.state == "choose_category"){
+			action.value = "Curate the Vibe";
+			action.style.display = 'initial';
+		}
+		else if(party.state == "pick_song" && !hasPicked){
+			action.value = "Pick Song";
+			action.style.display = 'initial';
+		}
+		else{
+			action.style.display = 'none';
+		}
+
+		var like = document.getElementById('like');
+		var dislike = document.getElementById('dislike');
+		var hasLiked = decodeBool(user.hasLiked);
+		if (! hasLiked && song.art != "lull" && song.user != user.user){
+			like.style.display = 'initial';
+			dislike.style.display = 'initial';
+		}
+		else{
+			like.style.display = 'none';
+			dislike.style.display = 'none';
+		}
+
+		var party_code = document.getElementById('party_code');
+		party_code.innerHTML = party.joinCode;
+
+		var settings = document.getElementById('settings');
+		if(isHost){
+			settings.style.display = 'initial';
+		}
+		else{
+			settings.style.display = 'none';
+		}
+	};
+
+	function decodeBool(input){
+		if (input == 'True'){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+</script>
 	
 	<div class = "container text-center">
-		{% if party.device_error and user.isHost %}
-		<div class="alert alert-danger">
-			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device 
+		<div class="alert alert-danger" id='device_error' style='display:none;'>
+			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
 		</div>
-		{% endif %}
-		{% if song.art != "lull" %}
-			<h5>{{category.name}}</h5>
-			<h6>{{category.leader}}'s Vibe</h6>
-			{% if song.art == 'duplicate' %}
-				{% load static %}
-				<img src="{% static 'images/quesome.png' %}" class="img-thumbnail" width="200" height="200" alt="...">
-			{% else %}
-			<img src={{song.art}} class="img-thumbnail" width="200" height="200" alt="...">
-			{% endif %}
-			<div class = "pt-1">
-				{% load static %}
-				<img src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
-				<a href={{song.link}}><h6>{{song.name}}</h6></a>
-			</div>
-		{% else %}
-			<h5>{{category.name}}</h5>
-			<h6>{{party.name}}</h6>
+		<h5 id = "category_name"></h5>
+		<h6 id = "category_leader"></h6>
+		<img id = "artwork" class="img-thumbnail" width="200" height="200"  alt=""/>		
+		<div class="pt-1">
 			{% load static %}
-			<img src="{% static 'images/queue_it_to_it_brah.png' %}" class="img-thumbnail" width="200" height="200"  alt="" />
-			<div class = "pt-1">
-				{% if party.state == "pick_song" %}
-					<h6> Someone Needs to Pick a Song</h6>
-				{% else %}
-					<h6>Someone Needs to Curate the Vibe</h6>
-				{% endif %}
-			</div>
-		{% endif %}
-		
-	
+			<img id="logo" style='display:none;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+			<a id = "song_link"><h6 id = "song_name"></h6></a>
+		</div>
 		<form action="" method="post">
 			{% csrf_token %}
 			<div class = "row">
 				<div class = "col text-center pb-2">
-					{% if user.turn == "picking" and party.state == "choose_category" %}
-						
-						<input type="submit" class="btn btn-outline-primary" value="Curate the Vibe">
-						
-					{% elif party.state == "pick_song" and not user.hasPicked %}
-						
-						<input type="submit" class="btn btn-outline-primary" value="Pick Song">
-						
-					{% endif %}
-					
-					
-					{% if not user.hasLiked and song.art != "lull" and song.user != user %}
-					<button class="btn btn-outline-primary" name = "like"><i class="fa fa-thumbs-o-up"></i></button>
-					<button class="btn btn-outline-primary" name = "dislike"><i class="fa fa-thumbs-o-down"></i></button>
-					{% endif %}
+					<input id="action" type="submit" class="btn btn-outline-primary" style='display:none;'>
+					<button id="like" class="btn btn-outline-primary" name = "like" style='display:none;'><i class="fa fa-thumbs-o-up"></i></button>
+					<button id="dislike"class="btn btn-outline-primary" name = "dislike" style='display:none;'><i class="fa fa-thumbs-o-down"></i></button>
 				</div>
 			</div>
 
 			<nav class="navbar fixed-bottom navbar-dark bg-primary">
-				{% if user.isHost %}
-				<button class="btn text-white bg-primary navbar-btn" name = "settings"> <i class="fa fa-cog"></i></button>
-				{% endif %}
-				<button class="btn text-white bg-primary navbar-btn" name = "users"> <i class="fa fa-users"></i></button>
-				<!--<button class="btn text-white bg-primary navbar-btn" name = "settings" disabled> <i class="fa fa-cog"></i></button>-->
 				
+				<button id="settings" class="btn text-white bg-primary navbar-btn" name = "settings" style='display:none;'> <i class="fa fa-cog"></i></button>
+				
+				<button class="btn text-white bg-primary navbar-btn" name = "users"> <i class="fa fa-users"></i></button>
+								
 				<div class=" pl-5 text-white text-center">
-					<b>{{party.joinCode}}</b>
+					<b id="party_code"></b>
 				</div>	
 				
 				<button class="btn text-white bg-primary navbar-btn" name = "results">Results <i class="fa fa-bar-chart"></i></button>
