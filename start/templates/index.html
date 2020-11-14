@@ -295,12 +295,13 @@
 
 </style>
 
-<div class="test" style="background-image: linear-gradient(0deg, rgba(252,70,107,1) 1%, rgba(0,123,255,1) 77%);">
+<div class="test" style="background: rgb(247,255,0);
+background: linear-gradient(0deg, rgba(247,255,0,1) 5%, rgba(255,175,0,1) 5%, rgba(255,117,12,1) 10%, rgba(255,0,35,1) 10%, rgba(228,63,55,1) 15%, rgba(184,101,240,1) 15%, rgba(178,111,237,1) 20%, rgba(53,70,255,1) 20%, rgba(0,123,255,1) 100%);">
     {% load static %}
     <form action="" method="post">
     {% csrf_token %}	
         <div class="text-center main" id="main">
-            <h1 style="color:white; text-shadow: 2px 2px #fc466b; font-size:50px; font-family: 'Righteous', cursive;">friyay vibes</h1>
+            <h1 style="color:white; text-shadow: 2px 2px #fc466b; font-size:50px; font-family: 'Righteous', cursive;">queuesome</h1>
             <p style="color:white;">Let's get something going</p>
             <div class="row">
                 <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Start Sesh">
@@ -336,7 +337,7 @@
                         <div class="carousel-inner">
                             <div class="carousel-item active">
                                 <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
-                                    <h6 style="color:black;">Friyay Vibes, curate songs together based on whatever the vibe is...</h6>
+                                    <h6 style="color:black;">queue some songs together based on whatever the vibe is...</h6>
                                 </div>
                                 <img class="d-block w-100" src="{% static 'images/headphones.jpg' %}" alt="Music vector created by pch.vector - www.freepik.com">
                                 <div class="text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
