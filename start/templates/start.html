@@ -27,7 +27,12 @@
         var main = document.getElementById("main");
         main.classList.remove("slide-up-fade-in");
         main.style.opacity = '1';
-        window.location.replace('index');
+        if ('{{PROD}}' == 'True'){
+        window.location.replace('https://queuesome.com/index');
+        }
+        else{
+            window.location.replace('index');  
+        }
 	}, 3200);
 </script>
 

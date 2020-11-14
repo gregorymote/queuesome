@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from party.models import Party, Users
-from queue_it_up.settings import CLIENT_ID, CLIENT_SECRET, SCOPE, URI
+from queue_it_up.settings import CLIENT_ID, CLIENT_SECRET, SCOPE, URI, PROD
 from game.forms import blankForm
 import util_custom as util
 
@@ -55,6 +55,7 @@ def start(request):
     
     context = {
         'form' : form,
+        'PROD': PROD,
         }
 
     return render(request, 'start.html', context)
