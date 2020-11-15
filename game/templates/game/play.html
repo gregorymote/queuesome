@@ -55,13 +55,19 @@
 				},
 				dataType: 'json',
 				success: function (data) {
-								
+					var inactive = decodeBool(data.inactive);
+					if (inactive){
+						window.location.replace('https://queuesome.com/index');
+					}			
 			} });
 		}
 	}, refresh_rate);
 
 	function updatePage(party, user, category, song){
-
+		var inactive = decodeBool(party.inactive);
+		if (inactive){
+			window.location.replace('https://queuesome.com/index');
+		}
 		var device_error = document.getElementById('device_error');
 		var isError = decodeBool(party.device_error);
 		var isHost = decodeBool(user.isHost);
@@ -147,7 +153,7 @@
 	};
 
 	function decodeBool(input){
-		if (input == 'True'){
+		if (input == 'True' || input == 'true' || input == true){
 			return true;
 		}
 		else{

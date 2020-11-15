@@ -91,7 +91,8 @@ def update_lobby(request):
     
     data = {
         'size': len(guests),
-        'started': p.started
+        'started': p.started,
+        'inactive': p.active
     }
 
     return JsonResponse(data)
@@ -193,7 +194,9 @@ def play(request, pid):
 def update_play(request):
     pid = request.GET.get('pid', None)
     if not checkActive(pid, request):
-        return HttpResponseRedirect(reverse('index'))
+        inactive = True
+    else:
+        inactive = False
     p = Party.objects.get(pk = pid)
     u = getUser(request, pid)
 
@@ -203,12 +206,13 @@ def update_play(request):
     else:
         s = Songs(art='lull')
         c = Category.objects.filter(party=p, roundNum=0).first()
-        
+
     party = {
 		"device_error" : str(p.device_error),
 		"name" : p.name,
 		"state": p.state,
 		"joinCode" : p.joinCode,
+        "inactive": inactive
 	}
     user={
 	    "isHost":str(u.isHost),
@@ -248,7 +252,9 @@ def update_play(request):
 def update_game(request):
     pid = request.GET.get('pid', None)
     if not checkActive(pid, request):
-        return HttpResponseRedirect(reverse('index'))
+        inactive = True
+    else:
+        inactive = False
     
     p = Party.objects.get(pk = pid)
     
@@ -316,9 +322,9 @@ def update_game(request):
             if p.roundNum != n[0].category.roundNum + 1:
                 p.roundNum = n[0].category.roundNum + 1
                 p.save()
-    
     data={
-        "success": 'True'
+        "success": 'True',
+        "inactive" : inactive
         }
 
     return JsonResponse(data)

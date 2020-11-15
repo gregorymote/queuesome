@@ -14,7 +14,7 @@
 				},
 				dataType: 'json',
 				success: function (data) {
-					if (data.size != size || data.started) {
+					if (data.size != size || data.started || !data.inactive) {
 						location.reload();
 					}
 				}
