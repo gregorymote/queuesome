@@ -1,14 +1,14 @@
-<h1> Queue it Up </h1>
+<h1> Queuesome </h1>
 
    A Django Web Application Powered By Spotipy
 
-   Try it yourself at <a href="http://qitup.us">qitup.us</a>
+   Try it yourself at <a href="https://queuesome.com">queuesome.com</a>
 
 
 
    <h3>What is It?</h3>
 
-   Queue it Up is a Fun and Interactive way to Listen to Music Together
+   Queuesome is a Fun and Interactive way to Listen to Music Together
 
    Take Turns Selecting and Creating Different Song Categories
 
