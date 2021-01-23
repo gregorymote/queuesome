@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-
 from party.models import Party, Users, Category, Library, Likes, Songs, Searches, Devices
 from party.views import checkToken
 from game.forms import blankForm, chooseCategoryForm, searchForm, searchResultsForm, settingsForm
@@ -24,7 +23,7 @@ def lobby(request, pid):
     p = Party.objects.get(pk = pid)
 
     inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
-    if inactivity >= 2:
+    if inactivity >= 20:
         p.active=False
         p.save()
         clean_up_party(p.pk)
@@ -81,7 +80,7 @@ def update_lobby(request):
     pid = request.GET.get('pid', None)
     p = Party.objects.get(pk = pid)
     inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
-    if inactivity >= 2:
+    if inactivity >= 20:
         p.active=False
         p.save()
         clean_up_party(p.pk)
