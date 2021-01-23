@@ -24,7 +24,7 @@ def lobby(request, pid):
     p = Party.objects.get(pk = pid)
 
     inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
-    if inactivity >= 20:
+    if inactivity >= 2:
         p.active=False
         p.save()
         clean_up_party(p.pk)
@@ -81,7 +81,7 @@ def update_lobby(request):
     pid = request.GET.get('pid', None)
     p = Party.objects.get(pk = pid)
     inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
-    if inactivity >= 20:
+    if inactivity >= 2:
         p.active=False
         p.save()
         clean_up_party(p.pk)
@@ -257,7 +257,6 @@ def update_game(request):
         inactive = False
     
     p = Party.objects.get(pk = pid)
-    
     inactivity = ((datetime.now(timezone.utc) - p.last_updated).seconds // 60) % 60
     if inactivity >= 20:
         p.active=False
