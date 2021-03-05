@@ -45,12 +45,11 @@ def lobby(request, pid):
                 p.lib_repo = temp
                 p.save()
                 if STAGE:
-                    print('http://www.',IP, "/sesh/", str(pid),  "/play?user=", SYSTEM)
-                    DRIVER.get('http://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                    DRIVER.get('http://www.'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
                 elif HEROKU:
-                    DRIVER.get('https://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                    DRIVER.get('https://www.'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
                 else:
-                    webbrowser.open(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                    webbrowser.open(URL + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
