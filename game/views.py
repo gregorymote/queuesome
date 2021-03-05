@@ -45,8 +45,8 @@ def lobby(request, pid):
                 p.lib_repo = temp
                 p.save()
                 if STAGE:
-                    print('http://www.'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
-                    DRIVER.get('http://www.'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
+                    print('http://'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
+                    DRIVER.get('http://'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
                 elif HEROKU:
                     DRIVER.get('https://www.'+ IP + '/sesh/' + str(pid) +  '/play?user='+ SYSTEM)
                 else:
