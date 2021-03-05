@@ -28,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("DJANGO_SECRET_Q")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = not HEROKU
+DEBUG = STAGE
 ALLOWED_HOSTS = ['localhost', 'q-it-up.herokuapp.com','q-it-up-staging.herokuapp.com', 'www.qitup.us', 'www.friyayvibes.com', 'www.queuesome.com']
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
