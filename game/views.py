@@ -4,7 +4,7 @@ from django.urls import reverse
 from party.models import Party, Users, Category, Library, Likes, Songs, Searches, Devices
 from party.views import checkToken
 from game.forms import blankForm, chooseCategoryForm, searchForm, searchResultsForm, settingsForm
-from queue_it_up.settings import DRIVER, SYSTEM, HEROKU, URL, IP
+from queue_it_up.settings import DRIVER, SYSTEM, HEROKU, STAGE, URL, IP
 from datetime import datetime, timedelta, timezone
 import spotipy
 import time
@@ -44,7 +44,9 @@ def lobby(request, pid):
                     temp.add(l.id)
                 p.lib_repo = temp
                 p.save()
-                if HEROKU:
+                if STAGE:
+                    DRIVER.get('http://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
+                elif HEROKU:
                     DRIVER.get('https://www.'+ IP + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
                 else:
                     webbrowser.open(URL + "/sesh/" + str(pid) +  "/play?user="+ SYSTEM)
