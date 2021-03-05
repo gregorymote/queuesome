@@ -43,7 +43,7 @@
 
    <h4> Edit <I>queue_it_up/settings.py</I> </h4>
 
-   line 17: PROD = False
+   line 17: HEROKU = False
 
    line 90: Configure Local Database
 

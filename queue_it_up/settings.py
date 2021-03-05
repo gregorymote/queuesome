@@ -14,7 +14,8 @@ import os
 import dj_database_url
 from selenium import webdriver
 
-PROD = True
+HEROKU = True
+STAGE=True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,8 +28,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("DJANGO_SECRET_Q")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = not PROD
-ALLOWED_HOSTS = ['localhost', 'q-it-up.herokuapp.com', 'www.qitup.us', 'www.friyayvibes.com', 'www.queuesome.com']
+DEBUG = not HEROKU
+ALLOWED_HOSTS = ['localhost', 'q-it-up.herokuapp.com','q-it-up-staging.herokuapp.com', 'www.qitup.us', 'www.friyayvibes.com', 'www.queuesome.com']
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Application definition
@@ -82,7 +83,7 @@ WSGI_APPLICATION = 'queue_it_up.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-if PROD:
+if HEROKU:
     ####Heroku Postgresql
     DATABASES = {}
     DATABASES['default'] = dj_database_url.config(conn_max_age=600)
@@ -161,7 +162,12 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 PORT='8000'
-if PROD:
+if STAGE:
+    IP='q-it-up-staging.herokuapp.com'
+    URL='http://' + IP
+    URI = URL + '/party/auth/'
+    DRIVER = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+elif HEROKU:
     IP='queuesome.com'
     URL='https://' + IP
     URI = URL + '/party/auth/'
