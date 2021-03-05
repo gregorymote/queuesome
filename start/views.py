@@ -48,10 +48,8 @@ def start(request):
 
             p.url_open = url
             p.save()
-            if 'access_denied' in url:
-                return  HttpResponseRedirect(reverse('index'))
-            else:
-                return HttpResponseRedirect(url)
+            
+            return HttpResponseRedirect(url)
             
     else:
         form = blankForm(initial= {'blank' : ''})

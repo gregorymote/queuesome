@@ -123,7 +123,7 @@ def choose_device(request, pid):
         'party': p,
         }
             
-    return render(request, 'party/choose_device.html',context)
+    return render(request, 'party/choose_device.html', context)
 
 
 def check_devices(request):
@@ -167,6 +167,8 @@ def auth(request):
          return HttpResponseRedirect(reverse('index'))
     p = u.party
     url = getURL(str(request.get_full_path))
+    if 'access_denied' in url:
+        return  HttpResponseRedirect(reverse('index'))
     p.url = url
     p.save()
     
