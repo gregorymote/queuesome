@@ -50,7 +50,7 @@ def start(request):
             p.save()
             if 'access_denied' in url:
                 return  HttpResponseRedirect(reverse('index'))
-            else
+            else:
                 return HttpResponseRedirect(url)
             
     else:
