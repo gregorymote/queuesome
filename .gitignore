@@ -2,3 +2,4 @@
 .cache-doesnotexist
 wa-venv/
 venv/
+*.pyc
