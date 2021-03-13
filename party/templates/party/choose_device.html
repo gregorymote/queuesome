@@ -10,7 +10,7 @@
 		setInterval(function () {
 			if (!inactivity){
 				$.ajax({
-					url: '/party/check_devices',
+					url: '/party/update_devices',
 					data: {
 					'pid': {{ party.pk }}
 					},

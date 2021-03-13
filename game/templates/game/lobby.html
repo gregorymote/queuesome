@@ -5,7 +5,11 @@
 {% block page_content %}
 
 	<script>
-		var size = {{size}};
+		var names = {{ names|safe }};
+		var size = {{ names|safe }}.length;
+		window.onload = function() {
+			updatePage(names)
+		};
 		setInterval(function () {
 			$.ajax({
 				url: '/sesh/update_lobby',
@@ -14,12 +18,29 @@
 				},
 				dataType: 'json',
 				success: function (data) {
-					if (data.size != size || data.started || !data.inactive) {
+					if (data.size != size) {
+						updatePage(data.names)
+						size = data.size;
+					}
+					else if( data.started || !data.inactive){
 						location.reload();
 					}
 				}
 			});
 		}, 5000);
+
+		function updatePage(names){
+			var name_list = document.getElementById('name_list');
+			name_list.innerHTML = '';
+			for(var i=0; i<names.length; i++){
+				var header = document.createElement('h5');
+				var span = document.createElement('span');
+				span.classList.add("badge","badge-pill","badge-light");
+				span.innerHTML=names[i];
+				header.appendChild(span);
+				name_list.appendChild(header);
+			}
+		}
 			
 	</script>
 	
@@ -27,30 +48,50 @@
 		<h2><span class="badge badge-pill badge-primary">{{party.name}}</span></h2>
 		
 		<div class = "row">
-			<div class = "col">
-				{% for q in guests %}
-				<h5><span class="badge badge-pill badge-light">{{ q.name }}</span></h5>
-				{% endfor %}
-			</div>
+			<div class = "col" id="name_list"></div>
 		</div>	
 		
-		<div class = "row">
-			<div class = "col text-right">
-				<form action="" method="post">
-					{% csrf_token %}
-					<button class="btn text-white bg-primary btn-lg" name = "code">QR <i class="fa fa-qrcode"></i></button>
-					{% if access %}
-						<input type="submit" class="btn btn-outline-primary btn-lg" value="Let's Go">
-					{% endif %}
-				</form>
-			</div>
+
+		<div class = "row-12 text-right">
+			<form action="" method="post">
+				<a class="btn text-white bg-primary btn-lg" data-toggle="modal" data-target="#myModal">QR <em class="fa fa-qrcode"></em></a>
+				{% csrf_token %}
+				{% if access %}
+					<input type="submit" class="btn btn-outline-primary btn-lg" value="Let's Go">
+				{% endif %}
+			</form>
 		</div>
 	
 		<div class = "row">
 			<div class = "col text-center">
 				<h1 class = "display-3"><span class="badge badge-secondary">{{party.joinCode}}</span></h1>
-				<h6>This Is Your Room Code</h6>
+				<h6>This is Your Room Code</h6>
 			</div>		
 		</div>
 	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body text-center">
+					{% load static %}
+					<!--<img src="{% static 'images/queuesome_qr.png' %}" class="img-thumbnail" width="200" height="200"
+						alt="" />-->
+						<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ URL }}/party/join_party/?code={{ party.joinCode }}" class="img-thumbnail" width="200" height="200"
+						alt="" />	
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 {% endblock %}

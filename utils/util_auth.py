@@ -1,13 +1,15 @@
 
-# shows a user's playlists (need to be authenticated via oauth)
-
 from __future__ import print_function
 import os
 import spotipy.oauth2 as oauth2
 import spotipy
+from ast import literal_eval
+from party.models import Party
 
-def generateURL(username, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None, show_dialog=True):
+
+def generate_url(username=None, scope=None, client_id = None,
+        client_secret = None, redirect_uri = None, cache_path = None,
+        show_dialog=True):
     ''' prompts the user to login if necessary and returns
         the user token suitable for use with the spotipy.Spotify 
         constructor
@@ -46,53 +48,72 @@ def generateURL(username, scope=None, client_id = None,
         ''')
         raise spotipy.SpotifyException(550, -1, 'no credentials set')
 
-    cache_path = cache_path or ".cache-" + username
     sp_oauth = oauth2.SpotifyOAuth(
-        client_id,
-        client_secret,
-        redirect_uri, 
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_uri, 
         scope=scope,
-        cache_path=cache_path,
         show_dialog=show_dialog
     )
 
-    # try to get a valid token for this user, from the cache,
-    # if not in the cache, the create a new (this will send
-    # the user to a web page where they can authorize this app)
-
-    #token_info = sp_oauth.get_cached_token()
-
-    #if not token_info:
     auth_url = sp_oauth.get_authorize_url()
 
     return auth_url
-##    try:
-##        import webbrowser
-##        webbrowser.open(auth_url)
-##    except:
-##        print("")
-    
-def createToken(url, username, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None, show_dialog=False):
 
-    cache_path = cache_path or ".cache-" + "doesnotexist"
+
+def get_url(path, is_cloud, ip, port):
+    i = 0
+    while path[i] != '/':
+        i = i + 1
+    start = i
+
+    while path[i] != '\'':
+        i = i + 1
+    end = i
+    if is_cloud:
+        url = ip + path[start:end]
+    else:
+        url = ip + ':' + port + path[start:end]
+    return url
+
+    
+def create_token(url, username=None, scope=None, client_id = None,
+        client_secret = None, redirect_uri = None, cache_path = None,
+        show_dialog=False):
     
     sp_oauth = oauth2.SpotifyOAuth(
-        client_id,
-        client_secret,
-        redirect_uri, 
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_uri, 
         scope=scope,
-        cache_path=cache_path,
         show_dialog=show_dialog
     )
-    
     code = sp_oauth.parse_response_code(url)
     if code:
-        token_info = sp_oauth.get_access_token(code, check_cache=False)
+        token_info = sp_oauth.get_access_token(code=code, check_cache=False)
     else:
         return None
-    # Auth'ed API request
     if token_info:
         return token_info
     else:
         return None
+
+
+def check_token(token_info, party_id, scope=None, client_id = None,
+        client_secret = None, redirect_uri = None):
+    token_info = literal_eval(token_info)
+    p = Party.objects.get(pk=party_id)
+    sp_oauth = oauth2.SpotifyOAuth(
+        client_id=client_id,
+        client_secret=client_secret, 
+        redirect_uri=redirect_uri,
+        scope=scope
+    )
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        p.token = token_info['access_token']
+        p.token_info = token_info
+        p.save()
+    return p.token
+
+
