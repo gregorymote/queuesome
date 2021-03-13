@@ -170,21 +170,24 @@ chrome_options.add_argument("--no-sandbox")
 
 PORT='8000'
 if STAGE:
+    proto='http://'
     IP='q-it-up-staging.herokuapp.com'
 elif HEROKU:
+    proto='https://'
     IP='queuesome.com'
 else:
+    proto='http://'
     IP='localhost'
 if HEROKU:
-    URL='https://' + IP
+    URL=proto + IP
     URI = URL + '/party/auth/'
     DRIVER = webdriver.Chrome(
         executable_path=os.environ.get("CHROMEDRIVER_PATH"),
         chrome_options=chrome_options
     )
 else:
-    URI = 'http://' + IP + ':' + PORT + '/party/auth/'
-    URL='http://localhost:8000'
+    URL=proto + IP + ':' + PORT
+    URI = URL + '/party/auth/'
     DRIVER = "DRIVER"
 
 CLIENT_SECRET=os.environ.get("SPOTIFY_CLIENT_SECRET")
