@@ -168,15 +168,16 @@ def name_party(request, pid):
 def join_party(request):
     invalid = False
     session_key = request.session.session_key
+    party_name = ""
+    host = ""
     if not session_key:
         session_key = request.session.create()
 
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            p = Party.objects.filter(
-                joinCode=form.cleaned_data['party_code'].upper(), active=True
-            ).first()
+            code = form.cleaned_data['party_code'].upper() 
+            p = Party.objects.filter(joinCode=code, active=True).first()
             if p:  
                 name = form.cleaned_data['user_name']
                 user = Users.objects.filter(
@@ -185,12 +186,12 @@ def join_party(request):
                     user.name = name
                     user.turn = 'not_picked'
                 else:
-                    u = Users(
+                    user = Users(
                         name=name,
                         party=p,
                         sessionID=session_key,
                     )
-                u.save()
+                user.save()
                 return HttpResponseRedirect(
                     reverse('lobby', kwargs={'pid': p.pk})
                 )
@@ -198,6 +199,13 @@ def join_party(request):
                 invalid = True
     else:
         code = request.GET.get('code', '')[:4]
+        p = Party.objects.filter(
+                joinCode=code.upper(), active=True).first()
+        if p:
+            party_name = p.name
+            host = Users.objects.filter(party=p, isHost=True).first()
+            host = host.name
+
         form = CreateUserForm(
             initial={
                 'party_code': code,
@@ -207,5 +215,7 @@ def join_party(request):
     context = {
         'form': form,
         'invalid': invalid,
+        'party_name': party_name,
+        'host': host
     }
     return render(request, 'party/join_party.html', context)

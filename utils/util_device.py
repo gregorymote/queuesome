@@ -2,11 +2,17 @@ from party.models import Party, Users, Devices
 from utils.util_auth import check_token
 import spotipy
 
-def activate_device(pid):
-    p = Party.objects.get(pk = pid)
-    token = check_token(p.token_info, pid)
-    if token is None:
-        token = p.token
+def activate_device(token_info, party_id, scope=None, client_id = None,
+        client_secret = None, redirect_uri = None):
+    p = Party.objects.get(pk = party_id)
+    token = check_token(
+                token_info=p.token_info,
+                party_id=party_id,
+                scope=scope,
+                client_id=client_id,
+                client_secret=client_secret,
+                redirect_uri=redirect_uri
+    )
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
     device_results = device_results['devices']
@@ -25,11 +31,17 @@ def activate_device(pid):
         p.save()
 
 
-def is_device_active(pid):
-    p = Party.objects.get(pk = pid)
-    token = check_token(p.token_info, pid)
-    if token is None:
-        token = p.token
+def is_device_active(token_info, party_id, scope=None, client_id = None,
+        client_secret = None, redirect_uri = None):
+    p = Party.objects.get(pk=party_id)
+    token = check_token(
+                token_info=p.token_info,
+                party_id=party_id,
+                scope=scope,
+                client_id=client_id,
+                client_secret=client_secret,
+                redirect_uri=redirect_uri
+    )
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
     device_results = device_results['devices']

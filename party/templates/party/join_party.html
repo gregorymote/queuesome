@@ -6,8 +6,16 @@
 	<div class = "container">
 		<form action="" method="post">
 			{% csrf_token %}
+			{% if not party_name %}
 			<h6>{{ form.party_code.label }}</h6>
 			{{ form.party_code }}
+			{% else %}
+			<div class="d-none">{{ form.party_code }}</div>
+			<h6>Join {{host}}'s Sesh</h6>
+			<div class="text-center">
+			<strong>{{ party_name }}</strong>
+			</div>
+			{% endif %}
 			{% if invalid %}
 			<div class="alert alert-info">
 				invalid room code

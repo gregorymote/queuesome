@@ -1,24 +1,14 @@
-from party.models import Party, Users
+from party.models import Party, Users, Library
 from datetime import datetime, timedelta, timezone
-from utils.util_user import get_user
 from queue_it_up.settings import SYSTEM
+from django.http import HttpResponseRedirect
 
-def check_active(pid, request):
+def get_party(pid):
     try:
-        p = Party.objects.get(pk = pid)
-        users = Users.objects.filter(party=p, active=True)
-        if not p.active:
-            return False
-        elif not users :
-            return False
-        else:
-            u = get_user(request, p)
-            if u.name != SYSTEM:
-                return u.active
-            else:
-                return True
+        return Party.objects.get(pk=pid)
     except Exception:
-        return False
+        return HttpResponseRedirect(reverse('index'))
+
 
 def get_inactivity(pid, duration):
     p = Party.objects.get(pk=pid)
@@ -36,3 +26,11 @@ def clean_up_party(pid):
     p.url_open = ""
     p.deviceID = ""
     p.save()
+
+
+def set_lib_repo():
+    lib_set = set()
+    libraries = Library.objects.filter(visible=True).exclude(special=True)
+    for library in libraries:
+        lib_set.add(library.id)
+    return lib_set
