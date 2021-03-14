@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from party.models import Party, Users
+from party.models import Party, Users, Songs
 
 def get_user(request, party):
     session_key = request.session.session_key
@@ -28,3 +28,14 @@ def check_permission(pid, request):
         return False
     else:
         return True
+
+
+def like_song(song, user, request):
+    if song and not song.duplicate:
+        if 'like' in request.POST:
+            song.likes += 1
+        else:
+            song.likes -= 1
+        song.save()
+        user.hasLiked = True
+        user.save()

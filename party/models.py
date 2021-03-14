@@ -91,7 +91,7 @@ class Songs(models.Model):
     order = models.IntegerField(default = 0)
     state = models.CharField(max_length=10, default='not_played')
     startTime= models.FloatField(default=0)
-    likes = models.ForeignKey('Likes',on_delete=models.CASCADE,)
+    likes = models.IntegerField(default=0)
     debug = models.CharField(max_length=4000, null=True)
     link = models.CharField(max_length=500, null=True)
     duration=models.IntegerField(default=0, null=True)

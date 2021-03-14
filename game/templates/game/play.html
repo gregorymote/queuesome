@@ -30,9 +30,11 @@
 		"user": "{{song.user.pk}}",
 		"art": "{{song.art}}"
 	}
+	var results = {{ results|safe }};
+	
 
 	window.onload = function() {
-		updatePage(party, user, category, song)
+		updatePage(party, user, category, song, results)
 	};
 
 	setInterval(function () {
@@ -44,7 +46,7 @@
 				},
 				dataType: 'json',
 				success: function (data) {
-					updatePage(data.party, data.user, data.category, data.song);			
+					updatePage(data.party, data.user, data.category, data.song, data.results);			
 			} });
 		}
 		else{
@@ -63,7 +65,7 @@
 		}
 	}, refresh_rate);
 
-	function updatePage(party, user, category, song){
+	function updatePage(party, user, category, song, results){
 		var inactive = decodeBool(party.inactive);
 		if (inactive){
 			window.location.replace('https://queuesome.com/index');
@@ -117,12 +119,14 @@
 		var action = document.getElementById('action');
 		var hasPicked = decodeBool(user.hasPicked)
 		if (user.turn == "picking" && party.state == "choose_category"){
-			action.value = "Curate the Vibe";
+			action.innerHTML = "Curate the Vibe";
 			action.style.display = 'initial';
+			action.href = "{% url 'choose_category' pid=party.id %}" 
 		}
 		else if(party.state == "pick_song" && !hasPicked){
-			action.value = "Pick Song";
+			action.innerHTML = "Pick Song";
 			action.style.display = 'initial';
+			action.href = "{% url 'pick_song' pid=party.id %}" 
 		}
 		else{
 			action.style.display = 'none';
@@ -149,6 +153,29 @@
 		}
 		else{
 			settings.style.display = 'none';
+		}
+		
+		var results_title = document.getElementById('results_title');
+		results_title.innerHTML = results[0].category_result;
+		if (results[0].category_result != "No Results Yet"){	
+			var results_body = document.getElementById('results_body');
+			results_body.innerHTML = '';
+			for(var i=0; i<results.length; i++){
+				var row = document.createElement('tr');
+				var user_result  = document.createElement('td');
+				user_result.innerHTML = results[i].user_result;
+				row.appendChild(user_result);
+				var song_result = document.createElement('td');
+				song_result.innerHTML = results[i].song_result;
+				row.appendChild(song_result);
+				var like_result = document.createElement('td');
+				like_result.innerHTML = results[i].like_result;
+				row.appendChild(like_result);
+				var total_result = document.createElement('td');
+				total_result.innerHTML = results[i].total_result;
+				row.appendChild(total_result);			
+				results_body.appendChild(row);
+			}
 		}
 	};
 
@@ -177,25 +204,58 @@
 		<form action="" method="post">
 			{% csrf_token %}
 			<div class = "row">
-				<div class = "col text-center pb-2">
-					<input id="action" type="submit" class="btn btn-outline-primary" style='display:none;'>
-					<button id="like" class="btn btn-outline-primary" name = "like" style='display:none;'><i class="fa fa-thumbs-o-up"></i></button>
-					<button id="dislike"class="btn btn-outline-primary" name = "dislike" style='display:none;'><i class="fa fa-thumbs-o-down"></i></button>
+				<div class = "col text-center pt-2 pb-2">
+					<a id="action" class="btn btn-outline-primary" style='display:none;'></a>
+					<button id="like" class="btn btn-outline-primary" name = "like" style='display:none;'><em class="fa fa-thumbs-o-up"></em></button>
+					<button id="dislike"class="btn btn-outline-primary" name = "dislike" style='display:none;'><em class="fa fa-thumbs-o-down"></em></button>
 				</div>
 			</div>
 
 			<nav class="navbar fixed-bottom navbar-dark bg-primary">
 				
-				<button id="settings" class="btn text-white bg-primary navbar-btn" name = "settings" style='display:none;'> <i class="fa fa-cog"></i></button>
+				<a href="{% url 'settings' pid=party.id %}" id="settings" class="btn text-white bg-primary navbar-btn" style='display:none;'> <em class="fa fa-cog"></em></a>
 				
-				<button class="btn text-white bg-primary navbar-btn" name = "users"> <i class="fa fa-users"></i></button>
+				<a href="{% url 'users' pid=party.id %}" class="btn text-white bg-primary navbar-btn"> <em class="fa fa-users"></em></a>
 								
 				<div class=" pl-5 text-white text-center">
-					<b id="party_code"></b>
+					<strong id="party_code"></strong>
 				</div>	
 				
-				<button class="btn text-white bg-primary navbar-btn" name = "results">Results <i class="fa fa-bar-chart"></i></button>
+				<a class="btn text-white bg-primary navbar-btn" data-toggle="modal" data-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
 			</nav>
 		</form>
 	</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+			aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="results_title"></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body text-center">
+						<table class="table">
+							<caption>Round Results</caption>
+							<thead>
+								<tr>
+									<th id="user_result">Name</th>
+									<th id="song_result">Song</th>
+									<th id="like_result">Likes</th>
+									<th id="total_result">Total</th>
+								</tr>
+							</thead>
+							<tbody id = "results_body">
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 {% endblock %}

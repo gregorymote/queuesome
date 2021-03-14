@@ -82,8 +82,6 @@
 				</div>
 				<div class="modal-body text-center">
 					{% load static %}
-					<!--<img src="{% static 'images/queuesome_qr.png' %}" class="img-thumbnail" width="200" height="200"
-						alt="" />-->
 						<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ URL }}/party/join_party/?code={{ party.joinCode }}" class="img-thumbnail" width="200" height="200"
 						alt="" />	
 				</div>
