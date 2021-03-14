@@ -1,7 +1,29 @@
 <!DOCTYPE html>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
 {% block page_content %}
+
+<style>
+	.item {
+		position:relative;
+		padding-top:20px;
+		display:inline-block;
+	}
+	.notify-badge{
+		position: absolute;
+		right:-20px;
+		top:10px;
+		background:red;
+		text-align: center;
+		border-radius: 50%;
+		color:white;
+		padding:5px 10px;
+		font-size:20px;
+		font-family: 'Righteous', cursive;
+	}
+</style>
 
 <script type="text/javascript">
 	var refresh_rate = {{user.refreshRate}} * 1000;
@@ -161,20 +183,35 @@
 			var results_body = document.getElementById('results_body');
 			results_body.innerHTML = '';
 			for(var i=0; i<results.length; i++){
-				var row = document.createElement('tr');
-				var user_result  = document.createElement('td');
-				user_result.innerHTML = results[i].user_result;
-				row.appendChild(user_result);
-				var song_result = document.createElement('td');
+				var item = document.createElement('div');
+				item.classList.add("pb-2");
+
+				var user_result  = document.createElement('h6');
+				user_result.innerHTML = results[i].user_result + "'s Pick";
+				item.appendChild(user_result);
+				
+				var img_badge = document.createElement('div');
+				img_badge.classList.add("item", "pb-2");
+
+				var badge = document.createElement('span');
+				badge.classList.add("notify-badge");
+				badge.innerHTML = results[i].like_result;
+				img_badge.appendChild(badge);
+
+				var art_result = document.createElement('img');
+				art_result.src=results[i].art_result;
+				art_result.classList.add("img-thumbnail");
+				art_result.height=200;
+				art_result.width=200;
+				img_badge.appendChild(art_result);
+				item.appendChild(img_badge);
+
+				var song_result = document.createElement('h6');
 				song_result.innerHTML = results[i].song_result;
-				row.appendChild(song_result);
-				var like_result = document.createElement('td');
-				like_result.innerHTML = results[i].like_result;
-				row.appendChild(like_result);
-				var total_result = document.createElement('td');
-				total_result.innerHTML = results[i].total_result;
-				row.appendChild(total_result);			
-				results_body.appendChild(row);
+				item.appendChild(song_result);		
+				results_body.appendChild(item);
+				var divider = document.createElement('hr');
+				results_body.appendChild(divider);
 			}
 		}
 	};
@@ -237,20 +274,7 @@
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
-					<div class="modal-body text-center">
-						<table class="table">
-							<caption>Round Results</caption>
-							<thead>
-								<tr>
-									<th id="user_result">Name</th>
-									<th id="song_result">Song</th>
-									<th id="like_result">Likes</th>
-									<th id="total_result">Total</th>
-								</tr>
-							</thead>
-							<tbody id = "results_body">
-							</tbody>
-						</table>
+					<div id="results_body" class="modal-body text-center">
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

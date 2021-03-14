@@ -1,4 +1,4 @@
-from party.models import Party, Users, Library
+from party.models import Party, Users,Songs, Library
 from datetime import datetime, timedelta, timezone
 from queue_it_up.settings import SYSTEM
 from django.http import HttpResponseRedirect
@@ -34,3 +34,25 @@ def set_lib_repo():
     for library in libraries:
         lib_set.add(library.id)
     return lib_set
+
+
+def get_results(party):
+    results=[]
+    if party.roundNum > 1:
+        song_results = Songs.objects.filter(
+            category__roundNum = party.roundNum - 1, category__party=party
+            ).order_by('-likes').all()
+        for result in song_results:
+            results.append(
+                {
+                    "user_result":result.user.name,
+                    "song_result":result.name,
+                    "like_result":result.likes,
+                    "total_result":result.user.points,
+                    "art_result":result.art,
+                    "category_result":result.category.name
+                }
+            )
+    else:
+        results.append({"category_result": "No Results Yet" })
+    return results

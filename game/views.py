@@ -7,7 +7,7 @@ from party.models import (Party, Users, Category, Library, Songs,
 from utils.util_auth import check_token
 from utils.util_user import get_user, check_permission, like_song
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
-    set_lib_repo)
+    set_lib_repo, get_results)
 from utils.util_rand import get_letter, get_numbers
 from utils.util_device import is_device_active, activate_device
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -138,23 +138,7 @@ def play(request, pid):
         song = Songs(art='lull')
         category = Category.objects.filter(party=party, roundNum=0).first()
     
-    results=[]
-    if party.roundNum > 1:
-        song_results = Songs.objects.filter(
-            category__roundNum = party.roundNum - 1, category__party=party
-            ).order_by('-likes').all()
-        for result in song_results:
-            results.append(
-                {
-                    "user_result":result.user.name,
-                    "song_result":result.name,
-                    "like_result":result.likes,
-                    "total_result":result.user.points,
-                    "category_result":result.category.name
-                }
-            )
-    else:
-        results.append({"category_result": "No Results Yet" })
+    results = get_results(party)
     context = {
         'form': form,
         'party': party,
@@ -194,23 +178,7 @@ def update_play(request):
         song = Songs(art='lull')
         category = Category.objects.filter(party=party, roundNum=0).first()
     
-    results=[]
-    if party.roundNum > 1:
-        song_results = Songs.objects.filter(
-            category__roundNum=party.roundNum - 1, category__party=party
-            ).order_by('-likes').all()
-        for result in song_results:
-            results.append(
-                {
-                    "user_result":result.user.name,
-                    "song_result":result.name,
-                    "like_result":result.likes,
-                    "total_result":result.user.points,
-                    "category_result":result.category.name
-                }
-            )
-    else:
-        results.append({"category_result": "No Results Yet" })
+    results = get_results(party)
     party_info = {
 		"device_error" : str(party.device_error),
 		"name" : party.name,
@@ -570,35 +538,6 @@ def search_results(request, pid):
                }
         
     return render(request, 'game/search_results.html', context)
-
-def round_results(request, pid):
-
-    p = get_party(pid)
-
-    if p.roundNum > 1:
-        songs = list(Songs.objects.filter(
-            category__roundNum = p.roundNum - 1, category__party = p
-            ).order_by('-likes')
-        )
-        category = songs[0].category.name
-    else:
-        category = "No Results Yet"
-        songs = []
-    
-    if request.method == 'POST':
-        form = blankForm(request.POST)
-
-        if form.is_valid():
-            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-    else:
-        form = blankForm(initial={'text':'blank',})
-
-    context = {
-                'form' : form,
-                'songs': songs,
-                'category': category,
-                }    
-    return render(request, 'game/round_results.html', context)
 
 
 def settings(request, pid):
