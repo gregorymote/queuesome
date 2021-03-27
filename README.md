@@ -110,7 +110,7 @@
    
    http://localhost:8000/party/auth/
    
-   or
+   OR
    
    http://YOUR_IP:YOUR_PORT/party/auth/
    
