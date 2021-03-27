@@ -7,21 +7,34 @@
 
 <style>
 	.item {
-		position:relative;
-		padding-top:20px;
-		display:inline-block;
+		width:160px;
+		vertical-align: top;
+	}
+	.img-badge {
+		padding: 15px 26px 0px;
+		position: relative;
+		display: inline-block;
 	}
 	.notify-badge{
+		width: 36px; 
+		height: 36px; 
+		line-height:36px;
 		position: absolute;
-		right:-20px;
-		top:10px;
-		background:red;
-		text-align: center;
+		top: 5px;
+		right: 15px;
+		padding: 5px 10px;
 		border-radius: 50%;
-		color:white;
-		padding:5px 10px;
+		background: red;
+		color: white;
+		display: flex;
+  		justify-content: center;
+  		align-items: center;
 		font-size:20px;
-		font-family: 'Righteous', cursive;
+	}
+
+	.art{
+		height: 110px;
+		width: 110px;
 	}
 </style>
 
@@ -81,7 +94,7 @@
 				success: function (data) {
 					var inactive = decodeBool(data.inactive);
 					if (inactive){
-						window.location.replace('https://queuesome.com/index');
+						window.location.replace('/index');
 					}			
 			} });
 		}
@@ -90,7 +103,7 @@
 	function updatePage(party, user, category, song, results){
 		var inactive = decodeBool(party.inactive);
 		if (inactive){
-			window.location.replace('https://queuesome.com/index');
+			window.location.replace('/index');
 		}
 		var device_error = document.getElementById('device_error');
 		var isError = decodeBool(party.device_error);
@@ -182,16 +195,13 @@
 		if (results[0].category_result != "No Results Yet"){	
 			var results_body = document.getElementById('results_body');
 			results_body.innerHTML = '';
+			var row = document.createElement('row');
 			for(var i=0; i<results.length; i++){
 				var item = document.createElement('div');
-				item.classList.add("pb-2");
-
-				var user_result  = document.createElement('h6');
-				user_result.innerHTML = results[i].user_result + "'s Pick";
-				item.appendChild(user_result);
+				item.classList.add("pb-2", "item", "text-center"); 
 				
 				var img_badge = document.createElement('div');
-				img_badge.classList.add("item", "pb-2");
+				img_badge.classList.add("img-badge");
 
 				var badge = document.createElement('span');
 				badge.classList.add("notify-badge");
@@ -200,19 +210,19 @@
 
 				var art_result = document.createElement('img');
 				art_result.src=results[i].art_result;
-				art_result.classList.add("img-thumbnail");
-				art_result.height=200;
-				art_result.width=200;
+				art_result.classList.add("art","img-thumbnail");
+				art_result.title=results[i].user_result + "'s Pick";
 				img_badge.appendChild(art_result);
 				item.appendChild(img_badge);
 
-				var song_result = document.createElement('h6');
-				song_result.innerHTML = results[i].song_result;
-				item.appendChild(song_result);		
-				results_body.appendChild(item);
-				var divider = document.createElement('hr');
-				results_body.appendChild(divider);
+				var song_title = document.createElement('p');
+				song_title.innerHTML = results[i].song_result;
+				song_title.style.fontSize = "8px";
+				item.appendChild(song_title);
+				item.style.display = 'inline-block';		
+				row.appendChild(item);
 			}
+			results_body.appendChild(row);
 		}
 	};
 

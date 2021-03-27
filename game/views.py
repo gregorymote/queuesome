@@ -5,9 +5,10 @@ from django.db.models import Q
 from party.models import (Party, Users, Category, Library, Songs,
     Searches, Devices)
 from utils.util_auth import check_token
-from utils.util_user import get_user, check_permission, like_song
+from utils.util_user import (get_user, check_permission, like_song,
+    assign_leader, reset_users)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
-    set_lib_repo, get_results)
+    set_lib_repo, get_results, get_category_choices, create_category)
 from utils.util_rand import get_letter, get_numbers
 from utils.util_device import is_device_active, activate_device
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -223,6 +224,13 @@ def update_play(request):
 
 
 def update_game(request):
+    ''' Ajax request made by system to update the game logic 
+
+    Parameters:
+
+        - request - web request
+
+    '''
     pid = request.GET.get('pid', None)   
     party = Party.objects.get(pk = pid)
 
@@ -232,45 +240,36 @@ def update_game(request):
     else:
         inactive = False
 
-    if party.state == 'assign':
-        lead = Users.objects.filter(party=party, turn='not_picked', active=True).order_by('?').first()
-        if lead:
-            party.state = 'choose_category'
-            party.save()
-        else:
-            users = Users.objects.filter(party=party, active=True).all()
-            for user in users:
-                if user.turn == 'has_picked_last':
-                    picked_last = user.id
-                user.turn = 'not_picked'
-                user.save()
-            lead = Users.objects.filter(party=party, active=True).exclude(pk=picked_last).order_by('?').first()
-            if not lead:
-               lead = Users.objects.filter(party=party, active=True).order_by('?').first() 
-            party.state = 'choose_category'
-            party.save()  
-        lead.turn = 'picking'
-        lead.save()
-    
-    if party.state == 'choose_category' and not Users.objects.filter(party=party, turn='picking', active=True):
-        lead = Users.objects.filter(party=party, turn='not_picked', active=True).first()
-        if lead:
-            lead.turn = 'picking'
-            lead.save()
-        else:
-            party.state = 'assign'
-            party.save()
-    
-    if party.state == 'pick_song' and not Users.objects.filter(party=party, hasPicked=False, active=True):
+    if party.state == 'assign' or \
+            (party.state=='choose_category' and not 
+                Users.objects.filter(
+                    turn='picking',
+                    party=party,
+                    active=True
+                ).first()
+            ):
+        assign_leader(party)
+        party.state = 'choose_category'
+        party.save()  
+                
+    if party.state == 'pick_song' and not \
+            Users.objects.filter(
+                hasPicked=False,
+                party=party,
+                active=True
+            ).all():
+        reset_users(party) 
         party.state = 'assign'
         party.save()
-        users = Users.objects.filter(party=party, active=True)
-        for user in users:
-            user.hasPicked = False
-            user.save() 
 
     if not party.device_error:
-        if not party.thread and Songs.objects.filter(category__party=party, category__roundNum = party.roundNum, state='not_played', category__full=True):
+        if not party.thread and \
+                Songs.objects.filter(
+                    category__party=party,
+                    category__roundNum=party.roundNum,
+                    state='not_played',
+                    category__full=True
+                ):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
     else:
@@ -291,7 +290,10 @@ def update_game(request):
             party.roundNum = category.roundNum
             party.save()
     else:
-        last_played = Songs.objects.filter(category__party=party, state='played').order_by('-category__roundNum').first()
+        last_played = Songs.objects.filter(
+            category__party=party,
+            state='played'
+            ).order_by('-category__roundNum').first()
         if last_played and party.roundNum != last_played.category.roundNum + 1:
             party.roundNum = last_played.category.roundNum + 1
             party.save()
@@ -305,108 +307,50 @@ def update_game(request):
 
 def choose_category(request, pid):
 
-    p =get_party(pid)
-    u = get_user(request, pid)
-    invalid=False
-    ARTIST='Songs by this Artist'
-
-    if u.turn != 'picking':
+    party = get_party(pid)
+    user = get_user(request, pid)
+    if user.turn != 'picking':
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-
-    show_custom = False
-    if request.method != 'POST' and p.indices is None:
-        num = 12
-        if len(p.lib_repo) < num:
-            num = len(p.lib_repo)
-        p.indices = get_numbers(num, len(p.lib_repo)) 
-        p.save() 
-    repo = set()
-    list_repo = list(p.lib_repo)
-    for i in p.indices:
-        repo.add(list_repo[int(i)])
+    valid=True
+    choices = get_category_choices(request, party)
         
     if request.method == 'POST':
-        form = chooseCategoryForm(request.POST, repo=repo)
+        form = chooseCategoryForm(request.POST, repo=choices)
         if form.is_valid():
-            if ( 'back' in request.POST):
+            category = form.cleaned_data['cat_choice']
+            valid = create_category(
+                party=party,
+                user=user,
+                category=category,
+                artist=form.cleaned_data['artist'],
+                custom=form.cleaned_data['custom'],
+                sc_type=form.cleaned_data['scatt_radio']
+            )
+            if valid:
+                party.state = 'pick_song'
+                party.roundTotal = party.roundTotal + 1
+                party.save()
+                remaining_users = Users.objects.filter(
+                    party=party,
+                    turn='not_picked',
+                    active=True
+                ).all()
+                if not remaining_users:
+                    user.turn = 'has_picked_last'
+                else:
+                    user.turn = 'has_picked'
+                user.save()
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-            else:
-                try:
-                    p.indices = None
-                    if not form.cleaned_data['cat_choice'].special:
-                        choice_pk = str(form.cleaned_data['cat_choice'].pk)
-                        p.lib_repo.remove(choice_pk)   
-                    p.save()
-                    choice = form.cleaned_data['cat_choice'].display
-                    if choice != 'Custom' and choice != ARTIST: 
-                        create_category(
-                                        choice=choice,
-                                        request=request,
-                                        p=p,
-                                        sc_type=form.cleaned_data['scatt_radio']
-                        )
-                        return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-                    elif choice == ARTIST:
-                        if form.cleaned_data['artist'] != '':
-                            create_category(
-                                choice='Songs by ' + form.cleaned_data['artist'],
-                                request=request,
-                                p=p
-                            )
-                            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-                    else:
-                        show_custom = True
-
-                        if form.cleaned_data['custom'] != '':
-                            create_category(
-                                choice=form.cleaned_data['custom'],
-                                request=request,
-                                p=p
-                            )
-                            l = Library(name=form.cleaned_data['custom'])
-                            l.save()
-                            return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-                except Exception as e:
-                    print(e)
-                    invalid=True
     else:
-        form = chooseCategoryForm(repo=repo, initial={
-            'cat_choice': '',
-            'custom': '',
-        }
+        form = chooseCategoryForm(repo=choices,
+                    initial={'cat_choice': '','custom': '',}
         )
     context = {
         'form':form,
-        'showCustom':show_custom,
-        'invalid':invalid,
-        }
-    
-    return render(request, 'game/chooseCat.html', context)
-
-
-def create_category(choice, request, p, sc_type=None):
-    
-    u = get_user(request, p)
-    user =Users.objects.filter(party=p, turn='not_picked', active=True).first()
-    if not user:
-        u.turn = 'has_picked_last'
-    else:
-        u.turn = 'has_picked'
-    u.save()
-
-    if choice == 'Scattergories':
-        choice =  sc_type + ' Names that Begin with the Letter ' + get_letter()
-    
-    c = Category(name = choice,
-                 roundNum = p.roundTotal + 1,
-                 party = p,
-                 leader = u,
-                )
-    c.save()
-
-    p.state = 'pick_song'
-    p.roundTotal = p.roundTotal + 1
-    p.save()
+        'party':party,
+        'invalid': not valid,
+    }
+    return render(request, 'game/choose_category.html', context)
 
 
 def pick_song(request, pid):

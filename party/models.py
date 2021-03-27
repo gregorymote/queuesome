@@ -61,6 +61,7 @@ class Category(models.Model):
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
     leader = models.ForeignKey('Users',on_delete=models.SET_NULL, null=True)
     full = models.BooleanField(null=True, default=False)
+    library = models.ForeignKey('Library', on_delete=models.CASCADE,null=True)
     
     def __str__(self):
         return self.name
