@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from party.models import Library, Searches, Devices
+from game.fields import ListTextWidget
 
 
 class blankForm(forms.Form):
@@ -22,8 +23,17 @@ class chooseCategoryForm(forms.Form):
 
 
 class searchForm(forms.Form):
-    search = forms.CharField(label = 'search', required = False,widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Search Songs or Artists',}))
+    result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
+    search = forms.CharField(required=False,widget=forms.TextInput)
 
+    def __init__(self, *args, **kwargs):
+        _song_list = kwargs.pop('data_list', None)
+        super(searchForm, self).__init__(*args, **kwargs)
+
+    # the "name" parameter will allow you to use the same widget more than once in the same
+    # form, not setting this parameter differently will cuse all inputs display the
+    # same list.
+        self.fields['search'].widget = ListTextWidget(data_list=_song_list, name='song-list')
 
 class searchResultsForm(forms.Form):
     results = forms.ModelChoiceField(widget=forms.Select(attrs={'class':'form-control'}),queryset=Searches.objects.all(), required=False)

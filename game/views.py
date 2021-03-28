@@ -355,133 +355,135 @@ def choose_category(request, pid):
 
 def pick_song(request, pid):
 
-    p = get_party(pid)
-    u = get_user(request, p)
+    party = get_party(pid)
+    user = get_user(request, party)
     invalid = False
-    
-    if u.hasPicked:
+    song_list = ('')
+    if user.hasPicked:
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
-    c = Category.objects.filter(party=p, roundNum=p.roundTotal).first()
+    category = Category.objects.filter(
+        party=party, roundNum=party.roundTotal
+    ).first()
 
     if request.method == 'POST':
-        form = searchForm(request.POST)
-
+        form = searchForm(request.POST,data_list=song_list)
         if form.is_valid():
-            if ( 'back' in request.POST):
-                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-            else:
-                token = check_token(
-                    token_info=p.token_info,
-                    party_id=pid,
-                    scope=SCOPE,
-                    client_id=CLIENT_ID,
-                    client_secret=CLIENT_SECRET,
-                    redirect_uri=URI
+            result = form.cleaned_data['result']
+            if result != '-1':
+                search = Searches.objects.filter(uri=result).first()
+                print(search)
+                Songs(
+                    name=search.name,
+                    uri=search.uri,
+                    art=search.art,
+                    user=user,
+                    category=category,
+                    played=False,
+                    order=random.randint(1,101),
+                    state='not_played',
+                    link=search.link,
+                    duration=search.duration,
+                ).save()
+                Searches.objects.filter(user=user, party=party).delete()
+                user.hasPicked = True
+                user.save()
+                not_picked = Users.objects.filter(
+                    party=party,
+                    active=True,
+                    hasPicked=False
+                    ).all()
+                if not not_picked:
+                    category.full = True
+                    category.save()
+                return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid':pid})
                 )
-                spotify_object = spotipy.Spotify(auth=token)               
-                search = form.cleaned_data['search']
-                if search != "":
-                    search_results = spotify_object.search(search, 15, 0, 'track')
-                    tracks = search_results['tracks']['items'] 
-                    for x in tracks:
-                        try:
-                            albumArt = x['album']['images'][0]['url']
-                        except Exception:
-                            albumArt=""
-                        artistName = x['artists'][0]['name']  
-                        trackName = x['name']
-                        trackURI = x['uri']
-                        trackDuration = x['duration_ms']
-                        url = x['external_urls']['spotify']
-                        trackName = (trackName[:255] + '..') if len(trackName) > 255 else trackName
-                        s = Searches(
-                                        name = trackName + ", " + artistName,
-                                        uri=trackURI,
-                                        art=albumArt,
-                                        party=p,
-                                        user=u,
-                                        link=url,
-                                        duration=trackDuration
-                                    )
-                        s.save()                    
-                    return HttpResponseRedirect(reverse('search_results', kwargs={'pid':pid}))
-                else:
-                    invalid=True
+            else:
+                invalid=True
     else:
-        form = searchForm(initial={'search':'',})
+        form = searchForm(data_list=song_list)
     
     context = {
         'form':form,
-        'category':c,
-        'invalid':invalid
-        }
+        'category':category,
+        'invalid':invalid,
+        'party':party
+    }
     return render(request, 'game/pick_song.html', context)
 
 
-def search_results(request, pid):
+def update_search(request):
+    ''' Ajax request made to update search results 
 
-    p = get_party(pid)
-    u = get_user(request, p)
-    invalid = False
-    
-    if u.hasPicked:
-        return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-    
-    c = Category.objects.filter(party=p, roundNum=p.roundTotal).first() 
-    try:
-        isArtist = (list(Searches.objects.filter(party=p).filter(user=u))[0].art == None)
-    except Exception:
-        isArtist = True
-        
-    if request.method == 'POST':
-        form = searchResultsForm(request.POST, partyObject=p, userObject=u)
-        if form.is_valid():
-            if ('add2q' in request.POST):
-                search = form.cleaned_data['results']
-                if search != None:
-                    s = Songs(
-                              name=search.name,
-                              uri=search.uri,
-                              art=search.art,
-                              user=u,
-                              category=c,
-                              played=False,
-                              order=random.randint(1,101),
-                              state='not_played',
-                              link=search.link,
-                              duration=search.duration,
-                    )
-                    s.save()
-                    u.hasPicked = True
-                    u.save()
-                    Searches.objects.filter(user=u, party=p).delete()
+    Parameters:
 
-                    not_picked = Users.objects.filter(party=p, active=True, hasPicked=False)
-                    if not not_picked:
-                        c.full = True
-                        c.save()
+        - request - web request
 
-                    return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-                else:
-                    invalid = True
+    '''
+    pid = request.GET.get('pid', None)   
+    party = Party.objects.get(pk = pid)
+    user = get_user(request, party)
+    result = request.GET.get('result', None)
+    search = Searches.objects.all()
 
-            elif ('back' in request.POST):
-                Searches.objects.filter(user=u).filter(party=p).delete()
-                return HttpResponseRedirect(reverse('pick_song', kwargs={'pid':pid}))
-    else:
-        form = searchResultsForm(partyObject=p, userObject=u, initial={'results':''})
-   
-    album_search = list(Searches.objects.filter(party=p, user=u).order_by('pk'))
-        
-    context = {
-               'form':form,
-               'isArtist':isArtist,
-               'invalid':invalid,
-               'albumSearch':album_search
-               }
-        
-    return render(request, 'game/search_results.html', context)
+    Searches.objects.filter(user=user, party=party).exclude(uri=result).delete()
+    current = Searches.objects.filter(uri=result).first()
+    if current:
+        print('******',current.uri,':', current.name,'**********')
+    search_text = request.GET.get('text', None)
+    token = check_token(
+        token_info=party.token_info,
+        party_id=pid,
+        scope=SCOPE,
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=URI
+    )
+    spotify_object = spotipy.Spotify(auth=token)
+    search_results = spotify_object.search(search_text, 15, 0, 'track')
+    tracks = search_results['tracks']['items']
+    song_list = []
+    for track in tracks:
+        try:
+            album_art = track['album']['images'][0]['url']
+        except Exception:
+            album_art=""
+        artist_name = track['artists'][0]['name']  
+        track_name = track['name']
+        track_uri = track['uri']
+        track_duration = track['duration_ms']
+        url = track['external_urls']['spotify']
+        track_name = (
+            trackName[:255] + '..'
+        ) if len(track_name) > 255 else track_name
+        if not current or current.uri != track_uri:
+            search = Searches(
+                name = track_name + ", " + artist_name,
+                uri=track_uri,
+                art=album_art,
+                party=party,
+                user=user,
+                link=url,
+                duration=track_duration
+            )
+            search.save()
+        else:
+            search = current
+        print(search.name,':',search.uri)
+        song_list.append(
+            {
+            'track_name':search.name,
+            'album_art':album_art,
+            'id': search.uri,
+            }
+        )
+    data={
+        "success": 'True',
+        "song_list": song_list,
+
+    }
+    return JsonResponse(data)
 
 
 def settings(request, pid):

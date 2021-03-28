@@ -1,8 +1,81 @@
 <!DOCTYPE html>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
 
 {% block page_content %}
+<script type="text/javascript">
+	var flag = true;
+	$(document).ready(function() {
+		var search = document.getElementById("id_search");
+		search.autocomplete="off";
+		search.classList.add("form-control");
+		search.placeholder = 'Search Songs or Artists';
+		search.addEventListener("input", update_search);
+		search.addEventListener("focusin", current_search);
+		search.addEventListener("input", getOption);
+	});
+	function current_search(e){
+		$.ajax({
+			url: '/sesh/update_search',
+			data: {
+			'pid': {{ party.pk }},
+			'text': e.target.value,
+			'result': document.getElementById("id_result").value,
+			},
+			dataType: 'json',
+			success: function (data) {
+				populateOptions(data.song_list);
+				
+		} });
+	}
+	function update_search(e){
+
+		var result = document.getElementById("id_result");
+		var artwork = document.getElementById("artwork");
+		result.value = '-1';
+		artwork.innerHTML = '';
+		if (flag){
+			$.ajax({
+				url: '/sesh/update_search',
+				data: {
+				'pid': {{ party.pk }},
+				'text': e.target.value,
+				'result': result.value,
+				},
+				dataType: 'json',
+				success: function (data) {
+					populateOptions(data.song_list);
+					
+			} });
+		}
+	}
+	function populateOptions(song_list){
+		var data_list = document.getElementById("list__song-list");
+		data_list.innerHTML = "";
+		for(var i=0; i<song_list.length; i++){
+			var option = document.createElement('option');
+			option.id = song_list[i].id;
+			option.value = song_list[i].track_name;
+			option.art = song_list[i].album_art;
+			data_list.appendChild(option);
+		}
+	}
+	function getOption(){
+		var val = document.getElementById("id_search").value;
+		var opts = document.getElementById("list__song-list").childNodes;
+		var artwork = document.getElementById("artwork");
+		var result = document.getElementById("id_result");
+		flag = true;
+		for (var i = 0; i < opts.length; i++) {
+			if (opts[i].value === val) {
+				artwork.innerHTML = '<img src="'+ opts[i].art + '" class="img-thumbnail" width="200" height="200" alt="...">';
+				result.value = opts[i].id;
+				flag = false;
+				break;
+			}
+    	}
+	}
+</script>
 	<div class = "container">
 		<div class = "text-center">
 			<h6>...and the vibe is:</h6>
@@ -10,12 +83,14 @@
 		<div class ="pt-2">
 			<h6>{{category.name}}</h6>
 		</div>
+		<div id="artwork", class ="pt-1 pb-2 text-center"></div>
 		<form action="" method="post">
 			{% csrf_token %}
 			<h6>{{ form.search }}</h6>
+			<div style="display:none">{{ form.result }}</div>
 			<div class = "text-right pb-2">
-				<input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
-				<input type="submit" class="btn btn-outline-primary" value="Search">
+				<a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-primary">Back</a>
+				<input type="submit" class="btn btn-outline-primary" value="Add to Queue">
 			</div>			
 			{% if invalid %}
 			<div class="alert alert-info">
