@@ -35,15 +35,16 @@ def check_permission(pid, request):
 
     '''
     try:
-        p = Party.objects.get(pk=pid, active=True)
+        party = Party.objects.get(pk=pid, active=True)
     except Exception:
         return False
     session_key = request.session.session_key
     try:
-        u = Users.objects.get(sessionID=session_key, party = p)
+        user = Users.objects.get(sessionID=session_key, party=party)
     except Exception:
+        print('here')
         return False
-    if not u.isHost:
+    if not user.isHost:
         return False
     else:
         return True

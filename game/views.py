@@ -277,13 +277,8 @@ def update_game(request):
         party.device_error = not activate_device(
             token_info=party.token_info,
             party_id=party.pk,
-            scope=SCOPE,
-            client_id=CLIENT_ID,
-            client_secret=CLIENT_SECRET,
-            redirect_uri=URI
         )
         party.save()
-
     song = Songs.objects.filter(category__party=party, state='playing').first()
     if song:
         category = song.category
@@ -372,7 +367,6 @@ def pick_song(request, pid):
             result = form.cleaned_data['result']
             if result != '-1':
                 search = Searches.objects.filter(uri=result).first()
-                print(search)
                 Songs(
                     name=search.name,
                     uri=search.uri,
@@ -429,17 +423,8 @@ def update_search(request):
 
     Searches.objects.filter(user=user, party=party).exclude(uri=result).delete()
     current = Searches.objects.filter(uri=result).first()
-    if current:
-        print('******',current.uri,':', current.name,'**********')
     search_text = request.GET.get('text', None)
-    token = check_token(
-        token_info=party.token_info,
-        party_id=pid,
-        scope=SCOPE,
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=URI
-    )
+    token = check_token(token_info=party.token_info,party_id=pid)
     spotify_object = spotipy.Spotify(auth=token)
     search_results = spotify_object.search(search_text, 15, 0, 'track')
     tracks = search_results['tracks']['items']
@@ -470,7 +455,6 @@ def update_search(request):
             search.save()
         else:
             search = current
-        print(search.name,':',search.uri)
         song_list.append(
             {
             'track_name': track_name,
@@ -488,75 +472,60 @@ def update_search(request):
 
 
 def settings(request, pid):
-
-    p = get_party(pid)
-
     if not check_permission(pid, request):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-    
+    party = get_party(pid)
     invalid = False
-    
-    token = check_token(
-        token_info=p.token_info,
-        party_id=pid,
-        scope=SCOPE,
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=URI
-    )
+    token = check_token(token_info=party.token_info, party_id=party.pk)
     spotify_object = spotipy.Spotify(auth=token)
-
     device_results = spotify_object.devices()
     device_results = device_results['devices']
-    curr_devices = []
+    curr_devices = []       
+    for result in device_results:
+        curr_devices.append(result['id'])
+        current_device = Devices.objects.filter(
+            party=party, deviceID=result['id']
+        ).first()
+        if not current_device:
+            Devices(
+                name=result['name'],
+                deviceID=result['id'],
+                party=party
+            ).save()
+    all_devices = Devices.objects.filter(party=party).all()
 
-    for x in device_results:
-        curr_devices.append(x['id'])
-                            
-    for x in device_results:
-        try:
-            Devices.objects.get(party=p, deviceID= x['id'])
-        except Exception:
-            d = Devices(name = x['name'], deviceID = x['id'], party = p)
-            d.save()
-    query = Devices.objects.filter(party=p)
-
-    for x in query:
-        if x.deviceID  not in curr_devices:
-            x.delete()
+    for device in all_devices:
+        if device.deviceID not in curr_devices:
+            device.delete()
         
     if request.method == 'POST':
-        form = settingsForm(request.POST, partyObject=p)
-
+        form = settingsForm(request.POST, partyObject=party)
         if form.is_valid():
-            Devices.objects.filter(party=p).all().delete()
-            if ('back' in request.POST):
-                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-
-            elif ('kill' in request.POST):
-                p.active = False
-                p.save()
-                clean_up_party(p.pk)
-                return HttpResponseRedirect(reverse('index'))
-                
+            Devices.objects.filter(party=party).all().delete()
+            if ('kill' in request.POST):
+                clean_up_party(party.pk)
+                return HttpResponseRedirect(reverse('index'))   
             else:
                 device = form.cleaned_data['device']
                 if device != None:
-                    p.deviceID=device.deviceID
+                    party.deviceID=device.deviceID
                     time = form.cleaned_data['time']
-                    p.time = time
-                    p.device_error = False
-                    p.save()
-                    return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                    party.time = time
+                    party.device_error = False
+                    party.save()
+                    return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid':pid})
+                    )
                 else:
                     invalid = True
     else:
-        form = settingsForm(partyObject=p, initial={'time':p.time,})
+        form = settingsForm(partyObject=party, initial={'time':party.time,})
 
     context = {
-                'form' : form,
-                'invalid':invalid,
-                }    
+        'party':party,
+        'form':form,
+        'invalid':invalid,
+    }    
     return render(request, 'game/settings.html', context)
 
 
@@ -639,17 +608,20 @@ def play_songs(pid):
         p.device_error = False
     p.save()
     rN = p.roundNum
-    token = check_token(
-        token_info=p.token_info,
-        party_id=pid,
-        scope=SCOPE,
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=URI
-    )
+    token = check_token(token_info=p.token_info,party_id=pid)
     spotify_object = spotipy.Spotify(auth=token)
-    while (Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True)):
-        queue = Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', category__full=True).order_by('order')
+    while (Songs.objects.filter(
+        category__party=p,
+        category__roundNum=rN,
+        state='not_played',
+        category__full=True
+        ).all()):
+        queue = Songs.objects.filter(
+            category__party=p,
+            category__roundNum=rN,
+            state='not_played',
+            category__full=True
+            ).order_by('order').all()
         for song in queue:
             song = Songs.objects.get(pk=song.pk)
             ls = [song.uri]
@@ -658,7 +630,11 @@ def play_songs(pid):
                     p = Party.objects.get(pk=pid)
                     if not p.active:
                         return
-                    dups = list(Songs.objects.filter(category__party=p, category__roundNum = rN, state='not_played', name=song.name))
+                    dups = list(Songs.objects.filter(
+                        category__party=p,
+                        category__roundNum=rN,
+                        state='not_played',name=song.name
+                        ).all())
                     if len(dups) > 1:
                         for d in dups:
                             d.duplicate=True
@@ -668,24 +644,10 @@ def play_songs(pid):
                             u.save()
                         song.duplicate=True
                         song.save()
-                    token = check_token(
-                        token_info=p.token_info,
-                        party_id=pid,
-                        scope=SCOPE,
-                        client_id=CLIENT_ID,
-                        client_secret=CLIENT_SECRET,
-                        redirect_uri=URI
-                    )
+                    token = check_token(token_info=p.token_info, party_id=pid)
                     spotify_object = spotipy.Spotify(auth=token)
-                    activate_device(
-                        token_info=p.token_info,
-                        party_id=pid,
-                        scope=SCOPE,
-                        client_id=CLIENT_ID,
-                        client_secret=CLIENT_SECRET,
-                        redirect_uri=URI
-                    )
-                    spotify_object.start_playback(device_id=p.deviceID , uris=ls)
+                    activate_device(token_info=p.token_info, party_id=pid)
+                    spotify_object.start_playback(device_id=p.deviceID, uris=ls)
                     song.state = 'playing'
                     song.startTime = time.time()
                     song.save()

@@ -72,30 +72,13 @@
 		var search = document.getElementById("id_search");
 		search.value = '';
 		var result = document.getElementById("id_result");
-		if (results.value != -1){
+		if (result.value != -1){
 			search.style.display = 'none';
 		}
-
-	}
-	function current_search(e){
-		$.ajax({
-			url: '/sesh/update_search',
-			data: {
-			'pid': {{ party.pk }},
-			'text': e.target.value,
-			'result': document.getElementById("id_result").value,
-			},
-			dataType: 'json',
-			success: function (data) {
-				populateOptions(data.song_list);
-				
-		} });
 	}
 	function update_search(e){
 		var result = document.getElementById("id_result");
 		var artwork = document.getElementById("artwork");
-		result.value = '-1';
-		artwork.innerHTML = '';
 		$.ajax({
 			url: '/sesh/update_search',
 			data: {

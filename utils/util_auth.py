@@ -5,10 +5,11 @@ import spotipy.oauth2 as oauth2
 import spotipy
 from ast import literal_eval
 from party.models import Party
+from queue_it_up.settings import URI, SCOPE, CLIENT_ID, CLIENT_SECRET
 
 
-def generate_url(username=None, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None,
+def generate_url(username=None, scope=SCOPE, client_id=CLIENT_ID,
+        client_secret = CLIENT_SECRET, redirect_uri=URI, cache_path = None,
         show_dialog=True):
     ''' prompts the user to login if necessary and returns
         the user token suitable for use with the spotipy.Spotify 
@@ -77,8 +78,8 @@ def get_url(path, is_cloud, ip, port):
     return url
 
     
-def create_token(url, username=None, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None, cache_path = None,
+def create_token(url, username=None, scope=SCOPE, client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET, redirect_uri=URI, cache_path = None,
         show_dialog=False):
     
     sp_oauth = oauth2.SpotifyOAuth(
@@ -99,8 +100,8 @@ def create_token(url, username=None, scope=None, client_id = None,
         return None
 
 
-def check_token(token_info, party_id, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None):
+def check_token(token_info, party_id, scope=SCOPE, client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET, redirect_uri=URI):
     token_info = literal_eval(token_info)
     p = Party.objects.get(pk=party_id)
     sp_oauth = oauth2.SpotifyOAuth(

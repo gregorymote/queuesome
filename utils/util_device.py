@@ -1,9 +1,10 @@
 from party.models import Party, Users, Devices
 from utils.util_auth import check_token
+from queue_it_up.settings import URI, SCOPE, CLIENT_ID, CLIENT_SECRET
 import spotipy
 
-def activate_device(token_info, party_id, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None):
+def activate_device(token_info, party_id, scope=SCOPE, client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET, redirect_uri=URI):
     p = Party.objects.get(pk = party_id)
     token = check_token(
                 token_info=p.token_info,
@@ -31,8 +32,8 @@ def activate_device(token_info, party_id, scope=None, client_id = None,
         p.save()
 
 
-def is_device_active(token_info, party_id, scope=None, client_id = None,
-        client_secret = None, redirect_uri = None):
+def is_device_active(token_info, party_id, scope=SCOPE, client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET, redirect_uri=URI):
     p = Party.objects.get(pk=party_id)
     token = check_token(
                 token_info=p.token_info,
