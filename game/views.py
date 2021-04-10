@@ -358,7 +358,6 @@ def pick_song(request, pid):
     party = get_party(pid)
     user = get_user(request, party)
     invalid = False
-    song_list = ('')
     if user.hasPicked:
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
@@ -367,7 +366,7 @@ def pick_song(request, pid):
     ).first()
 
     if request.method == 'POST':
-        form = searchForm(request.POST,data_list=song_list)
+        form = searchForm(request.POST)
         if form.is_valid():
             result = form.cleaned_data['result']
             if result != '-1':
@@ -392,17 +391,17 @@ def pick_song(request, pid):
                     party=party,
                     active=True,
                     hasPicked=False
-                    ).all()
+                ).all()
                 if not not_picked:
                     category.full = True
                     category.save()
                 return HttpResponseRedirect(
-                        reverse('play', kwargs={'pid':pid})
+                    reverse('play', kwargs={'pid':pid})
                 )
             else:
                 invalid=True
     else:
-        form = searchForm(data_list=song_list)
+        form = searchForm()
     
     context = {
         'form':form,
@@ -473,7 +472,8 @@ def update_search(request):
         print(search.name,':',search.uri)
         song_list.append(
             {
-            'track_name':search.name,
+            'track_name': track_name,
+            'artist': artist_name,
             'album_art':album_art,
             'id': search.uri,
             }
