@@ -147,7 +147,8 @@ def play(request, pid):
         'category' : category,
         'song' : song,
         'results': results,
-        'system': SYSTEM
+        'system': SYSTEM,
+        'URL':URL,
     }
     
     return render(request, 'game/play.html', context)
