@@ -166,6 +166,8 @@
 		searchIcon.style.display = "block";
 		var search = document.getElementById("id_search");
 		search.style.display = "none";
+		var category = document.getElementById("category");
+		category.classList.add("text-center");
 		moveSearchDown();
 		
 	}
@@ -175,7 +177,7 @@
 			<div class = "text-center">
 				<h6>...and the vibe is:</h6>
 			</div>
-			<div class ="pt-2">
+			<div id="category" class ="pt-2">
 				<h6>{{category.name}}</h6>
 			</div>
 			<div id="artwork", class ="pt-1 pb-2 text-center">
