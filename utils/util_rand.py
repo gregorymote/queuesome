@@ -1,5 +1,7 @@
 import random
 
+black_list = {ord('A'), ord('E'), ord('I'), ord('O'), ord('U'), ord('0'), ord('3')}
+
 def get_code(i):
     code = ""
     while len(code) < i:
@@ -11,7 +13,7 @@ def get_code(i):
 
 
 def is_valid_character(num):
-    if (num >= 58 and num < 65) or (num >= 91) or (num == 48) or (num == 79):
+    if (num >= 58 and num < 65) or (num >= 91) or num in black_list:
         return False
     else:
         return True

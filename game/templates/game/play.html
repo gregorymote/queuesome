@@ -7,21 +7,25 @@
 
 <style>
 	.item {
-		width:160px;
+		width:100px;
 		vertical-align: top;
-	}
-	.img-badge {
-		padding: 15px 26px 0px;
-		position: relative;
 		display: inline-block;
 	}
+	.img-badge {
+		width: 100px;
+		height: 100px;
+		padding: 0px 0px 0px;
+		position: relative;
+		display: inline-block;
+		margin-bottom: -10px !important;
+	}
 	.notify-badge{
-		width: 36px; 
-		height: 36px; 
-		line-height:36px;
+		width: 20px; 
+		height: 20px; 
+		line-height:20px;
 		position: absolute;
-		top: 5px;
-		right: 15px;
+		top: -2px;
+		right: 0px;
 		padding: 5px 10px;
 		border-radius: 50%;
 		background: red;
@@ -29,12 +33,29 @@
 		display: flex;
   		justify-content: center;
   		align-items: center;
-		font-size:20px;
+		font-size:14px;
 	}
-
 	.art{
-		height: 110px;
-		width: 110px;
+		height: 90px;
+		width: 90px;
+	}
+	.results-song{
+		text-overflow: ellipsis;
+		max-width: 90px;
+		white-space: nowrap;
+		overflow: hidden;
+		padding-left: 6px;
+		font-size: 10px;
+	}
+	.results-user{
+		text-overflow: ellipsis;
+		max-width: 90px;
+		white-space: nowrap;
+		overflow: hidden;
+		padding-right: 6px;
+		font-size: 8px;
+		color: gray;
+		margin-top: -18px !important;
 	}
 </style>
 
@@ -45,7 +66,6 @@
 		"name" : "{{party.name}}",
 		"state": "{{party.state}}",
 		"joinCode" : "{{party.joinCode}}",
-
 	}
 	var user = {
 		"isHost":"{{ user.isHost }}",
@@ -67,7 +87,6 @@
 	}
 	var results = {{ results|safe }};
 	
-
 	window.onload = function() {
 		updatePage(party, user, category, song, results)
 	};
@@ -211,15 +230,20 @@
 				var art_result = document.createElement('img');
 				art_result.src=results[i].art_result;
 				art_result.classList.add("art","img-thumbnail");
-				art_result.title=results[i].user_result + "'s Pick";
+				art_result.title=results[i].user_result;
 				img_badge.appendChild(art_result);
 				item.appendChild(img_badge);
 
 				var song_title = document.createElement('p');
 				song_title.innerHTML = results[i].song_result;
-				song_title.style.fontSize = "8px";
+				song_title.classList.add('results-song');
 				item.appendChild(song_title);
-				item.style.display = 'inline-block';		
+
+				var user = document.createElement('p');
+				user.innerHTML = results[i].user_result + "'s Pick";
+				user.classList.add('results-user', 'text-right');
+				item.appendChild(user);
+						
 				row.appendChild(item);
 			}
 			results_body.appendChild(row);

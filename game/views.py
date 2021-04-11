@@ -10,7 +10,7 @@ from utils.util_user import (get_user, check_permission, like_song,
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
     set_lib_repo, get_results, get_category_choices, create_category)
 from utils.util_rand import get_letter, get_numbers
-from utils.util_device import is_device_active, activate_device
+from utils.util_device import is_device_active, activate_device, get_devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
     searchResultsForm, settingsForm)
 from queue_it_up.settings import (DRIVER, DRIVER_URI, SYSTEM, HEROKU, STAGE,
@@ -476,28 +476,7 @@ def settings(request, pid):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     party = get_party(pid)
     invalid = False
-    token = check_token(token_info=party.token_info, party_id=party.pk)
-    spotify_object = spotipy.Spotify(auth=token)
-    device_results = spotify_object.devices()
-    device_results = device_results['devices']
-    curr_devices = []       
-    for result in device_results:
-        curr_devices.append(result['id'])
-        current_device = Devices.objects.filter(
-            party=party, deviceID=result['id']
-        ).first()
-        if not current_device:
-            Devices(
-                name=result['name'],
-                deviceID=result['id'],
-                party=party
-            ).save()
-    all_devices = Devices.objects.filter(party=party).all()
-
-    for device in all_devices:
-        if device.deviceID not in curr_devices:
-            device.delete()
-        
+    get_devices(party)
     if request.method == 'POST':
         form = settingsForm(request.POST, partyObject=party)
         if form.is_valid():
@@ -531,39 +510,40 @@ def settings(request, pid):
 
 def users(request, pid):
 
-    p = get_party(pid)
-    u = get_user(request, p)
-    if u.isHost:
-        isHost = True
-    else:
-        isHost = False
-    users = Users.objects.filter(party=p, active=True)
-
+    party = get_party(pid)
+    user = get_user(request, party)
+    users = Users.objects.filter(party=party, active=True).all()
     if request.method == 'POST':
         form = blankForm(request.POST)
         if form.is_valid():
-            p = Party.objects.get(pk = pid)
+            party = Party.objects.get(pk = pid)
             if ('back' in request.POST):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             elif ('skip' in request.POST):
-                if p.roundNum == p.roundTotal:
-                    c = Category.objects.filter(party=p, roundNum=p.roundNum).first()
-                    c.full = True
-                    c.save()
-                    users = Users.objects.filter(party=p, active=True)
+                if party.roundNum == party.roundTotal:
+                    category = Category.objects.filter(
+                        party=party,
+                        roundNum=party.roundNum
+                    ).first()
+                    category.full = True
+                    category.save()
+                    users = Users.objects.filter(party=party, active=True).all()
                     for x in users:
                         x.hasPicked = False
                         x.save()
-                    p.state = 'assign'
-                    p.save()
-                elif p.roundNum > p.roundTotal:
-                    lead = Users.objects.filter(party=p, turn='picking', active=True).first()
+                    party.state = 'assign'
+                    party.save()
+                elif party.roundNum > party.roundTotal:
+                    lead = Users.objects.filter(
+                        party=party,
+                        turn='picking',
+                        active=True
+                    ).first()
                     if lead:
                         lead.turn='picked'
                         lead.save()
-                    p.state = 'assign'
-                    p.save()
-
+                    party.state = 'assign'
+                    party.save()
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
                 for x in users:
@@ -571,31 +551,37 @@ def users(request, pid):
                         x.active=False
                         x.sessionID = ""
                         x.save()
-                        not_picked = Users.objects.filter(party=p, active=True, hasPicked=False)
+                        not_picked = Users.objects.filter(
+                            party=party,
+                            active=True,
+                            hasPicked=False
+                        ).all()
                         if not not_picked:
-                            c = Category.objects.filter(party=p, roundNum=p.roundTotal).first()
-                            c.full = True
-                            c.save()
-                        return HttpResponseRedirect(reverse('users', kwargs={'pid':pid}))
+                            category = Category.objects.filter(
+                                party=party,
+                                roundNum=party.roundTotal
+                            ).first()
+                            category.full = True
+                            category.save()
+                        return HttpResponseRedirect(
+                            reverse('users', kwargs={'pid':pid})
+                        )
     else:
         form = blankForm(initial={'text':'blank',})
-    
     decode = {
-              'True':'Yes',
-              'False':'No',
-              'picking':'Picking',
-              'not_picked':'No',
-              'has_picked':'Yes',
-              'has_picked_last':'Yes',
-              }
-    
+        'True':'Yes',
+        'False':'No',
+        'picking':'Picking',
+        'not_picked':'No',
+        'has_picked':'Yes',
+        'has_picked_last':'Yes',
+    }
     context = {
-                'form' : form,
-                'users':users,
-                'decode':decode,
-                'isHost':isHost,
-                
-                }    
+        'form' : form,
+        'users':users,
+        'decode':decode,
+        'isHost':user.isHost,
+    }    
     return render(request, 'game/users.html', context)
 
 
