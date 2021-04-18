@@ -86,6 +86,7 @@ def assign_leader(party):
         active=True
     ).order_by('?').first()
     if not leader:
+        picked_last = -1
         users = Users.objects.filter(party=party, active=True).all()
         for user in users:
             if user.turn == 'has_picked_last':
@@ -116,4 +117,50 @@ def reset_users(party):
     users = Users.objects.filter(party=party, active=True).all()
     for user in users:
         user.hasPicked = False
-        user.save() 
+        user.save()
+
+
+def set_user_points(party, round_number):
+    ''' Adds Each Songs Likes to the User's Total Likes 
+
+    Parameters:
+
+        - party - party object
+        - round_number - the number of the current round
+
+    '''
+    songs = Songs.objects.filter(category__party=party, category__roundNum=round_number)
+    for song in songs:
+        user = song.user
+        user.points = user.points + song.likes
+        user.save()
+
+
+def reset_user_likes(party):
+    ''' Resets each Active User to not having liked
+
+    Parameters:
+
+        - party - party object
+
+    '''
+    users = Users.objects.filter(party=party, active=True)
+    for user in users:
+        user.hasLiked = False
+        user.save()
+
+
+def get_like_threshold(party):
+    ''' Returns an integer of the number of down votes needed to skip a song
+
+    Parameters:
+
+        - party - party object
+
+    '''
+    users = Users.objects.filter(party=party, active=True).all()
+    threshold = len(list(users)) * (-1) + 1
+    if threshold == 0:
+        threshold = -1
+    
+    return threshold

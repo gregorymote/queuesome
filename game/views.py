@@ -6,9 +6,11 @@ from party.models import (Party, Users, Category, Library, Songs,
     Searches, Devices)
 from utils.util_auth import check_token
 from utils.util_user import (get_user, check_permission, like_song,
-    assign_leader, reset_users)
+    assign_leader, reset_users, set_user_points, reset_user_likes,
+    get_like_threshold)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
-    set_lib_repo, get_results, get_category_choices, create_category)
+    set_lib_repo, get_results, get_category_choices, create_category,
+    check_duplicate, get_song_length)
 from utils.util_rand import get_letter, get_numbers
 from utils.util_device import is_device_active, activate_device, get_devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -166,11 +168,10 @@ def update_play(request):
 
     '''
     pid = request.GET.get('pid', None)
-    if get_inactivity(pid,20):
-        inactive = True
-    else:
-        inactive = False
     party = Party.objects.get(pk = pid)
+    if get_inactivity(pid,20):
+        party.active = False
+    
     user = get_user(request, pid)
 
     song = Songs.objects.filter(category__party=party, state='playing').first()
@@ -186,7 +187,7 @@ def update_play(request):
 		"name" : party.name,
 		"state": party.state,
 		"joinCode" : party.joinCode,
-        "inactive": inactive
+        "inactive": not party.active
 	}
     user_info={
 	    "isHost":str(user.isHost),
@@ -233,13 +234,10 @@ def update_game(request):
 
     '''
     pid = request.GET.get('pid', None)   
-    party = Party.objects.get(pk = pid)
+    party = Party.objects.get(pk=pid)
 
     if get_inactivity(pid,20):
         clean_up_party(party.pk)
-        inactive = True
-    else:
-        inactive = False
 
     if party.state == 'assign' or \
             (party.state=='choose_category' and not 
@@ -262,7 +260,6 @@ def update_game(request):
         reset_users(party) 
         party.state = 'assign'
         party.save()
-
     if not party.device_error:
         if not party.thread and \
                 Songs.objects.filter(
@@ -274,34 +271,53 @@ def update_game(request):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
     else:
-        party.device_error = not activate_device(
+        party.device_error = activate_device(
             token_info=party.token_info,
             party_id=party.pk,
         )
         party.save()
-    song = Songs.objects.filter(category__party=party, state='playing').first()
-    if song:
-        category = song.category
-        if party.roundNum != category.roundNum:
-            party.roundNum = category.roundNum
-            party.save()
-    else:
-        last_played = Songs.objects.filter(
-            category__party=party,
-            state='played'
-            ).order_by('-category__roundNum').first()
-        if last_played and party.roundNum != last_played.category.roundNum + 1:
-            party.roundNum = last_played.category.roundNum + 1
-            party.save()
+    print(party.roundNum)
+    print(Users.objects.filter(
+                    party=party,
+                    active=True,
+                    hasPicked=False
+                ).first().name)
+    #song = Songs.objects.filter(category__party=party, state='playing').first()
+    #if song:
+    #    category = song.category
+    #    #if party.roundNum != category.roundNum:
+    #    #    party.roundNum = category.roundNum
+    #    #    party.save()
+    ##else:
+    ##    last_played = Songs.objects.filter(
+    ##        category__party=party,
+    ##        state='played'
+    ##        ).order_by('-category__roundNum').first()
+    ##    if last_played and party.roundNum != last_played.category.roundNum + 1:
+    ##        party.roundNum = last_played.category.roundNum + 1
+    ##        party.save()
+    ##        print("****************************")
+    ##        print("****************************")
+    ##        print("****************************")
+    ##        print("****************************")
+    ##        print("****************************")
     data={
         "success": 'True',
-        "inactive" : inactive
-        }
+        "inactive" : not party.active
+    }
 
     return JsonResponse(data)
 
 
 def choose_category(request, pid):
+    ''' Allows User with turn in picking state to create a category object
+
+    Parameters:
+
+        - request - web request
+        - pid - Primary Key of the Party the User belongs to
+
+    '''
 
     party = get_party(pid)
     user = get_user(request, pid)
@@ -350,6 +366,14 @@ def choose_category(request, pid):
 
 
 def pick_song(request, pid):
+    ''' Allows User to create a song Object using a search result object
+
+    Parameters:
+
+        - request - web request
+        - pid - Primary Key of the Party the User belongs to
+
+    '''
 
     party = get_party(pid)
     user = get_user(request, party)
@@ -472,6 +496,14 @@ def update_search(request):
 
 
 def settings(request, pid):
+    ''' Allows Host to change device, the song time limit or end the session
+
+    Parameters:
+
+        - request - web request
+        - pid - Primary Key of the Party the User belongs to
+
+    '''
     if not check_permission(pid, request):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     party = get_party(pid)
@@ -586,102 +618,68 @@ def users(request, pid):
 
 
 def play_songs(pid):
-    p = Party.objects.get(pk = pid)
-    p.thread = True
-    if not p.active:
+    party = Party.objects.get(pk=pid)
+    party.thread = True
+    if not party.active:
         return
-    if p.device_error:
-        p.device_error = False
-    p.save()
-    rN = p.roundNum
-    token = check_token(token_info=p.token_info,party_id=pid)
-    spotify_object = spotipy.Spotify(auth=token)
-    while (Songs.objects.filter(
-        category__party=p,
-        category__roundNum=rN,
-        state='not_played',
-        category__full=True
+    if party.device_error:
+        party.device_error = False
+    party.save()
+    while (Songs.objects.filter(category__party=party,
+            category__roundNum=party.roundNum,state='not_played',
+            category__full=True
         ).all()):
-        queue = Songs.objects.filter(
-            category__party=p,
-            category__roundNum=rN,
+        party = Party.objects.get(pk=pid)
+        if not party.active:
+            return
+        song = Songs.objects.filter(
+            category__party=party,
+            category__roundNum=party.roundNum,
             state='not_played',
             category__full=True
-            ).order_by('order').all()
-        for song in queue:
-            song = Songs.objects.get(pk=song.pk)
-            ls = [song.uri]
-            try:
-                if not song.duplicate:
-                    p = Party.objects.get(pk=pid)
-                    if not p.active:
-                        return
-                    dups = list(Songs.objects.filter(
-                        category__party=p,
-                        category__roundNum=rN,
-                        state='not_played',name=song.name
-                        ).all())
-                    if len(dups) > 1:
-                        for d in dups:
-                            d.duplicate=True
-                            d.save()
-                            u = d.user
-                            u.hasLiked=True
-                            u.save()
-                        song.duplicate=True
-                        song.save()
-                    token = check_token(token_info=p.token_info, party_id=pid)
-                    spotify_object = spotipy.Spotify(auth=token)
-                    activate_device(token_info=p.token_info, party_id=pid)
-                    spotify_object.start_playback(device_id=p.deviceID, uris=ls)
-                    song.state = 'playing'
-                    song.startTime = time.time()
-                    song.save()
-
-                    num = len(list(Users.objects.filter(party = p, active=True))) * (-1) + 1
-                    if num == 0:
-                        num = -1
-                    duration = song.duration / 1000
-                    
-                    if duration < p.time or song.duplicate:
-                        length = duration - 5
-                    else:
-                        length = p.time
-                    flag = True
-                    while(time.time() - song.startTime < length):
-                        if Songs.objects.filter(pk=song.pk, likes__lte=num):
-                            break
-                        if song.duplicate and (time.time() - song.startTime) >= p.time and flag:
-                            song.art= "duplicate"
-                            song.save()
-                            flag = False
-                        continue
-                song = Songs.objects.filter(pk=song.pk).first()
-                song.state= 'played'
-                song.save()
+        ).order_by('order').first()
+        if not song.duplicate:
+            check_duplicate(party, party.roundNum, song)
+            try:   
+                token = check_token(token_info=party.token_info, party_id=pid)
+                spotify_object = spotipy.Spotify(auth=token)
+                activate_device(token_info=party.token_info, party_id=pid)
+                spotify_object.start_playback(device_id=party.deviceID, uris=[song.uri])
             except Exception as e:
-                p = Party.objects.get(pk = pid)
+                party = Party.objects.get(pk=pid)
                 if 'Device not found' in str(e):
-                    p.device_error = True
-                p.thread  = False
-                p.debug = p.debug
-                p.save()
-                print('**************************')
-                print(e)
-                print('**************************')
+                    party.device_error = True
+                party.thread = False
+                party.debug += str(e)
+                party.save()
                 return
-            users = Users.objects.filter(party = p, active=True)
-            for x in users:
-                x.hasLiked = False
-                x.save()
-        songs = Songs.objects.filter(category__party=p, category__roundNum = rN)
-        for s in songs:
-            u = s.user
-            u.points = u.points + s.likes
-            u.save()   
-        rN = rN + 1
-    p = Party.objects.get(pk = pid)
-    p.thread=False
-    p.save()
+            song.state = 'playing'
+            song.startTime = time.time()
+            song.save()
+            song_length = get_song_length(song)
+            threshold = get_like_threshold(party)
+            flag = True
+            while(time.time() - song.startTime < song_length):
+                if Songs.objects.filter(pk=song.pk, likes__lte=threshold).first():
+                    break
+                if song.duplicate and (time.time() - song.startTime) >= party.time and flag:
+                    song.art= "duplicate"
+                    song.save()
+                    flag = False
+        song = Songs.objects.filter(pk=song.pk).first()
+        song.state= 'played'
+        song.save()
+        party = Party.objects.get(pk=pid)
+        if not Songs.objects.filter(category__party=party,
+                category__roundNum=party.roundNum,state='not_played',
+                category__full=True
+            ).all():
+            reset_user_likes(party)
+            set_user_points(party, party.roundNum) 
+            party.roundNum += 1
+            party.save()
+    party = Party.objects.get(pk=pid)
+    party.thread = False
+    party.save()
     print('EXITING THREAD')
 

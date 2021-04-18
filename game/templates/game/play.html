@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
 {% block page_content %}
 
@@ -90,7 +88,7 @@
 	window.onload = function() {
 		updatePage(party, user, category, song, results)
 	};
-
+	
 	setInterval(function () {
 		if(user.name != '{{system}}'){
 			$.ajax({
@@ -174,12 +172,12 @@
 		var hasPicked = decodeBool(user.hasPicked)
 		if (user.turn == "picking" && party.state == "choose_category"){
 			action.innerHTML = "Curate the Vibe";
-			action.style.display = 'initial';
+			action.style.display = '';
 			action.href = "{% url 'choose_category' pid=party.id %}" 
 		}
 		else if(party.state == "pick_song" && !hasPicked){
 			action.innerHTML = "Pick Song";
-			action.style.display = 'initial';
+			action.style.display = '';
 			action.href = "{% url 'pick_song' pid=party.id %}" 
 		}
 		else{
@@ -223,10 +221,11 @@
 				img_badge.classList.add("img-badge");
 
 				var badge = document.createElement('span');
-				badge.classList.add("notify-badge");
-				badge.innerHTML = results[i].like_result;
-				img_badge.appendChild(badge);
-
+				if (results[i].like_result != 0){
+					badge.classList.add("notify-badge");
+					badge.innerHTML = results[i].like_result;
+					img_badge.appendChild(badge);
+				}
 				var art_result = document.createElement('img');
 				art_result.src=results[i].art_result;
 				art_result.classList.add("art","img-thumbnail");
@@ -297,27 +296,27 @@
 		</form>
 	</div>
 
-		<!-- Modal -->
-		<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-			aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="results_title"></h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div id="results_body" class="modal-body text-center">
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					</div>
+	<!-- Modal -->
+	<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="results_title"></h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div id="results_body" class="modal-body text-center">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
+	</div>
 
-		<div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	<div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
 		aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">

@@ -115,7 +115,31 @@ def create_category(party, user, category, artist, custom, sc_type):
     return valid
 
 
+def check_duplicate(party, round_number, song):
+    dups = list(Songs.objects.filter(
+                    category__party=party,
+                    category__roundNum=round_number,
+                    state='not_played',
+                    name=song.name
+            ).all())
+    if len(dups) > 1:
+        for d in dups:
+            d.duplicate=True
+            d.save()
+            u = d.user
+            u.hasLiked=True
+            u.save()
+        song.duplicate=True
+        song.save()
 
-    
 
-
+def get_song_length(song):
+    duration = song.duration / 1000
+    party = song.category.party
+    if duration < party.time or (song.duplicate and duration < 180):
+        length = duration - 5
+    elif song.duplicate:
+        length = 180 
+    else:
+        length = party.time
+    return length

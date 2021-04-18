@@ -14,6 +14,7 @@ def activate_device(token_info, party_id):
     device_results = device_results['devices']
     flag = True
     for device in device_results:
+        
         if device["id"] == p.deviceID:
             if not device["is_active"]:
                 spotify_object.transfer_playback(
@@ -25,6 +26,7 @@ def activate_device(token_info, party_id):
     if flag:
         p.debug = p.debug + " **!!!** Device Not Found"
         p.save()
+    return flag
 
 
 def is_device_active(token_info, party_id):
