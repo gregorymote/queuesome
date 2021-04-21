@@ -77,19 +77,21 @@
 		}
 	}
 	function update_search(e){
-		var result = document.getElementById("id_result");
-		var artwork = document.getElementById("artwork");
-		$.ajax({
-			url: '/sesh/update_search',
-			data: {
-			'pid': {{ party.pk }},
-			'text': e.target.value,
-			'result': result.value,
-			},
-			dataType: 'json',
-			success: function (data) {
-				populateOptions(data.song_list);
-		} });
+		if (e.target.value != ''){
+			var result = document.getElementById("id_result");
+			var artwork = document.getElementById("artwork");
+			$.ajax({
+				url: '/sesh/update_search',
+				data: {
+				'pid': {{ party.pk }},
+				'text': e.target.value,
+				'result': result.value,
+				},
+				dataType: 'json',
+				success: function (data) {
+					populateOptions(data.song_list);
+			} });
+		}
 	}
 	function populateOptions(song_list){
 		var results = document.getElementById("results");
