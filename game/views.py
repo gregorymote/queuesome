@@ -347,7 +347,7 @@ def run_game(pid):
             assign_leader(party)
             party.state = 'choose_category'
             party.save() 
-            print('save') 
+            print('assign') 
                     
         if party.state == 'pick_song' and not \
                 Users.objects.filter(
@@ -358,7 +358,7 @@ def run_game(pid):
             reset_users(party) 
             party.state = 'assign'
             party.save()
-            print('save')
+            print('pick_song')
 
         if not party.device_error and not party.thread and \
             Songs.objects.filter(
