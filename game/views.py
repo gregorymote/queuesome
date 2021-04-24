@@ -1,16 +1,15 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from django.db.models import Q
+from background_task import background
 from party.models import (Party, Users, Category, Library, Songs,
     Searches, Devices)
 from utils.util_auth import check_token
 from utils.util_user import (get_user, check_permission, like_song,
-    assign_leader, reset_users, set_user_points, reset_user_likes,
-    get_like_threshold)
+    assign_leader, reset_users, set_user_points, reset_user_likes)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
     set_lib_repo, get_results, get_category_choices, create_category,
-    check_duplicate, get_song_length)
+    check_duplicate, wait_for_song)
 from utils.util_rand import get_letter, get_numbers
 from utils.util_device import is_device_active, activate_device, get_devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -39,20 +38,21 @@ def lobby(request, pid):
     '''
     party = get_party(pid)
     if get_inactivity(pid,20):
-        clean_up_party(p.pk)
+        clean_up_party(party.pk)
     if request.method == 'POST':
         form = blankForm(request.POST)
         if form.is_valid():
-            c = Category(name='Looks Like We Got A Lull', party=party)
-            c.save()
+            category = Category(name='Looks Like We Got A Lull', party=party)
+            category.save()
             party.lib_repo = set_lib_repo()
             party.started = True
             party.save()
-            if HEROKU:
-                DRIVER.get(DRIVER_URI.format(str(pid)))
-            else:
-                print(DRIVER_URI.format(str(pid)))
-                webbrowser.open(DRIVER_URI.format(str(pid)))
+            ##if HEROKU:
+            ##    DRIVER.get(DRIVER_URI.format(str(pid)))
+            ##else:
+                #webbrowser.open(DRIVER_URI.format(str(pid)))
+            task = threading.Thread(target=call_task, args=(pid,))
+            task.start()
             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -100,6 +100,17 @@ def update_lobby(request):
     return JsonResponse(data)
 
 
+def call_task(pid):
+    ''' Thread used to run background task, prevents delay in redirect while
+    calling the task
+
+    Parameters:
+        - pid - Primary Key of the Party the User belongs to
+
+    '''
+    run_game.now(pid)
+
+
 def play(request, pid):
     ''' Gets the song playing and displays it with the category and party info.
     Form Post will increment/decrement the playing song's likes.
@@ -111,19 +122,19 @@ def play(request, pid):
 
     '''
     party = get_party(pid)
-    if request.GET.get('user', '') == SYSTEM:
-        user=Users.objects.filter(party=party, name=SYSTEM)
-        if not user:
-            user=Users(
-                party=party,
-                name=SYSTEM,
-                sessionID=request.session.session_key,
-                active=False,
-                refreshRate=3
-            )
-            user.save()
-    else:
-        user = get_user(request, pid)
+    ##if request.GET.get('user', '') == SYSTEM:
+    ##    user=Users.objects.filter(party=party, name=SYSTEM)
+    ##    if not user:
+    ##        user=Users(
+    ##            party=party,
+    ##            name=SYSTEM,
+    ##            sessionID=request.session.session_key,
+    ##            active=False,
+    ##            refreshRate=3
+    ##        )
+    ##        user.save()
+    ##else:
+    user = get_user(request, pid)
 
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -224,7 +235,7 @@ def update_play(request):
     }
     return JsonResponse(data)
 
-
+#TBD OBE
 def update_game(request):
     ''' Ajax request made by system to update the game logic 
 
@@ -240,7 +251,7 @@ def update_game(request):
         clean_up_party(party.pk)
 
     if party.state == 'assign' or \
-            (party.state=='choose_category' and not 
+            (party.state =='choose_category' and not 
                 Users.objects.filter(
                     turn='picking',
                     party=party,
@@ -282,12 +293,12 @@ def update_game(request):
                     active=True,
                     hasPicked=False
                 ).first().name)
-    #song = Songs.objects.filter(category__party=party, state='playing').first()
-    #if song:
-    #    category = song.category
-    #    #if party.roundNum != category.roundNum:
-    #    #    party.roundNum = category.roundNum
-    #    #    party.save()
+    ##song = Songs.objects.filter(category__party=party, state='playing').first()
+    ##if song:
+    ##    category = song.category
+    ##    #if party.roundNum != category.roundNum:
+    ##    #    party.roundNum = category.roundNum
+    ##    #    party.save()
     ##else:
     ##    last_played = Songs.objects.filter(
     ##        category__party=party,
@@ -309,6 +320,70 @@ def update_game(request):
     return JsonResponse(data)
 
 
+@background()
+def run_game(pid):
+    ''' Background Task to update the game logic and trigger the song thread 
+
+    Parameters:
+
+        - pid - primary key of party
+
+    '''
+    print('starting background task')
+    party = Party.objects.get(pk=pid)
+    while(party.active):
+        party = Party.objects.get(pk=pid)
+        if get_inactivity(pid,20):
+            clean_up_party(party.pk)
+
+        if party.state == 'assign' or \
+                (party.state=='choose_category' and not 
+                    Users.objects.filter(
+                        turn='picking',
+                        party=party,
+                        active=True
+                    ).first()
+                ):
+            assign_leader(party)
+            party.state = 'choose_category'
+            party.save() 
+            print('assign') 
+                    
+        if party.state == 'pick_song' and not \
+                Users.objects.filter(
+                    hasPicked=False,
+                    party=party,
+                    active=True
+                ).all():
+            reset_users(party) 
+            party.state = 'assign'
+            party.save()
+            print('pick_song')
+
+        if not party.device_error and not party.thread and \
+            Songs.objects.filter(
+                category__party=party,
+                category__roundNum=party.roundNum,
+                state='not_played',
+                category__full=True
+            ):
+            thread = threading.Thread(target=play_songs, args=(pid,))
+            thread.start()
+            party.thread = True
+            print('starting thread')
+            party.save()
+            print('save')
+
+        if party.device_error:
+            party.device_error = activate_device(
+                token_info=party.token_info,
+                party_id=party.pk,
+            )
+            party.save()
+            print('save')
+    print('ending background task')
+
+
 def choose_category(request, pid):
     ''' Allows User with turn in picking state to create a category object
 
@@ -325,7 +400,6 @@ def choose_category(request, pid):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     valid=True
     choices = get_category_choices(request, party)
-        
     if request.method == 'POST':
         form = chooseCategoryForm(request.POST, repo=choices)
         if form.is_valid():
@@ -619,14 +693,13 @@ def users(request, pid):
 
 def play_songs(pid):
     party = Party.objects.get(pk=pid)
-    party.thread = True
-    if not party.active:
-        return
     if party.device_error:
         party.device_error = False
     party.save()
-    while (Songs.objects.filter(category__party=party,
-            category__roundNum=party.roundNum,state='not_played',
+    while (Songs.objects.filter(
+            category__party=party,
+            category__roundNum=party.roundNum,
+            state='not_played',
             category__full=True
         ).all()):
         party = Party.objects.get(pk=pid)
@@ -656,16 +729,7 @@ def play_songs(pid):
             song.state = 'playing'
             song.startTime = time.time()
             song.save()
-            song_length = get_song_length(song)
-            threshold = get_like_threshold(party)
-            flag = True
-            while(time.time() - song.startTime < song_length):
-                if Songs.objects.filter(pk=song.pk, likes__lte=threshold).first():
-                    break
-                if song.duplicate and (time.time() - song.startTime) >= party.time and flag:
-                    song.art= "duplicate"
-                    song.save()
-                    flag = False
+            wait_for_song(song)
         song = Songs.objects.filter(pk=song.pk).first()
         song.state= 'played'
         song.save()

@@ -3,6 +3,8 @@ from datetime import datetime, timedelta, timezone
 from queue_it_up.settings import SYSTEM
 from django.http import HttpResponseRedirect
 from utils.util_rand import get_numbers, get_letter
+from utils.util_user import get_like_threshold
+import time
 
 
 def get_party(pid):
@@ -65,7 +67,7 @@ def get_category_choices(request, party):
         num = 12
         if len(party.lib_repo) < num:
             num = len(party.lib_repo)
-        party.indices = get_numbers(num, len(party.lib_repo)) 
+        party.indices = get_numbers(num, len(party.lib_repo))
         party.save() 
     repo = set()
     list_repo = list(party.lib_repo)
@@ -143,3 +145,17 @@ def get_song_length(song):
     else:
         length = party.time
     return length
+
+
+def wait_for_song(song):
+    party = song.category.party
+    song_length = get_song_length(song)
+    threshold = get_like_threshold(party)
+    flag = True
+    while(time.time() - song.startTime < song_length):
+        if Songs.objects.filter(pk=song.pk, likes__lte=threshold).first():
+            break
+        if song.duplicate and (time.time() - song.startTime) >= party.time and flag:
+            song.art= "duplicate"
+            song.save()
+            flag = False
