@@ -625,8 +625,10 @@ def play_songs(pid):
     if party.device_error:
         party.device_error = False
     party.save()
-    while (Songs.objects.filter(category__party=party,
-            category__roundNum=party.roundNum,state='not_played',
+    while (Songs.objects.filter(
+            category__party=party,
+            category__roundNum=party.roundNum,
+            state='not_played',
             category__full=True
         ).all()):
         party = Party.objects.get(pk=pid)
