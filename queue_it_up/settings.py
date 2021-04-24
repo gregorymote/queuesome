@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'background_task',
     'start',
     'party',
     'game',
@@ -74,6 +75,9 @@ MIDDLEWARE = [
 ]
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+BACKGROUND_TASK_RUN_ASYNC = True
+BACKGROUND_TASK_ASYNC_THREADS = 1000
 
 ROOT_URLCONF = 'queue_it_up.urls'
 

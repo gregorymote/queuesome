@@ -90,7 +90,7 @@
 	};
 	
 	setInterval(function () {
-		if(user.name != '{{system}}'){
+		//if(user.name != '{{system}}'){
 			$.ajax({
 				url: '/sesh/update_play',
 				data: {
@@ -100,8 +100,8 @@
 				success: function (data) {
 					updatePage(data.party, data.user, data.category, data.song, data.results);			
 			} });
-		}
-		else{
+		//}
+		/*else{
 			$.ajax({
 				url: '/sesh/update_game',
 				data: {
@@ -114,7 +114,7 @@
 						window.location.replace('/index');
 					}			
 			} });
-		}
+		}*/
 	}, refresh_rate);
 
 	function updatePage(party, user, category, song, results){
