@@ -67,8 +67,8 @@ def like_song(song, user, request):
         else:
             song.likes -= 1
         song.save()
-        user.hasLiked = True
-        user.save()
+    user.hasLiked = True
+    user.save()
 
 
 def assign_leader(party):

@@ -329,7 +329,6 @@ def run_game(pid):
         - pid - primary key of party
 
     '''
-    print('starting background task')
     party = Party.objects.get(pk=pid)
     while(party.active):
         party = Party.objects.get(pk=pid)
@@ -344,10 +343,15 @@ def run_game(pid):
                         active=True
                     ).first()
                 ):
+            print('assign: ' , party.state, Users.objects.filter(
+                                                turn='picking',
+                                                party=party,
+                                                active=True
+                                            ).first(), party.roundTotal
+            )
             assign_leader(party)
             party.state = 'choose_category'
             party.save() 
-            print('assign') 
                     
         if party.state == 'pick_song' and not \
                 Users.objects.filter(
@@ -355,10 +359,14 @@ def run_game(pid):
                     party=party,
                     active=True
                 ).all():
+            print('pick_song: ', party.state,  Users.objects.filter(
+                    hasPicked=False,
+                    party=party,
+                    active=True
+                ).all() )
             reset_users(party) 
             party.state = 'assign'
             party.save()
-            print('pick_song')
 
         if not party.device_error and not party.thread and \
             Songs.objects.filter(
@@ -370,7 +378,6 @@ def run_game(pid):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
             party.thread = True
-            print('starting thread')
             party.save()
             print('save')
 
@@ -381,7 +388,6 @@ def run_game(pid):
             )
             party.save()
             print('save')
-    print('ending background task')
 
 
 def choose_category(request, pid):
@@ -416,6 +422,8 @@ def choose_category(request, pid):
                 party.state = 'pick_song'
                 party.roundTotal = party.roundTotal + 1
                 party.save()
+                party = Party.objects.get(pk=pid)
+                print('cat: ', party.state, party.roundTotal)
                 remaining_users = Users.objects.filter(
                     party=party,
                     turn='not_picked',
@@ -733,12 +741,12 @@ def play_songs(pid):
         song = Songs.objects.filter(pk=song.pk).first()
         song.state= 'played'
         song.save()
+        reset_user_likes(party)
         party = Party.objects.get(pk=pid)
         if not Songs.objects.filter(category__party=party,
                 category__roundNum=party.roundNum,state='not_played',
                 category__full=True
             ).all():
-            reset_user_likes(party)
             set_user_points(party, party.roundNum) 
             party.roundNum += 1
             party.save()
