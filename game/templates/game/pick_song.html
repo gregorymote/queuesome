@@ -64,12 +64,13 @@
 		document.getElementById("labels").style.display = 'none';
 		document.getElementById("buttons").style.display = 'none';
 		document.getElementById("arrow").style.display = 'block';
+		document.getElementById("results").style.display = '';
 	}
 	function moveSearchDown(){
 		document.getElementById("labels").style.display = 'block';
 		document.getElementById("buttons").style.display = 'block';
 		document.getElementById("arrow").style.display = 'none';
-		document.getElementById("results").innerHTML = '';
+		document.getElementById("results").style.display = 'none';
 		var search = document.getElementById("id_search");
 		search.value = '';
 		var result = document.getElementById("id_result");

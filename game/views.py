@@ -363,9 +363,9 @@ def run_game(pid):
                     party=party,
                     active=True
                 ).all() )
-            reset_users(party) 
             party.state = 'assign'
             party.save()
+            reset_users(party) 
         
         party = Party.objects.get(pk=pid)
         if Party.objects.filter(
