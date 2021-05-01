@@ -741,6 +741,8 @@ def play_songs(pid):
                 party.thread = False
                 party.debug += str(e)
                 party.save()
+                song.duplicate = False
+                song.save()
                 return
             song.state = 'playing'
             song.startTime = time.time()
