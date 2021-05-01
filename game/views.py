@@ -329,36 +329,35 @@ def run_game(pid):
         - pid - primary key of party
 
     '''
-    party = Party.objects.get(pk=pid)
-    while(party.active):
-        party = Party.objects.get(pk=pid)
+    while(Party.objects.filter(pk=pid, active=True).first()):
+        
         if get_inactivity(pid,20):
-            clean_up_party(party.pk)
+            clean_up_party(pid)
 
-        if party.state == 'assign' or \
-                (party.state=='choose_category' and not 
-                    Users.objects.filter(
-                        turn='picking',
-                        party=party,
-                        active=True
-                    ).first()
-                ):
-            print('assign: ' , party.state, Users.objects.filter(
-                                                turn='picking',
-                                                party=party,
-                                                active=True
-                                            ).first(), party.roundTotal
+        if Party.objects.filter(pk=pid,active=True,state='assign').first() or (
+            Party.objects.filter(pk=pid,active=True,state='choose_category'
+            ).first() 
+            and not 
+            Users.objects.filter(turn='picking',party__pk=pid,active=True
+            ).first()
+            ):
+            party = Party.objects.get(pk=pid)
+            print(
+                'assign: ',
+                party.state,
+                Users.objects.filter(turn='picking',party=party,active=True
+                    ).first(),
+                party.roundTotal
             )
             assign_leader(party)
             party.state = 'choose_category'
             party.save() 
                     
-        if party.state == 'pick_song' and not \
-                Users.objects.filter(
-                    hasPicked=False,
-                    party=party,
-                    active=True
+        if Party.objects.filter(pk=pid,active=True,state='pick_song').first() \
+                and not \
+                Users.objects.filter(hasPicked=False,party__pk=pid,active=True
                 ).all():
+            party = Party.objects.get(pk=pid)
             print('pick_song: ', party.state,  Users.objects.filter(
                     hasPicked=False,
                     party=party,
@@ -367,27 +366,36 @@ def run_game(pid):
             reset_users(party) 
             party.state = 'assign'
             party.save()
-
-        if not party.device_error and not party.thread and \
+        
+        party = Party.objects.get(pk=pid)
+        if Party.objects.filter(
+                pk=pid,
+                active=True,
+                device_error=False,
+                thread=False
+            ).first() and \
             Songs.objects.filter(
-                category__party=party,
+                category__party__pk=pid,
                 category__roundNum=party.roundNum,
                 state='not_played',
                 category__full=True
             ):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
+            party = Party.objects.get(pk=pid)
             party.thread = True
             party.save()
             print('save')
 
-        if party.device_error:
+        if Party.objects.filter(pk=pid,active=True,device_error=True).first():
+            party = Party.objects.get(pk=pid) 
             party.device_error = activate_device(
                 token_info=party.token_info,
-                party_id=party.pk,
+                party_id=party.id,
             )
-            party.save()
-            print('save')
+            if not party.device_error:
+                party.save()
+                print('save')
 
 
 def choose_category(request, pid):
