@@ -61,3 +61,63 @@ def search_results(request, pid):
                }
         
     return render(request, 'game/search_results.html', context)
+
+
+    #TBD OBE
+def update_game(request):
+    ''' Ajax request made by system to update the game logic 
+
+    Parameters:
+
+        - request - web request
+
+    '''
+    pid = request.GET.get('pid', None)   
+    party = Party.objects.get(pk=pid)
+
+    if get_inactivity(pid,20):
+        clean_up_party(party.pk)
+
+    if party.state == 'assign' or \
+            (party.state =='choose_category' and not 
+                Users.objects.filter(
+                    turn='picking',
+                    party=party,
+                    active=True
+                ).first()
+            ):
+        assign_leader(party)
+        party.state = 'choose_category'
+        party.save()  
+                
+    if party.state == 'pick_song' and not \
+            Users.objects.filter(
+                hasPicked=False,
+                party=party,
+                active=True
+            ).all():
+        reset_users(party) 
+        party.state = 'assign'
+        party.save()
+    if not party.device_error:
+        if not party.thread and \
+                Songs.objects.filter(
+                    category__party=party,
+                    category__roundNum=party.roundNum,
+                    state='not_played',
+                    category__full=True
+                ):
+            thread = threading.Thread(target=play_songs, args=(pid,))
+            thread.start()
+    else:
+        party.device_error = activate_device(
+            token_info=party.token_info,
+            party_id=party.pk,
+        )
+        party.save()
+    data={
+        "success": 'True',
+        "inactive" : not party.active
+    }
+
+    return JsonResponse(data)

@@ -147,6 +147,7 @@ def reset_user_likes(party):
     users = Users.objects.filter(party=party, active=True)
     for user in users:
         user.hasLiked = False
+        user.hasSkip = False
         user.save()
 
 

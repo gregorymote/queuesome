@@ -70,6 +70,7 @@
 		"hasPicked": "{{user.hasPicked}}",
 		"turn": "{{user.turn}}",
 		"hasLiked": "{{user.hasLiked}}",
+		"hasSkip": "{{user.hasSkip}}",
 		"user": "{{user.pk}}",
 		"name": "{{user.name}}"
 	}
@@ -84,38 +85,29 @@
 		"art": "{{song.art}}"
 	}
 	var results = {{ results|safe }};
-	
+	var send = true;
 	window.onload = function() {
-		updatePage(party, user, category, song, results)
+		updatePage(party, user, category, song, results);
 	};
 	
 	setInterval(function () {
-		//if(user.name != '{{system}}'){
-			$.ajax({
-				url: '/sesh/update_play',
-				data: {
-				'pid': {{ party.pk }}
-				},
-				dataType: 'json',
-				success: function (data) {
-					updatePage(data.party, data.user, data.category, data.song, data.results);			
-			} });
-		//}
-		/*else{
-			$.ajax({
-				url: '/sesh/update_game',
-				data: {
-				'pid': {{ party.pk }}
-				},
-				dataType: 'json',
-				success: function (data) {
-					var inactive = decodeBool(data.inactive);
-					if (inactive){
-						window.location.replace('/index');
-					}			
-			} });
-		}*/
+		$.ajax({
+			url: '/sesh/update_play',
+			data: {
+			'pid': {{ party.pk }}
+			},
+			dataType: 'json',
+			success: function (data) {
+				updatePage(data.party, data.user, data.category, data.song, data.results);			
+		} });
 	}, refresh_rate);
+
+	$(document).ready(function() {
+		var like = document.getElementById("like");
+		like.addEventListener("click", likeSong);
+		var dislike = document.getElementById("dislike");
+		dislike.addEventListener("click", likeSong);
+	});
 
 	function updatePage(party, user, category, song, results){
 		var inactive = decodeBool(party.inactive);
@@ -186,10 +178,19 @@
 
 		var like = document.getElementById('like');
 		var dislike = document.getElementById('dislike');
-		var hasLiked = decodeBool(user.hasLiked);
-		if (! hasLiked && song.art != "lull" && song.user != user.user){
+		var hasLiked = decodeBool(user.hasLiked)
+		var hasSkip = decodeBool(user.hasSkip)
+		if (song.art != "lull" && song.user != user.user){
 			like.style.display = 'initial';
+			if(hasLiked){
+				like.classList.add('active');
+				like.setAttribute('aria-pressed', true);
+			}
 			dislike.style.display = 'initial';
+			if(hasSkip){
+				dislike.classList.add('active');
+				dislike.setAttribute('aria-pressed', true);
+			}
 		}
 		else{
 			like.style.display = 'none';
@@ -248,6 +249,54 @@
 			results_body.appendChild(row);
 		}
 	};
+	function likeSong(e){
+		if(send){
+		var like = true;
+		var button = e.target;
+		if(button.id == ""){
+			button = button.parentElement;
+		}
+		var other;
+		if (button.id == 'like'){
+			other = document.getElementById('dislike');	
+		}
+		else{
+			other = document.getElementById('like');	
+		}
+		var isActive = button.classList.contains('active');
+		if((button.id == 'like' && isActive) ||
+			(button.id == 'dislike' && !isActive)){
+			like = false;
+		}
+		if (isActive){
+			button.classList.remove('active');
+			button.setAttribute('aria-pressed', false);
+		}
+		else{
+			button.classList.add('active');
+			button.setAttribute('aria-pressed', true);
+			other.classList.remove('active');
+			other.setAttribute('aria-pressed', false);
+		}
+		console.log(button.id + '-' + like);
+		
+		send=false;
+		$.ajax({
+			url: '/sesh/update_like',
+			data: {
+				'pid': {{ party.pk }},
+				'like': like,
+				'action': button.id,
+			},
+			dataType: 'json',
+			success: function (data) {
+				
+		} });
+		setTimeout(function () {
+			send = true;
+		}, 1250);
+		}
+	}
 
 	function decodeBool(input){
 		if (input == 'True' || input == 'true' || input == true){
@@ -271,29 +320,28 @@
 			<img id="logo" style='display:none;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
 			<a id = "song_link"><h6 id = "song_name"></h6></a>
 		</div>
-		<form action="" method="post">
-			{% csrf_token %}
-			<div class = "row">
-				<div class = "col text-center pt-2 pb-2">
-					<a id="action" class="btn btn-outline-primary" style='display:none;'></a>
-					<button id="like" class="btn btn-outline-primary" name = "like" style='display:none;'><em class="fa fa-thumbs-o-up"></em></button>
-					<button id="dislike"class="btn btn-outline-primary" name = "dislike" style='display:none;'><em class="fa fa-thumbs-o-down"></em></button>
-				</div>
+		
+		<div class = "row">
+			<div class = "col text-center pt-2 pb-2">
+				<a id="action" class="btn btn-outline-primary" style='display:none;'></a>
+				<button id="like" class="btn btn-outline-primary" name = "like" style='display:none;'><em class="fa fa-thumbs-o-up"></em></button>
+				<button id="dislike"class="btn btn-outline-primary" name = "dislike" style='display:none;'><em class="fa fa-thumbs-o-down"></em></button>
 			</div>
+		</div>
 
-			<nav class="navbar fixed-bottom navbar-dark bg-primary">
-				
-				<a href="{% url 'settings' pid=party.id %}" id="settings" class="btn text-white bg-primary navbar-btn" style='display:none;'> <em class="fa fa-cog"></em></a>
-				
-				<a href="{% url 'users' pid=party.id %}" class="btn text-white bg-primary navbar-btn"> <em class="fa fa-users"></em></a>
-								
-				<div class=" pl-5 text-white text-center">
-					<a class="btn text-white bg-primary navbar-btn" data-toggle="modal" data-target="#qrModal"><strong id="party_code"></strong> <em class="fa fa-qrcode"></em></a>
-				</div>	
-				
-				<a class="btn text-white bg-primary navbar-btn" data-toggle="modal" data-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
-			</nav>
-		</form>
+		<nav class="navbar fixed-bottom navbar-dark bg-primary">
+			
+			<a href="{% url 'settings' pid=party.id %}" id="settings" class="btn text-white bg-primary navbar-btn" style='display:none;'> <em class="fa fa-cog"></em></a>
+			
+			<a href="{% url 'users' pid=party.id %}" class="btn text-white bg-primary navbar-btn"> <em class="fa fa-users"></em></a>
+							
+			<div class=" pl-5 text-white text-center">
+				<a class="btn text-white bg-primary navbar-btn" data-toggle="modal" data-target="#qrModal"><strong id="party_code"></strong> <em class="fa fa-qrcode"></em></a>
+			</div>	
+			
+			<a class="btn text-white bg-primary navbar-btn" data-toggle="modal" data-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
+		</nav>
+	
 	</div>
 
 	<!-- Modal -->

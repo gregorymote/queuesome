@@ -14,8 +14,8 @@ from utils.util_rand import get_letter, get_numbers
 from utils.util_device import is_device_active, activate_device, get_devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
     searchResultsForm, settingsForm)
-from queue_it_up.settings import (DRIVER, DRIVER_URI, SYSTEM, HEROKU, STAGE,
-    URL, IP, URI, SCOPE, CLIENT_ID, CLIENT_SECRET)
+from queue_it_up.settings import (SYSTEM, HEROKU, STAGE, URL, IP, URI, SCOPE,
+    CLIENT_ID, CLIENT_SECRET)
 from datetime import datetime, timedelta, timezone
 import spotipy
 import time
@@ -47,10 +47,6 @@ def lobby(request, pid):
             party.lib_repo = set_lib_repo()
             party.started = True
             party.save()
-            ##if HEROKU:
-            ##    DRIVER.get(DRIVER_URI.format(str(pid)))
-            ##else:
-                #webbrowser.open(DRIVER_URI.format(str(pid)))
             task = threading.Thread(target=call_task, args=(pid,))
             task.start()
             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
@@ -122,29 +118,7 @@ def play(request, pid):
 
     '''
     party = get_party(pid)
-    ##if request.GET.get('user', '') == SYSTEM:
-    ##    user=Users.objects.filter(party=party, name=SYSTEM)
-    ##    if not user:
-    ##        user=Users(
-    ##            party=party,
-    ##            name=SYSTEM,
-    ##            sessionID=request.session.session_key,
-    ##            active=False,
-    ##            refreshRate=3
-    ##        )
-    ##        user.save()
-    ##else:
     user = get_user(request, pid)
-
-    if request.method == 'POST':
-        form = blankForm(request.POST)
-        if form.is_valid():
-            song = Songs.objects.filter(
-                state='playing', category__party=party).first()
-            like_song(song, user, request)         
-    else:
-        form = blankForm(initial={'text':'blank',})
-
     song = Songs.objects.filter(category__party=party, state='playing').first()
     if song:
         category = song.category
@@ -154,7 +128,6 @@ def play(request, pid):
     
     results = get_results(party)
     context = {
-        'form': form,
         'party': party,
         'user' : user,
         'category' : category,
@@ -179,7 +152,7 @@ def update_play(request):
 
     '''
     pid = request.GET.get('pid', None)
-    party = Party.objects.get(pk = pid)
+    party = Party.objects.get(pk=pid)
     if get_inactivity(pid,20):
         party.active = False
     
@@ -205,6 +178,7 @@ def update_play(request):
 		"hasPicked": str(user.hasPicked),
 		"turn": user.turn,
 		"hasLiked": str(user.hasLiked),
+        "hasSkip" : str(user.hasSkip),
 		"user": user.pk
 	}
     try:
@@ -235,88 +209,58 @@ def update_play(request):
     }
     return JsonResponse(data)
 
-#TBD OBE
-def update_game(request):
-    ''' Ajax request made by system to update the game logic 
+
+def update_like(request):
+    ''' Ajax call to increment or Decrement the like field of a Song object
+        based on the request. Prevents user from liking one song multiple times.
 
     Parameters:
 
         - request - web request
 
     '''
-    pid = request.GET.get('pid', None)   
+    pid = request.GET.get('pid', None)
+    like = request.GET.get('like', None)
+    action = request.GET.get('action', None)
+    
     party = Party.objects.get(pk=pid)
-
-    if get_inactivity(pid,20):
-        clean_up_party(party.pk)
-
-    if party.state == 'assign' or \
-            (party.state =='choose_category' and not 
-                Users.objects.filter(
-                    turn='picking',
-                    party=party,
-                    active=True
-                ).first()
-            ):
-        assign_leader(party)
-        party.state = 'choose_category'
-        party.save()  
-                
-    if party.state == 'pick_song' and not \
-            Users.objects.filter(
-                hasPicked=False,
-                party=party,
-                active=True
-            ).all():
-        reset_users(party) 
-        party.state = 'assign'
-        party.save()
-    if not party.device_error:
-        if not party.thread and \
-                Songs.objects.filter(
-                    category__party=party,
-                    category__roundNum=party.roundNum,
-                    state='not_played',
-                    category__full=True
-                ):
-            thread = threading.Thread(target=play_songs, args=(pid,))
-            thread.start()
+    user = get_user(request, pid)   
+    
+    if like == 'true':
+        if action == 'like': 
+            if user.hasSkip:
+                num = 2
+                user.hasLiked = True
+                user.hasSkip = False
+            else:
+                num = 1
+                user.hasLiked = True
+                user.hasSkip = False
+        else:
+            num = 1
+            user.hasLiked = False
+            user.hasSkip = False
     else:
-        party.device_error = activate_device(
-            token_info=party.token_info,
-            party_id=party.pk,
-        )
-        party.save()
-    print(party.roundNum)
-    print(Users.objects.filter(
-                    party=party,
-                    active=True,
-                    hasPicked=False
-                ).first().name)
-    ##song = Songs.objects.filter(category__party=party, state='playing').first()
-    ##if song:
-    ##    category = song.category
-    ##    #if party.roundNum != category.roundNum:
-    ##    #    party.roundNum = category.roundNum
-    ##    #    party.save()
-    ##else:
-    ##    last_played = Songs.objects.filter(
-    ##        category__party=party,
-    ##        state='played'
-    ##        ).order_by('-category__roundNum').first()
-    ##    if last_played and party.roundNum != last_played.category.roundNum + 1:
-    ##        party.roundNum = last_played.category.roundNum + 1
-    ##        party.save()
-    ##        print("****************************")
-    ##        print("****************************")
-    ##        print("****************************")
-    ##        print("****************************")
-    ##        print("****************************")
-    data={
-        "success": 'True',
-        "inactive" : not party.active
-    }
-
+        if action == 'dislike':
+            if user.hasLiked:
+                num = -2
+                user.hasLiked = False
+                user.hasSkip = True
+            else:
+                num = -1
+                user.hasLiked = False
+                user.hasSkip = True
+        else:
+            num = -1
+            user.hasLiked = False
+            user.hasSkip = False
+    user.save()
+    song = Songs.objects.filter(state='playing', category__party=party).first()
+    if song and not song.duplicate:
+        song.likes += num
+        song.save()
+        print(song.likes, num)
+    data = {}
     return JsonResponse(data)
 
 
@@ -342,13 +286,6 @@ def run_game(pid):
             ).first()
             ):
             party = Party.objects.get(pk=pid)
-            print(
-                'assign: ',
-                party.state,
-                Users.objects.filter(turn='picking',party=party,active=True
-                    ).first(),
-                party.roundTotal
-            )
             assign_leader(party)
             party.state = 'choose_category'
             party.save() 
@@ -358,11 +295,6 @@ def run_game(pid):
                 Users.objects.filter(hasPicked=False,party__pk=pid,active=True
                 ).all():
             party = Party.objects.get(pk=pid)
-            print('pick_song: ', party.state,  Users.objects.filter(
-                    hasPicked=False,
-                    party=party,
-                    active=True
-                ).all() )
             party.state = 'assign'
             party.save()
             reset_users(party) 
@@ -385,7 +317,6 @@ def run_game(pid):
             party = Party.objects.get(pk=pid)
             party.thread = True
             party.save()
-            print('save')
 
         if Party.objects.filter(pk=pid,active=True,device_error=True).first():
             party = Party.objects.get(pk=pid) 
@@ -395,7 +326,6 @@ def run_game(pid):
             )
             if not party.device_error:
                 party.save()
-                print('save')
 
 
 def choose_category(request, pid):
@@ -431,7 +361,6 @@ def choose_category(request, pid):
                 party.roundTotal = party.roundTotal + 1
                 party.save()
                 party = Party.objects.get(pk=pid)
-                print('cat: ', party.state, party.roundTotal)
                 remaining_users = Users.objects.filter(
                     party=party,
                     turn='not_picked',

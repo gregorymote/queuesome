@@ -9,7 +9,7 @@ urlpatterns = [
         path('<int:pid>/play/settings', views.settings, name='settings'),
         path('<int:pid>/play/users', views.users, name='users'),
         path('update_play', views.update_play, name='update_play'),
-        path('update_game', views.update_game, name='update_game'),
         path('update_lobby', views.update_lobby, name='update_lobby'),
         path('update_search', views.update_search, name='update_search'),
+        path('update_like', views.update_like, name='update_like'),
 ]
