@@ -10,12 +10,9 @@ import time
 
 def get_party(pid):
     try:
-        print('1')
         return Party.objects.get(pk=pid, active=True)
     except Exception:
-        print('2')
-        return HttpResponseRedirect(reverse('index'))
-        print('3')
+        return -1
 
 
 def get_inactivity(pid, duration):
@@ -163,10 +160,8 @@ def wait_for_song(song):
     song_length = get_song_length(song)
     threshold = get_like_threshold(party)
     flag = True
-    while(time.time() - song.startTime < song_length):
-        total = get_like_total(song)
-        print(total)
-        if total <= threshold:
+    while(time.time() - song.startTime < song_length): 
+        if get_like_total(song) <= threshold:
             break
         if song.duplicate and (time.time() - song.startTime) >= party.time and flag:
             song.art= "duplicate"

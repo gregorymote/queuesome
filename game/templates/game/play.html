@@ -98,7 +98,6 @@
 	window.onload = function() {
 		updatePage(party, user, category, song, results);
 	};
-	
 	setInterval(function () {
 		$.ajax({
 			url: '/sesh/update_play',
@@ -116,6 +115,10 @@
 		like.addEventListener("click", likeSong);
 		var dislike = document.getElementById("dislike");
 		dislike.addEventListener("click", likeSong);
+		var results = document.getElementById('results_title');
+		results.addEventListener("click", setTab);
+		var total = document.getElementById('total_title');
+		total.addEventListener("click", setTab);
 	});
 
 	function updatePage(party, user, category, song, results){
@@ -227,10 +230,12 @@
 			settings.style.display = 'none';
 		}
 		
-		var results_title = document.getElementById('results_title');
-		results_title.innerHTML = results[0].category_result;
-		if (results[0].category_result != "No Results Yet"){	
-			var results_body = document.getElementById('results_body');
+		var results_header = document.getElementById('results_header');
+		results_header.innerHTML = results[0].category_result;
+		if (results[0].category_result != "No Results Yet"){
+			var total_body = document.getElementById('total_contents');
+			total_body.innerHTML = "";	
+			var results_body = document.getElementById('results_contents');
 			results_body.innerHTML = '';
 			var row = document.createElement('row');
 			for(var i=0; i<results.length; i++){
@@ -264,6 +269,15 @@
 				item.appendChild(user);
 						
 				row.appendChild(item);
+
+				//add row to total table
+				var total = document.createElement('tr');
+				var total_name = document.createElement('td');
+				total_name.innerHTML = results[i].user_result;
+				var total_likes = document.createElement('td');
+				total_likes.innerHTML = results[i].total_result;
+				total.append(total_name, total_likes);
+				total_body.append(total);
 			}
 			results_body.appendChild(row);
 		}
@@ -309,6 +323,35 @@
 				
 		} });
 	}
+
+
+	function setTab(e){
+		var tab = e.target;
+		var results = document.getElementById('results_body');
+		var total = document.getElementById('total_body');
+		var other;
+		var show = "inline-block";
+		var hide = "none";
+
+		if (tab.id == "results_title"){
+			results.style.display = show;
+			total.style.display = hide;
+			other = document.getElementById('total_title');
+		}
+		else{
+			results.style.display = hide;
+			total.style.display = show;
+			other = document.getElementById('results_title');
+		}
+		if(!tab.classList.contains("active")){
+			tab.classList.add("active");
+			tab.classList.remove("text-muted");
+			other.classList.remove("active");
+			other.classList.add("text-muted");
+		}
+		
+	}
+
 
 	function decodeBool(input){
 		if (input == 'True' || input == 'true' || input == true){
@@ -361,14 +404,42 @@
 		aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="results_title"></h5>
+				<div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
+					<ul class="nav nav-tabs">
+						<li class="nav-item">
+						  <a class="nav-link active" id="results_title" aria-current="page">Results</a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link text-muted" id ="total_title">Total</a>
+						</li>
+					  </ul>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
+
 				<div id="results_body" class="modal-body text-center">
+					<h6 id=results_header></h6>
+					<div id="results_contents"></div>
 				</div>
+				<div id="total_body" class="modal-body text-center" style="display:none;">
+					<table class="table">
+						<caption></caption>
+						<thead>
+						  <tr>
+							<th id="total_name">Name</th>
+							<th id="total_likes">Total</th>
+						  </tr>
+						</thead>
+						<tbody id= "total_contents">
+							<tr>
+								<td>Everyone</td>
+								<td>∞</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				</div>

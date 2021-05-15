@@ -99,6 +99,8 @@ def name_party(request, pid):
         return HttpResponseRedirect(reverse('index'))
     party = Party.objects.get(pk=pid)
     user = get_user(request, party)
+    if user == -1:
+        return HttpResponseRedirect(reverse('index'))
     if party.started:
         return HttpResponseRedirect(reverse('lobby', kwargs={'pid': party.pk}))
     if request.method == 'POST':
