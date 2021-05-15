@@ -6,7 +6,8 @@ from party.models import (Party, Users, Category, Library, Songs,
     Searches, Devices)
 from utils.util_auth import check_token
 from utils.util_user import (get_user, check_permission, like_song,
-    assign_leader, reset_users, set_user_points, reset_user_likes)
+    assign_leader, reset_users, set_user_points, reset_user_likes,
+    get_like_total)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
     set_lib_repo, get_results, get_category_choices, create_category,
     check_duplicate, wait_for_song)
@@ -222,44 +223,24 @@ def update_like(request):
     pid = request.GET.get('pid', None)
     like = request.GET.get('like', None)
     action = request.GET.get('action', None)
-    
-    party = Party.objects.get(pk=pid)
     user = get_user(request, pid)   
     
     if like == 'true':
         if action == 'like': 
-            if user.hasSkip:
-                num = 2
-                user.hasLiked = True
-                user.hasSkip = False
-            else:
-                num = 1
-                user.hasLiked = True
-                user.hasSkip = False
+            user.hasLiked = True
+            user.hasSkip = False
         else:
-            num = 1
             user.hasLiked = False
             user.hasSkip = False
     else:
         if action == 'dislike':
-            if user.hasLiked:
-                num = -2
-                user.hasLiked = False
-                user.hasSkip = True
-            else:
-                num = -1
-                user.hasLiked = False
-                user.hasSkip = True
+            user.hasLiked = False
+            user.hasSkip = True
         else:
-            num = -1
             user.hasLiked = False
             user.hasSkip = False
     user.save()
-    song = Songs.objects.filter(state='playing', category__party=party).first()
-    if song and not song.duplicate:
-        song.likes += num
-        song.save()
-        print(song.likes, num)
+    #print(user.name, user.hasLiked, user.hasSkip)
     data = {}
     return JsonResponse(data)
 
@@ -678,7 +659,8 @@ def play_songs(pid):
             song.save()
             wait_for_song(song)
         song = Songs.objects.filter(pk=song.pk).first()
-        song.state= 'played'
+        song.state = 'played'
+        song.likes = get_like_total(song) 
         song.save()
         reset_user_likes(party)
         party = Party.objects.get(pk=pid)

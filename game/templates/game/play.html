@@ -59,9 +59,11 @@
 		outline: none !important;
   		box-shadow: none !important;
 	}
-	*:focus {
-    outline: 0 !important;
+	.btn-outline-primary:hover{
+    	color: #007bff;
+    	background-color: inherit;
 	}
+
 </style>
 
 <script type="text/javascript">
@@ -189,14 +191,24 @@
 		var hasSkip = decodeBool(user.hasSkip)
 		if (song.art != "lull" && song.user != user.user){
 			like.style.display = 'initial';
+			like.classList.remove("hover")
 			if(hasLiked){
 				like.classList.add('active');
 				like.setAttribute('aria-pressed', true);
 			}
+			else{
+				like.classList.remove('active');
+				like.setAttribute('aria-pressed', false);
+			}
 			dislike.style.display = 'initial';
+			dislike.classList.remove("hover")
 			if(hasSkip){
 				dislike.classList.add('active');
 				dislike.setAttribute('aria-pressed', true);
+			}
+			else{
+				dislike.classList.remove('active');
+				dislike.setAttribute('aria-pressed', false);
 			}
 		}
 		else{
@@ -257,7 +269,6 @@
 		}
 	};
 	function likeSong(e){
-		if(send){
 		var like = true;
 		var button = e.target;
 		if(button.id == ""){
@@ -286,8 +297,6 @@
 			other.setAttribute('aria-pressed', false);
 		}
 		console.log(button.id + '-' + like);
-		
-		send=false;
 		$.ajax({
 			url: '/sesh/update_like',
 			data: {
@@ -299,10 +308,6 @@
 			success: function (data) {
 				
 		} });
-		setTimeout(function () {
-			send = true;
-		}, 1250);
-		}
 	}
 
 	function decodeBool(input){
@@ -331,8 +336,8 @@
 		<div class = "row">
 			<div class = "col text-center pt-2 pb-2">
 				<a id="action" class="btn btn-outline-primary" style='display:none;'></a>
-				<button id="like" class="btn btn-outline-primary no-focus" name = "like" style='display:none;'><em class="fa fa-thumbs-o-up"></em></button>
-				<button id="dislike"class="btn btn-outline-primary no-focus" name = "dislike" style='display:none;'><em class="fa fa-thumbs-o-down"></em></button>
+				<button id="like" class="btn btn-outline-primary no-focus" name = "like" style='display:none;' ><em class="fa fa-thumbs-o-up"></em></button>
+				<button id="dislike"class="btn btn-outline-primary no-focus" name = "dislike" style='display:none;' ><em class="fa fa-thumbs-o-down"></em></button>
 			</div>
 		</div>
 

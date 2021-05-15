@@ -2,16 +2,20 @@ from party.models import Party, Users, Songs, Library, Category
 from datetime import datetime, timedelta, timezone
 from queue_it_up.settings import SYSTEM
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from utils.util_rand import get_numbers, get_letter
-from utils.util_user import get_like_threshold
+from utils.util_user import get_like_threshold, get_like_total
 import time
 
 
 def get_party(pid):
     try:
-        return Party.objects.get(pk=pid)
+        print('1')
+        return Party.objects.get(pk=pid, active=True)
     except Exception:
+        print('2')
         return HttpResponseRedirect(reverse('index'))
+        print('3')
 
 
 def get_inactivity(pid, duration):
@@ -47,13 +51,20 @@ def get_results(party):
             category__roundNum = party.roundNum - 1, category__party=party
             ).order_by('-likes').all()
         for result in song_results:
+            art = result.art
+            if art == "duplicate":
+                duplicate = Songs.objects.filter(
+                    category__roundNum = party.roundNum - 1, 
+                    category__party=party, 
+                    name=result.name).exclude(art="duplicate").first()
+                art = duplicate.art
             results.append(
                 {
                     "user_result":result.user.name,
                     "song_result":result.name,
                     "like_result":result.likes,
                     "total_result":result.user.points,
-                    "art_result":result.art,
+                    "art_result":art,
                     "category_result":result.category.name
                 }
             )
@@ -153,7 +164,9 @@ def wait_for_song(song):
     threshold = get_like_threshold(party)
     flag = True
     while(time.time() - song.startTime < song_length):
-        if Songs.objects.filter(pk=song.pk, likes__lte=threshold).first():
+        total = get_like_total(song)
+        print(total)
+        if total <= threshold:
             break
         if song.duplicate and (time.time() - song.startTime) >= party.time and flag:
             song.art= "duplicate"

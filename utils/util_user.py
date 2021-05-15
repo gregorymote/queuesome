@@ -42,7 +42,6 @@ def check_permission(pid, request):
     try:
         user = Users.objects.get(sessionID=session_key, party=party)
     except Exception:
-        print('here')
         return False
     if not user.isHost:
         return False
@@ -120,6 +119,26 @@ def reset_users(party):
         user.save()
 
 
+def get_like_total(song):
+    ''' Gets the amount of likes given to the song
+
+    Parameters:
+
+        - party - party object of song that just finished playing
+
+    '''
+    party = song.category.party
+    total = 0
+    likes=Users.objects.filter(party=party, active=True, hasLiked=True
+        ).exclude(pk=song.user.id).all()
+    dislikes=Users.objects.filter(party=party, active=True, hasSkip=True
+        ).exclude(pk=song.user.id).all()
+
+    if not song.duplicate:
+        total = len(list(likes)) - len(list(dislikes))
+    return total
+
+
 def set_user_points(party, round_number):
     ''' Adds Each Songs Likes to the User's Total Likes 
 
@@ -149,6 +168,7 @@ def reset_user_likes(party):
         user.hasLiked = False
         user.hasSkip = False
         user.save()
+        #print(user.name, user.hasLiked, user.hasSkip )
 
 
 def get_like_threshold(party):
