@@ -176,19 +176,6 @@ STATICFILES_DIRS = (
 #  Add configuration for static files storage using whitenoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
-
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
-
 PORT='8000'
 if STAGE:
     proto='http://'
@@ -202,17 +189,11 @@ else:
 if HEROKU:
     URL=proto + IP
     URI = URL + '/party/auth/'
-    DRIVER = webdriver.Chrome(
-        executable_path=os.environ.get("CHROMEDRIVER_PATH"),
-        chrome_options=chrome_options
-    )
 else:
     URL=proto + IP + ':' + PORT
     URI = URL + '/party/auth/'
-    DRIVER = "DRIVER"
 
 CLIENT_SECRET=os.environ.get("SPOTIFY_CLIENT_SECRET")
 SCOPE = 'user-read-playback-state user-modify-playback-state'
 CLIENT_ID='6de276d9e60548d5b05a7af92a5db3bb'
 SYSTEM=os.environ.get("SYSTEM_USER_ID")
-DRIVER_URI = URL + '/sesh/{}/play?user=' + SYSTEM
