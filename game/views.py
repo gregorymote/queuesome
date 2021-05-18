@@ -38,6 +38,8 @@ def lobby(request, pid):
 
     '''
     party = get_party(pid)
+    if party == -1:
+        return HttpResponseRedirect(reverse('index'))
     if get_inactivity(pid,20):
         clean_up_party(party.pk)
     if request.method == 'POST':
@@ -120,6 +122,8 @@ def play(request, pid):
     '''
     party = get_party(pid)
     user = get_user(request, pid)
+    if party == -1 or user == -1:
+        return HttpResponseRedirect(reverse('index'))
     song = Songs.objects.filter(category__party=party, state='playing').first()
     if song:
         category = song.category
@@ -240,7 +244,6 @@ def update_like(request):
             user.hasLiked = False
             user.hasSkip = False
     user.save()
-    #print(user.name, user.hasLiked, user.hasSkip)
     data = {}
     return JsonResponse(data)
 
@@ -321,6 +324,8 @@ def choose_category(request, pid):
 
     party = get_party(pid)
     user = get_user(request, pid)
+    if party == -1 or user == -1:
+        return HttpResponseRedirect(reverse('index'))
     if user.turn != 'picking':
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     valid=True
@@ -377,6 +382,8 @@ def pick_song(request, pid):
 
     party = get_party(pid)
     user = get_user(request, party)
+    if party == -1 or user == -1:
+        return HttpResponseRedirect(reverse('index'))
     invalid = False
     if user.hasPicked:
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
@@ -544,6 +551,8 @@ def users(request, pid):
 
     party = get_party(pid)
     user = get_user(request, party)
+    if party == -1 or user == -1:
+        return HttpResponseRedirect(reverse('index'))
     users = Users.objects.filter(party=party, active=True).all()
     if request.method == 'POST':
         form = blankForm(request.POST)

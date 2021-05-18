@@ -19,7 +19,7 @@ def get_user(request, party):
             sessionID=session_key, party=party, active=True
         )
     except Exception:
-        return HttpResponseRedirect(reverse('index'))
+        return -1
 
     return current_user
 
@@ -168,7 +168,6 @@ def reset_user_likes(party):
         user.hasLiked = False
         user.hasSkip = False
         user.save()
-        #print(user.name, user.hasLiked, user.hasSkip )
 
 
 def get_like_threshold(party):
