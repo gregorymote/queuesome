@@ -6,7 +6,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var time = document.getElementById("id_time");
-		time.addEventListener("input", validateTime);
+		time.addEventListener("focusout", validateTime);
 	});
 	function validateTime(e){
 		if(e.target.value < 30){
