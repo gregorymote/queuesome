@@ -94,9 +94,10 @@
 		"art": "{{song.art}}"
 	}
 	var results = {{ results|safe }};
-	var send = true;
+	var totals = {{ totals|safe }};
+
 	window.onload = function() {
-		updatePage(party, user, category, song, results);
+		updatePage(party, user, category, song, results, totals);
 	};
 	setInterval(function () {
 		$.ajax({
@@ -106,7 +107,7 @@
 			},
 			dataType: 'json',
 			success: function (data) {
-				updatePage(data.party, data.user, data.category, data.song, data.results);			
+				updatePage(data.party, data.user, data.category, data.song, data.results, data.totals);			
 		} });
 	}, refresh_rate);
 
@@ -121,7 +122,7 @@
 		total.addEventListener("click", setTab);
 	});
 
-	function updatePage(party, user, category, song, results){
+	function updatePage(party, user, category, song, results, totals){
 		var inactive = decodeBool(party.inactive);
 		if (inactive){
 			window.location.replace('/index');
@@ -269,17 +270,19 @@
 				item.appendChild(user);
 						
 				row.appendChild(item);
+			}
+			results_body.appendChild(row);
 
+			for(var i=0; i<totals.length; i++){
 				//add row to total table
 				var total = document.createElement('tr');
 				var total_name = document.createElement('td');
-				total_name.innerHTML = results[i].user_result;
+				total_name.innerHTML = totals[i].user_total;
 				var total_likes = document.createElement('td');
-				total_likes.innerHTML = results[i].total_result;
+				total_likes.innerHTML = totals[i].points_total;
 				total.append(total_name, total_likes);
 				total_body.append(total);
-			}
-			results_body.appendChild(row);
+			}	
 		}
 	};
 	function likeSong(e){

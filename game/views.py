@@ -9,8 +9,8 @@ from utils.util_user import (get_user, check_permission, like_song,
     assign_leader, reset_users, set_user_points, reset_user_likes,
     get_like_total)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
-    set_lib_repo, get_results, get_category_choices, create_category,
-    check_duplicate, wait_for_song)
+    set_lib_repo, get_results, get_totals, get_category_choices,
+    create_category, check_duplicate, wait_for_song)
 from utils.util_rand import get_letter, get_numbers
 from utils.util_device import is_device_active, activate_device, get_devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -132,12 +132,14 @@ def play(request, pid):
         category = Category.objects.filter(party=party, roundNum=0).first()
     
     results = get_results(party)
+    totals = get_totals(party)
     context = {
         'party': party,
         'user' : user,
         'category' : category,
         'song' : song,
         'results': results,
+        'totals': totals,
         'system': SYSTEM,
         'URL':URL,
     }
@@ -171,6 +173,8 @@ def update_play(request):
         category = Category.objects.filter(party=party, roundNum=0).first()
     
     results = get_results(party)
+    totals = get_totals(party)
+
     party_info = {
 		"device_error" : str(party.device_error),
 		"name" : party.name,
@@ -208,9 +212,10 @@ def update_play(request):
     data = {
         'party': party_info,
         'user' : user_info,
-        'category' : category_info,
-        'song' : song_info,
-        'results':results
+        'category': category_info,
+        'song': song_info,
+        'results': results,
+        'totals': totals
     }
     return JsonResponse(data)
 
