@@ -86,6 +86,7 @@
 	var category = {
 		"name": "{{category.name}}",
 		"leader": "{{category.leader.name}}",
+		"full": "{{ full }}",
 	}
 	var song = {
 		"name": "{{song.name}}",
@@ -175,12 +176,13 @@
 		}
 		var action = document.getElementById('action');
 		var hasPicked = decodeBool(user.hasPicked)
+		var full = decodeBool(category.full);
 		if (user.turn == "picking" && party.state == "choose_category"){
 			action.innerHTML = "Curate the Vibe";
 			action.style.display = '';
 			action.href = "{% url 'choose_category' pid=party.id %}" 
 		}
-		else if(party.state == "pick_song" && !hasPicked){
+		else if(party.state == "pick_song" && !hasPicked && !full){
 			action.innerHTML = "Pick Song";
 			action.style.display = '';
 			action.href = "{% url 'pick_song' pid=party.id %}" 

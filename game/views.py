@@ -131,6 +131,13 @@ def play(request, pid):
         song = Songs(art='lull')
         category = Category.objects.filter(party=party, roundNum=0).first()
     
+    last_category = Category.objects.filter(
+        party=party, roundNum=party.roundTotal
+    ).first()
+    full = False
+    if last_category:
+        full = last_category.full
+
     results = get_results(party)
     totals = get_totals(party)
     context = {
@@ -140,8 +147,8 @@ def play(request, pid):
         'song' : song,
         'results': results,
         'totals': totals,
-        'system': SYSTEM,
         'URL':URL,
+        'full': full,
     }
     
     return render(request, 'game/play.html', context)
@@ -172,6 +179,13 @@ def update_play(request):
         song = Songs(art='lull')
         category = Category.objects.filter(party=party, roundNum=0).first()
     
+    last_category = Category.objects.filter(
+        party=party, roundNum=party.roundTotal
+    ).first()
+    full = False
+    if last_category:
+        full = last_category.full
+
     results = get_results(party)
     totals = get_totals(party)
 
@@ -197,6 +211,7 @@ def update_play(request):
     category_info={
 		"name": category.name,
 		"leader": leader,
+        "full":full,
 	}
     try:
         song_user = song.user.pk

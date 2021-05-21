@@ -84,6 +84,7 @@
 			if (e.target.value != ''){
 				var result = document.getElementById("id_result");
 				var artwork = document.getElementById("artwork");
+				console.log(e.target.value);
 				$.ajax({
 					url: '/sesh/update_search',
 					data: {
