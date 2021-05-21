@@ -2,6 +2,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from party.models import Library, Searches, Devices
 from game.fields import ListTextWidget
+from django.core.validators import MinValueValidator
 
 
 class blankForm(forms.Form):
@@ -49,7 +50,7 @@ class searchResultsForm(forms.Form):
 
 class settingsForm(forms.Form):
 
-    time = forms.IntegerField()
+    time = forms.IntegerField(validators=[MinValueValidator(30)])
     device = forms.ModelChoiceField(queryset=Devices.objects.all(), required = False, widget=forms.Select(attrs={'class':'form-control'}))
         
     def __init__(self,*args,**kwargs):
