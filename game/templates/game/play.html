@@ -86,6 +86,7 @@
 	var category = {
 		"name": "{{category.name}}",
 		"leader": "{{category.leader.name}}",
+		"full": "{{ full }}",
 	}
 	var song = {
 		"name": "{{song.name}}",
@@ -94,9 +95,10 @@
 		"art": "{{song.art}}"
 	}
 	var results = {{ results|safe }};
-	var send = true;
+	var totals = {{ totals|safe }};
+
 	window.onload = function() {
-		updatePage(party, user, category, song, results);
+		updatePage(party, user, category, song, results, totals);
 	};
 	setInterval(function () {
 		$.ajax({
@@ -106,7 +108,7 @@
 			},
 			dataType: 'json',
 			success: function (data) {
-				updatePage(data.party, data.user, data.category, data.song, data.results);			
+				updatePage(data.party, data.user, data.category, data.song, data.results, data.totals);			
 		} });
 	}, refresh_rate);
 
@@ -121,7 +123,7 @@
 		total.addEventListener("click", setTab);
 	});
 
-	function updatePage(party, user, category, song, results){
+	function updatePage(party, user, category, song, results, totals){
 		var inactive = decodeBool(party.inactive);
 		if (inactive){
 			window.location.replace('/index');
@@ -174,12 +176,13 @@
 		}
 		var action = document.getElementById('action');
 		var hasPicked = decodeBool(user.hasPicked)
+		var full = decodeBool(category.full);
 		if (user.turn == "picking" && party.state == "choose_category"){
 			action.innerHTML = "Curate the Vibe";
 			action.style.display = '';
 			action.href = "{% url 'choose_category' pid=party.id %}" 
 		}
-		else if(party.state == "pick_song" && !hasPicked){
+		else if(party.state == "pick_song" && !hasPicked && !full){
 			action.innerHTML = "Pick Song";
 			action.style.display = '';
 			action.href = "{% url 'pick_song' pid=party.id %}" 
@@ -269,17 +272,19 @@
 				item.appendChild(user);
 						
 				row.appendChild(item);
+			}
+			results_body.appendChild(row);
 
+			for(var i=0; i<totals.length; i++){
 				//add row to total table
 				var total = document.createElement('tr');
 				var total_name = document.createElement('td');
-				total_name.innerHTML = results[i].user_result;
+				total_name.innerHTML = totals[i].user_total;
 				var total_likes = document.createElement('td');
-				total_likes.innerHTML = results[i].total_result;
+				total_likes.innerHTML = totals[i].points_total;
 				total.append(total_name, total_likes);
 				total_body.append(total);
-			}
-			results_body.appendChild(row);
+			}	
 		}
 	};
 	function likeSong(e){
@@ -362,7 +367,12 @@
 		}
 	}
 </script>
-	
+
+{% block settings %}
+<a href="{% url 'settings' pid=party.id %}" id="settings" class="btn text-white bg-primary navbar-btn" style='display:none;'> <em class="fa fa-cog"></em></a>
+{% endblock %}
+
+
 	<div class = "container text-center">
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
@@ -385,8 +395,6 @@
 		</div>
 
 		<nav class="navbar fixed-bottom navbar-dark bg-primary">
-			
-			<a href="{% url 'settings' pid=party.id %}" id="settings" class="btn text-white bg-primary navbar-btn" style='display:none;'> <em class="fa fa-cog"></em></a>
 			
 			<a href="{% url 'users' pid=party.id %}" class="btn text-white bg-primary navbar-btn"> <em class="fa fa-users"></em></a>
 							

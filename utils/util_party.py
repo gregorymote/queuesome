@@ -70,6 +70,21 @@ def get_results(party):
     return results
 
 
+def get_totals(party):
+    totals=[]
+    if party.roundNum > 1:
+        users = Users.objects.filter(
+            party=party, active=True).order_by('-points').all()
+        for user in users:
+            totals.append(
+                {
+                    "user_total":user.name,
+                    "points_total":user.points
+                }
+            )
+    return totals
+
+
 def get_category_choices(request, party):
     if request.method != 'POST' and party.indices is None:
         num = 12

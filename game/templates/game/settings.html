@@ -2,6 +2,20 @@
 
 {% extends "base.html" %}
 {% block page_content %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		var time = document.getElementById("id_time");
+		time.addEventListener("focusout", validateTime);
+	});
+	function validateTime(e){
+		if(e.target.value < 30){
+			e.target.value = 30;
+		}
+	}
+</script>
+
+
 <div class="container" style="width:90%">
 	<div class="text-center">
 		<h5>Settings</h5>
