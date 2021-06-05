@@ -395,7 +395,7 @@ def pick_song(request, pid):
     if party == -1 or user == -1:
         return HttpResponseRedirect(reverse('index'))
     invalid = False
-    if user.hasPicked:
+    if user.hasPicked or party.state != 'pick_song':
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     
     category = Category.objects.filter(

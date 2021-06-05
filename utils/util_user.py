@@ -1,5 +1,3 @@
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 from party.models import Party, Users, Songs
 
 def get_user(request, party):
