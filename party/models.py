@@ -1,6 +1,6 @@
 from django.db import models
 from django_mysql.models import SetTextField
-import spotipy
+from datetime import datetime
 
 STRUCTURE_CHOICES = (
     ("{} in the Title", "{} in the Title"),
@@ -36,6 +36,7 @@ class Party(models.Model):
     lib_repo = SetTextField(base_field=models.CharField(max_length=32), null=True)
     indices = SetTextField(base_field=models.CharField(max_length=32), null=True)
     debug = models.CharField(max_length=4000, default="")
+    created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -52,6 +53,7 @@ class Users(models.Model):
     turn = models.CharField(max_length=20, default='not_picked')
     active = models.BooleanField(default = True)
     refreshRate = models.IntegerField(default=5, null=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
     def __str__(self):
         return self.name
 
@@ -62,6 +64,7 @@ class Category(models.Model):
     leader = models.ForeignKey('Users',on_delete=models.SET_NULL, null=True)
     full = models.BooleanField(null=True, default=False)
     library = models.ForeignKey('Library', on_delete=models.CASCADE,null=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
     
     def __str__(self):
         return self.name
@@ -74,6 +77,7 @@ class Library(models.Model):
     visible = models.BooleanField(default = False)
     special = models.BooleanField(default=False)
     order = models.IntegerField(default = 100)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
     
     def save(self, *args, **kwargs): 
         self.display = self.structure.format(self.name) 
@@ -97,6 +101,7 @@ class Songs(models.Model):
     link = models.CharField(max_length=500, null=True)
     duration=models.IntegerField(default=0, null=True)
     duplicate=models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -111,6 +116,7 @@ class Devices(models.Model):
     name = models.CharField(max_length=100)
     deviceID = models.CharField(max_length=200)
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -123,5 +129,6 @@ class Searches(models.Model):
     user = models.ForeignKey('Users',on_delete=models.CASCADE,)
     link = models.CharField(max_length=500, null=True)
     duration=models.IntegerField(default=0, null=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
     def __str__(self):
         return self.name
