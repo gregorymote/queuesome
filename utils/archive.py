@@ -110,9 +110,7 @@ def update_game(request):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
     else:
-        party.device_error = activate_device(
-            token_info=party.token_info,
-            party_id=party.pk,
+        party.device_error = activate_device(party_id=party.pk,
         )
         party.save()
     data={

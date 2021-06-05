@@ -61,13 +61,23 @@
 	});
 	function moveSearchUp(e){
 		document.getElementById("id_search").style.display = 'block';
-		document.getElementById("labels").style.display = 'block';
+		document.getElementById("header").style.display = 'none';
+		var category = document.getElementById("category");
+		category.style.display = 'block';
+		category.classList.remove("text-center");
+		document.getElementById("artwork").style.display = 'none';
+		document.getElementById("title").style.display = 'none';
+		document.getElementById("search icon").style.display = 'none';
 		document.getElementById("buttons").style.display = 'none';
 		document.getElementById("arrow").style.display = 'block';
 		document.getElementById("results").style.display = '';
 	}
 	function moveSearchDown(){
-		document.getElementById("labels").style.display = 'block';
+		document.getElementById("header").style.display = 'block';
+		var category = document.getElementById("category")
+		category.style.display = 'block';
+		document.getElementById("artwork").style.display = 'block';
+		document.getElementById("title").style.display = 'block';
 		document.getElementById("buttons").style.display = 'block';
 		document.getElementById("arrow").style.display = 'none';
 		document.getElementById("results").style.display = 'none';
@@ -76,6 +86,8 @@
 		var result = document.getElementById("id_result");
 		if (result.value != -1){
 			search.style.display = 'none';
+			document.getElementById("search icon").style.display = 'block';
+			category.classList.add("text-center");
 		}
 	}
 	function update_search(e){
@@ -84,7 +96,6 @@
 			if (e.target.value != ''){
 				var result = document.getElementById("id_result");
 				var artwork = document.getElementById("artwork");
-				console.log(e.target.value);
 				$.ajax({
 					url: '/sesh/update_search',
 					data: {
@@ -165,10 +176,10 @@
 </script>
 	<div class = "container">
 		<div id = "labels">
-			<div class = "text-center">
+			<div id="header" class = "text-center">
 				<h6>...and the vibe is:</h6>
 			</div>
-			<div id="category" class ="pt-2">
+			<div id="category" class ="pt-1">
 				<h6>{{category.name}}</h6>
 			</div>
 			<div id="artwork", class ="pt-1 pb-2 text-center">

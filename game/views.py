@@ -1,28 +1,21 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from background_task import background
-from party.models import (Party, Users, Category, Library, Songs,
-    Searches, Devices)
+from party.models import Party, Users, Category, Songs, Searches, Devices
 from utils.util_auth import check_token
-from utils.util_user import (get_user, check_permission, like_song,
-    assign_leader, reset_users, set_user_points, reset_user_likes,
-    get_like_total)
+from utils.util_user import (get_user, check_permission, assign_leader,
+    reset_users, set_user_points, reset_user_likes, get_like_total)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
-    set_lib_repo, get_results, get_totals, get_category_choices,
-    create_category, check_duplicate, wait_for_song)
-from utils.util_rand import get_letter, get_numbers
-from utils.util_device import is_device_active, activate_device, get_devices
+     set_lib_repo, get_results, get_totals, get_category_choices,
+     create_category, check_duplicate, wait_for_song)
+from utils.util_device import activate_device, get_devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
-    searchResultsForm, settingsForm)
-from queue_it_up.settings import (SYSTEM, HEROKU, STAGE, URL, IP, URI, SCOPE,
-    CLIENT_ID, CLIENT_SECRET)
-from datetime import datetime, timedelta, timezone
+     settingsForm)
+from queue_it_up.settings import URL
 import spotipy
 import time
-import os
 import threading
-import webbrowser
 import random
 
 
@@ -324,10 +317,7 @@ def run_game(pid):
 
         if Party.objects.filter(pk=pid,active=True,device_error=True).first():
             party = Party.objects.get(pk=pid) 
-            party.device_error = activate_device(
-                token_info=party.token_info,
-                party_id=party.id,
-            )
+            party.device_error = activate_device(party_id=party.id)
             if not party.device_error:
                 party.save()
 
@@ -491,7 +481,7 @@ def update_search(request):
         track_duration = track['duration_ms']
         url = track['external_urls']['spotify']
         track_name = (
-            trackName[:255] + '..'
+            track_name[:255] + '..'
         ) if len(track_name) > 255 else track_name
         if not current or current.uri != track_uri:
             search = Searches(
@@ -671,8 +661,9 @@ def play_songs(pid):
             try:   
                 token = check_token(token_info=party.token_info, party_id=pid)
                 spotify_object = spotipy.Spotify(auth=token)
-                activate_device(token_info=party.token_info, party_id=pid)
-                spotify_object.start_playback(device_id=party.deviceID, uris=[song.uri])
+                activate_device(party_id=pid)
+                spotify_object.start_playback(
+                    device_id=party.deviceID, uris=[song.uri])
             except Exception as e:
                 party = Party.objects.get(pk=pid)
                 if 'Device not found' in str(e):

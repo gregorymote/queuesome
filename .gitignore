@@ -4,3 +4,5 @@ wa-venv/
 venv/
 *.pyc
 db.sqlite3
+*.cache
+*.cache-temp

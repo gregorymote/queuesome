@@ -1,20 +1,15 @@
-import os
-import json
 import spotipy
-import time
 from utils.util_auth import create_token, check_token, get_url
 from utils.util_user import get_user, check_permission
 from utils.util_party import get_inactivity
 from utils.util_rand import get_code
 from utils.util_device import get_devices
-from json.decoder import JSONDecodeError
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from party.models import Party, Users, Devices
 from party.forms import NamePartyForm, CreateUserForm, ChooseDeviceForm
-from queue_it_up.settings import (IP, PORT, URI, SCOPE, CLIENT_ID,
-    CLIENT_SECRET, HEROKU)
+from queue_it_up.settings import IP, PORT, HEROKU
 
 
 def auth(request):

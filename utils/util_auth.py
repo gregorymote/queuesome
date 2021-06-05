@@ -8,9 +8,8 @@ from party.models import Party
 from queue_it_up.settings import URI, SCOPE, CLIENT_ID, CLIENT_SECRET
 
 
-def generate_url(username=None, scope=SCOPE, client_id=CLIENT_ID,
-        client_secret = CLIENT_SECRET, redirect_uri=URI, cache_path = None,
-        show_dialog=True):
+def generate_url(scope=SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET,
+        redirect_uri=URI,show_dialog=True):
     ''' prompts the user to login if necessary and returns
         the user token suitable for use with the spotipy.Spotify 
         constructor
@@ -78,9 +77,8 @@ def get_url(path, is_cloud, ip, port):
     return url
 
     
-def create_token(url, username=None, scope=SCOPE, client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET, redirect_uri=URI, cache_path = None,
-        show_dialog=False):
+def create_token(url, scope=SCOPE, client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET, redirect_uri=URI, show_dialog=False):
     
     sp_oauth = oauth2.SpotifyOAuth(
         client_id=client_id,
