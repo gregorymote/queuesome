@@ -1,11 +1,9 @@
 from party.models import Party, Users, Songs, Library, Category
-from datetime import datetime, timedelta, timezone
-from queue_it_up.settings import SYSTEM
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from datetime import datetime, timezone
 from utils.util_rand import get_numbers, get_letter
 from utils.util_user import get_like_threshold, get_like_total
 import time
+from queue_it_up.settings import QDEBUG
 
 
 def get_party(pid):
@@ -16,21 +14,22 @@ def get_party(pid):
 
 
 def get_inactivity(pid, duration):
-    p = Party.objects.get(pk=pid)
+    party = Party.objects.get(pk=pid)
     now = datetime.now(timezone.utc)
-    inactivity = ((now - p.last_updated).seconds // 60) % 60
+    inactivity = ((now - party.last_updated).seconds // 60) % 60
     return inactivity > duration
 
 
 def clean_up_party(pid):
-    p = Party.objects.get(pk=pid)
-    p.active=False
-    p.token = ""
-    p.token_info = ""
-    p.url = ""
-    p.url_open = ""
-    p.deviceID = ""
-    p.save()
+    party = Party.objects.get(pk=pid)
+    party.active=False
+    party.token = ""
+    party.token_info = ""
+    party.url = ""
+    party.url_open = ""
+    party.deviceID = ""
+    party.save()
+    print(QDEBUG,"Clean Up Party")
 
 
 def set_lib_repo():
@@ -141,19 +140,19 @@ def create_category(party, user, category, artist, custom, sc_type):
 
 
 def check_duplicate(party, round_number, song):
-    dups = list(Songs.objects.filter(
+    duplicates = list(Songs.objects.filter(
                     category__party=party,
                     category__roundNum=round_number,
                     state='not_played',
                     name=song.name
             ).all())
-    if len(dups) > 1:
-        for d in dups:
-            d.duplicate=True
-            d.save()
-            u = d.user
-            u.hasLiked=True
-            u.save()
+    if len(duplicates) > 1:
+        for duplicate in duplicates:
+            duplicate.duplicate=True
+            duplicate.save()
+            user = duplicate.user
+            user.hasLiked=True
+            user.save()
         song.duplicate=True
         song.save()
 

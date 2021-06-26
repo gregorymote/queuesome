@@ -21,7 +21,7 @@ def activate_device(party_id):
                 )
             else:
                 flag = False
-        print(device)
+        #print(device)
     if flag:
         p.debug = p.debug + " **!!!** Device Not Found"
         p.save()

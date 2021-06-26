@@ -5,8 +5,8 @@ from utils.util_party import get_inactivity
 from utils.util_rand import get_code
 from utils.util_device import get_devices
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.http import HttpResponseRedirect, JsonResponse
 from party.models import Party, Users, Devices
 from party.forms import NamePartyForm, CreateUserForm, ChooseDeviceForm
 from queue_it_up.settings import IP, PORT, HEROKU
@@ -34,7 +34,7 @@ def auth(request):
     else:
         return HttpResponseRedirect(reverse('index'))
     return HttpResponseRedirect(
-        reverse('choose_device', kwargs={'pid': party.pk, })
+        reverse('choose_device', kwargs={'pid': party.pk,})
     )
 
 

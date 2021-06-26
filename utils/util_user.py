@@ -1,4 +1,5 @@
 from party.models import Party, Users, Songs
+from queue_it_up.settings import QDEBUG
 
 def get_user(request, party):
     ''' Returns the User object of the current user based on the Request
@@ -47,27 +48,6 @@ def check_permission(pid, request):
         return True
 
 
-def like_song(song, user, request):
-    ''' Increments or Decrements the like field of a Song object based on the
-        request. Prevents user from liking one song multiple times.
-
-    Parameters:
-
-        - request - web request
-        - song - song object
-        - user - user object
-
-    '''
-    if song and not song.duplicate:
-        if 'like' in request.POST:
-            song.likes += 1
-        else:
-            song.likes -= 1
-        song.save()
-    user.hasLiked = True
-    user.save()
-
-
 def assign_leader(party):
     ''' Selects a random user from the party to be the leader to select the next
         category. Prevents a user from having to pick in back to back rounds.
@@ -77,6 +57,7 @@ def assign_leader(party):
         - party - party object
 
     '''
+    debug = []
     leader = Users.objects.filter(
         turn='not_picked',
         party=party,
@@ -90,6 +71,10 @@ def assign_leader(party):
                 picked_last = user.id
             user.turn = 'not_picked'
             user.save()
+            debug.append((user.name, user.turn))
+        print(QDEBUG, 'Reset User Turn: ')
+        print(QDEBUG, debug)
+            
         leader = Users.objects.filter(
             party=party,
             active=True
@@ -101,6 +86,7 @@ def assign_leader(party):
             ).order_by('?').first()
     leader.turn = 'picking'
     leader.save()
+    print(QDEBUG, 'Set Round Leader: ', leader.name, ' - ', leader.turn)
 
 
 def reset_users(party):
@@ -111,10 +97,14 @@ def reset_users(party):
         - party - party object
 
     '''
+    debug = []
     users = Users.objects.filter(party=party, active=True).all()
     for user in users:
         user.hasPicked = False
         user.save()
+        debug.append((user.name, user.hasPicked))
+    print(QDEBUG,'Reset Users Has Picked:')
+    print(QDEBUG, debug)
 
 
 def get_like_total(song):
@@ -146,7 +136,9 @@ def set_user_points(party, round_number):
         - round_number - the number of the current round
 
     '''
-    songs = Songs.objects.filter(category__party=party, category__roundNum=round_number)
+    songs = Songs.objects.filter(
+        category__party=party, category__roundNum=round_number
+    )
     for song in songs:
         user = song.user
         user.points = user.points + song.likes

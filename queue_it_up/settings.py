@@ -13,7 +13,7 @@ import os
 import dj_database_url
 from selenium import webdriver
 
-STATE="PROD"
+STATE="STAGE"
 if STATE=="DEV":
     HEROKU = False
     STAGE = False
@@ -197,3 +197,4 @@ CLIENT_SECRET=os.environ.get("SPOTIFY_CLIENT_SECRET")
 SCOPE = 'user-read-playback-state user-modify-playback-state'
 CLIENT_ID='6de276d9e60548d5b05a7af92a5db3bb'
 SYSTEM=os.environ.get("SYSTEM_USER_ID")
+QDEBUG = 'QDEBUG!: '

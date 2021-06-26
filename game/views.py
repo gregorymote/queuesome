@@ -1,22 +1,22 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from background_task import background
-from party.models import Party, Users, Category, Songs, Searches, Devices
 from utils.util_auth import check_token
 from utils.util_user import (get_user, check_permission, assign_leader,
-    reset_users, set_user_points, reset_user_likes, get_like_total)
+     reset_users, set_user_points, reset_user_likes, get_like_total)
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
      set_lib_repo, get_results, get_totals, get_category_choices,
      create_category, check_duplicate, wait_for_song)
 from utils.util_device import activate_device, get_devices
+from django.http import HttpResponseRedirect, JsonResponse
+from party.models import Party, Users, Category, Songs, Searches, Devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
      settingsForm)
-from queue_it_up.settings import URL
 import spotipy
 import time
 import threading
 import random
+from queue_it_up.settings import URL, QDEBUG
 
 
 def lobby(request, pid):
@@ -51,15 +51,15 @@ def lobby(request, pid):
         party = Party.objects.get(pk=pid)
         if party.started:
             return HttpResponseRedirect(reverse('play', kwargs={'pid': pid}))
-    u = get_user(request, pid)
     users = Users.objects.filter(party=pid, active=True).all()
     names=[]
     for user in users:
         names.append(user.name)
+    current_user = get_user(request, pid)
     context = {
         'party':party,
         'names':names,
-        'access':u.isHost,
+        'access':current_user.isHost,
         'form':form,
         'URL':URL,
     }
@@ -257,6 +257,7 @@ def update_like(request):
             user.hasLiked = False
             user.hasSkip = False
     user.save()
+    print(QDEBUG,user.name, ': Set User Like: ', user.hasLiked, ' Set User Dislike: ', user.hasSkip)
     data = {}
     return JsonResponse(data)
 
@@ -277,23 +278,25 @@ def run_game(pid):
 
         if Party.objects.filter(pk=pid,active=True,state='assign').first() or (
             Party.objects.filter(pk=pid,active=True,state='choose_category'
-            ).first() 
+                ).first() 
             and not 
             Users.objects.filter(turn='picking',party__pk=pid,active=True
-            ).first()
-            ):
+                ).first()
+           ):
             party = Party.objects.get(pk=pid)
             assign_leader(party)
             party.state = 'choose_category'
-            party.save() 
+            party.save()
+            print(QDEBUG,'Set state to choose category: ', party.state)
                     
         if Party.objects.filter(pk=pid,active=True,state='pick_song').first() \
                 and not \
                 Users.objects.filter(hasPicked=False,party__pk=pid,active=True
-                ).all():
+            ).all():
             party = Party.objects.get(pk=pid)
             party.state = 'assign'
             party.save()
+            print(QDEBUG,'Set state to assign: ', party.state)
             reset_users(party) 
         
         party = Party.objects.get(pk=pid)
@@ -308,18 +311,20 @@ def run_game(pid):
                 category__roundNum=party.roundNum,
                 state='not_played',
                 category__full=True
-            ):
+          ):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
             party = Party.objects.get(pk=pid)
             party.thread = True
             party.save()
+            print(QDEBUG,'Set Thread to True: ', party.thread)
 
         if Party.objects.filter(pk=pid,active=True,device_error=True).first():
             party = Party.objects.get(pk=pid) 
             party.device_error = activate_device(party_id=party.id)
             if not party.device_error:
                 party.save()
+                ('Reset Device Error Flag: ', party.device_error)
 
 
 def choose_category(request, pid):
@@ -356,17 +361,20 @@ def choose_category(request, pid):
                 party.state = 'pick_song'
                 party.roundTotal = party.roundTotal + 1
                 party.save()
+                print(QDEBUG,'Set state to pick_song: ', party.state, ' Round Total: ',
+                    party.roundTotal)
                 party = Party.objects.get(pk=pid)
                 remaining_users = Users.objects.filter(
                     party=party,
-                    turn='not_picked',
-                    active=True
+                    active=True,
+                    turn='not_picked'
                 ).all()
                 if not remaining_users:
                     user.turn = 'has_picked_last'
                 else:
                     user.turn = 'has_picked'
                 user.save()
+                print(QDEBUG,'Set Leader Turn to: ',user.name, ' - ', user.turn)
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = chooseCategoryForm(repo=choices,
@@ -423,14 +431,17 @@ def pick_song(request, pid):
                 Searches.objects.filter(user=user, party=party).delete()
                 user.hasPicked = True
                 user.save()
+                print(QDEBUG,'Set User has Picked: ', user.name, ' - ', user.hasPicked)
                 not_picked = Users.objects.filter(
                     party=party,
                     active=True,
                     hasPicked=False
                 ).all()
+                print(QDEBUG,'Not Picked: ', not_picked)
                 if not not_picked:
                     category.full = True
                     category.save()
+                    print(QDEBUG,'Set Category to Full: ', category.full)
                 return HttpResponseRedirect(
                     reverse('play', kwargs={'pid':pid})
                 )
@@ -640,7 +651,8 @@ def play_songs(pid):
     party = Party.objects.get(pk=pid)
     if party.device_error:
         party.device_error = False
-    party.save()
+        party.save()
+        print(QDEBUG,'Reset Device Error: ', party.device_error)
     while (Songs.objects.filter(
             category__party=party,
             category__roundNum=party.roundNum,
@@ -677,11 +689,13 @@ def play_songs(pid):
             song.state = 'playing'
             song.startTime = time.time()
             song.save()
+            print(QDEBUG,'Set Song to playing: ', song.name, ' - ', song.state)
             wait_for_song(song)
         song = Songs.objects.filter(pk=song.pk).first()
         song.state = 'played'
         song.likes = get_like_total(song) 
         song.save()
+        print(QDEBUG,'Set Song to played: ', song.name, ' - ', song.state)
         reset_user_likes(party)
         party = Party.objects.get(pk=pid)
         if not Songs.objects.filter(category__party=party,
@@ -691,8 +705,10 @@ def play_songs(pid):
             set_user_points(party, party.roundNum) 
             party.roundNum += 1
             party.save()
+            print(QDEBUG,'Increment Round Number: ', party.roundNum)
     party = Party.objects.get(pk=pid)
     party.thread = False
     party.save()
-    print('EXITING THREAD')
+    print(QDEBUG,'Set Thread Flag to False: ', party.thread)
+    print(QDEBUG,'EXITING THREAD')
 
