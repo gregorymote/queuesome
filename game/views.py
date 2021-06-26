@@ -294,6 +294,11 @@ def run_game(pid):
                 Users.objects.filter(hasPicked=False,party__pk=pid,active=True
             ).all():
             party = Party.objects.get(pk=pid)
+            category = Category.objects.filter(
+                party=party,roundNum=party.roundTotal).first()
+            category.full = True
+            category.save()
+            print(QDEBUG,'Set Category to Full: ', category.full)
             party.state = 'assign'
             party.save()
             print(QDEBUG,'Set state to assign: ', party.state)
@@ -432,16 +437,16 @@ def pick_song(request, pid):
                 user.hasPicked = True
                 user.save()
                 print(QDEBUG,'Set User has Picked: ', user.name, ' - ', user.hasPicked)
-                not_picked = Users.objects.filter(
-                    party=party,
-                    active=True,
-                    hasPicked=False
-                ).all()
-                print(QDEBUG,'Not Picked: ', not_picked)
-                if not not_picked:
-                    category.full = True
-                    category.save()
-                    print(QDEBUG,'Set Category to Full: ', category.full)
+                ##not_picked = Users.objects.filter(
+                ##    party=party,
+                ##    active=True,
+                ##    hasPicked=False
+                ##).all()
+                ##print(QDEBUG,'Not Picked: ', not_picked)
+                ##if not not_picked:
+                ##    category.full = True
+                ##    category.save()
+                ##    print(QDEBUG,'Set Category to Full: ', category.full)
                 return HttpResponseRedirect(
                     reverse('play', kwargs={'pid':pid})
                 )
