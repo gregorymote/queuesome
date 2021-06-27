@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% block right_header %}<a href="/blog"><em><span style="font-family: 'Righteous', cursive; color:white;">the blog</span></em></a>{% endblock %}
+
 {% block page_content %}
 
 <style>
@@ -18,7 +20,11 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ post.title }}</h2>
                     <p class="card-text text-muted h6">{{ post.author }} | {{ post.created_on}} </p>
+                    {% if post.preview != "" %}
+                    <p class="card-text">{{post.preview}}</p>
+                    {% else %}
                     <p class="card-text">{{post.content|slice:":200" }}</p>
+                    {% endif %}
                     <a href="{% url 'post_detail' post.slug  %}" class="btn btn-outline-primary">Read More &rarr;</a>
                 </div>
             </div>
