@@ -3,7 +3,6 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-<html lang="en">
 <div class="container">
 	<div class="text-center">
 		<h5>Users</h5>
@@ -38,7 +37,7 @@
                     {% endif %}
                     {% endfor %}
                     {% if isHost and not u.isHost %}
-                    <td><button class="btn text-danger bg-white " name = {{u.sessionID}}> <i class="fa fa-times"></i></button></td>
+                    <td><button class="btn text-danger bg-white " name = {{u.sessionID}}> <em class="fa fa-times"></em></button></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
@@ -46,7 +45,7 @@
         </table>
 
 		<div class="text-right pt-3">
-            <input type="submit" class="btn btn-outline-primary" name="back" value="Back"></input>
+            <a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-primary">Back</a>
             {% if isHost %}
 			<input type="submit" class="btn btn-outline-primary" name="skip" value="Skip to Next Round"></input>
             {% endif %}

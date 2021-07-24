@@ -437,16 +437,6 @@ def pick_song(request, pid):
                 user.hasPicked = True
                 user.save()
                 print(QDEBUG,'Set User has Picked: ', user.name, ' - ', user.hasPicked)
-                ##not_picked = Users.objects.filter(
-                ##    party=party,
-                ##    active=True,
-                ##    hasPicked=False
-                ##).all()
-                ##print(QDEBUG,'Not Picked: ', not_picked)
-                ##if not not_picked:
-                ##    category.full = True
-                ##    category.save()
-                ##    print(QDEBUG,'Set Category to Full: ', category.full)
                 return HttpResponseRedirect(
                     reverse('play', kwargs={'pid':pid})
                 )
@@ -576,17 +566,15 @@ def settings(request, pid):
 def users(request, pid):
 
     party = get_party(pid)
-    user = get_user(request, party)
-    if party == -1 or user == -1:
+    current_user = get_user(request, party)
+    if party == -1 or current_user == -1:
         return HttpResponseRedirect(reverse('index'))
     users = Users.objects.filter(party=party, active=True).all()
     if request.method == 'POST':
         form = blankForm(request.POST)
         if form.is_valid():
-            party = Party.objects.get(pk = pid)
-            if ('back' in request.POST):
-                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
-            elif ('skip' in request.POST):
+            party = Party.objects.get(pk=pid)
+            if ('skip' in request.POST):
                 if party.roundNum == party.roundTotal:
                     category = Category.objects.filter(
                         party=party,
@@ -594,12 +582,7 @@ def users(request, pid):
                     ).first()
                     category.full = True
                     category.save()
-                    users = Users.objects.filter(party=party, active=True).all()
-                    for x in users:
-                        x.hasPicked = False
-                        x.save()
-                    party.state = 'assign'
-                    party.save()
+                    reset_users(party)
                 elif party.roundNum > party.roundTotal:
                     lead = Users.objects.filter(
                         party=party,
@@ -609,15 +592,15 @@ def users(request, pid):
                     if lead:
                         lead.turn='picked'
                         lead.save()
-                    party.state = 'assign'
-                    party.save()
+                party.state = 'assign'
+                party.save()
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
             else:
-                for x in users:
-                    if (x.sessionID in request.POST):
-                        x.active=False
-                        x.sessionID = ""
-                        x.save()
+                for user in users:
+                    if (user.sessionID in request.POST):
+                        user.active=False
+                        user.sessionID = ""
+                        user.save()
                         not_picked = Users.objects.filter(
                             party=party,
                             active=True,
@@ -644,10 +627,11 @@ def users(request, pid):
         'has_picked_last':'Yes',
     }
     context = {
+        'party':party,
         'form' : form,
         'users':users,
         'decode':decode,
-        'isHost':user.isHost,
+        'isHost':current_user.isHost,
     }    
     return render(request, 'game/users.html', context)
 
