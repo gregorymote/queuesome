@@ -43,6 +43,7 @@ def set_device(request, pid):
     if not check_permission(pid, request):
         return HttpResponseRedirect(reverse('index'))
     party = Party.objects.get(pk=pid)
+    party.save()
     device = get_active_device(party)
     if request.method == 'POST':
         form = BlankForm(request.POST)
@@ -68,6 +69,8 @@ def update_set_device(request):
     device = get_active_device(party)
     if get_inactivity(pid,20):
         stop = True
+    else:
+        stop = False
     data = {
         'device': device,
         'stop': stop
