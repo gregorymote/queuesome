@@ -22,7 +22,6 @@
 			var c = getIconClass(type);
 			icon.className = '';
 			icon.classList.add('device', c['glyph'], c['sub']);
-			console.log(active)
 			if(active){
 				icon.style.color = '#1ed760';
 				submit.disabled = false;
@@ -42,7 +41,7 @@
 
 		function getIconClass(type){
 			sub = "fas";
-			if (type == 'None'){
+			if (type == null || type == 'None'){
 				glyph = "fa-exclamation-circle";
 			}
 			else if(type =="smartphone" ){
