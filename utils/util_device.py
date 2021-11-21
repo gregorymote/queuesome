@@ -21,7 +21,6 @@ def activate_device(party_id):
                 )
             else:
                 flag = False
-        #print(device)
     if flag:
         p.debug = p.debug + " **!!!** Device Not Found"
         p.save()
@@ -47,6 +46,7 @@ def get_devices(party):
     token = check_token(token_info=party.token_info, party_id=party.pk)
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
+    print(device_results)
     device_results = device_results['devices']
     curr_devices = []       
     for result in device_results:
@@ -65,3 +65,28 @@ def get_devices(party):
     for device in all_devices:
         if device.deviceID not in curr_devices:
             device.delete()
+
+def get_active_device(party):
+    token = check_token(token_info=party.token_info, party_id=party.pk)
+    spotify_object = spotipy.Spotify(auth=token)
+    device_results = spotify_object.devices()
+    devices = device_results['devices']
+    for device in devices:
+        if device['is_active']:
+            return {
+                'id': device['id'],
+                'name': device['name'],
+                'type': device['type'].lower(),
+                'active': check_playback(spotify_object)
+                }
+    return {
+        'id': None,
+        'name': 'No Active Device Found',
+        'type': None,
+        'active': None
+        }
+
+
+def check_playback(spotify):
+    playback = spotify.currently_playing()
+    return playback and playback['is_playing']

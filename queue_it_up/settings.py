@@ -14,7 +14,7 @@ import os
 import dj_database_url
 from selenium import webdriver
 
-STATE="PROD"
+STATE="DEV"
 if STATE=="DEV":
     HEROKU = False
     STAGE = False

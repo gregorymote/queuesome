@@ -3,12 +3,13 @@ from utils.util_auth import create_token, check_token, get_url
 from utils.util_user import get_user, check_permission
 from utils.util_party import get_inactivity
 from utils.util_rand import get_code
-from utils.util_device import get_devices
+from utils.util_device import get_devices, get_active_device
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from party.models import Party, Users, Devices
-from party.forms import NamePartyForm, CreateUserForm, ChooseDeviceForm
+from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
+ BlankForm)
 from queue_it_up.settings import IP, PORT, HEROKU
 
 
@@ -34,8 +35,44 @@ def auth(request):
     else:
         return HttpResponseRedirect(reverse('index'))
     return HttpResponseRedirect(
-        reverse('choose_device', kwargs={'pid': party.pk,})
+        reverse('set_device', kwargs={'pid': party.pk,})
     )
+
+
+def set_device(request, pid):
+    if not check_permission(pid, request):
+        return HttpResponseRedirect(reverse('index'))
+    party = Party.objects.get(pk=pid)
+    device = get_active_device(party)
+    if request.method == 'POST':
+        form = BlankForm(request.POST)
+        if form.is_valid():
+            party.deviceID = device['id']
+            party.save()
+            return HttpResponseRedirect(
+                reverse('start_party', kwargs={'pid': party.pk})
+            )
+    else:
+        form = BlankForm(initial={'device': ''})
+    context = {
+        'form': form,
+        'device':device,
+        'party':party
+    }
+    return render(request, 'party/set_device.html', context)
+
+
+def update_set_device(request):
+    pid = request.GET.get('pid', None)
+    party = Party.objects.get(pk=pid)
+    device = get_active_device(party)
+    if get_inactivity(pid,20):
+        stop = True
+    data = {
+        'device': device,
+        'stop': stop
+    }
+    return JsonResponse(data)
 
 
 def choose_device(request, pid):
