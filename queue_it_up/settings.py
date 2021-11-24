@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import dj_database_url
-from selenium import webdriver
 
 STATE="STAGE"
 if STATE=="DEV":
