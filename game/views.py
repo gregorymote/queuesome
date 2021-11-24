@@ -7,7 +7,7 @@ from utils.util_user import (get_user, check_permission, assign_leader,
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
      set_lib_repo, get_results, get_totals, get_category_choices,
      create_category, check_duplicate, wait_for_song)
-from utils.util_device import activate_device, get_devices
+from utils.util_device import activate_device, get_devices, get_active_device
 from django.http import HttpResponseRedirect, JsonResponse
 from party.models import Party, Users, Category, Songs, Searches, Devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -56,12 +56,17 @@ def lobby(request, pid):
     for user in users:
         names.append(user.name)
     current_user = get_user(request, pid)
+    if current_user.isHost:
+        device = get_active_device(party)
+    else:
+        device = {}
     context = {
         'party':party,
         'names':names,
         'access':current_user.isHost,
         'form':form,
         'URL':URL,
+        'device': device
     }
     return render(request, 'game/lobby.html', context)
 
@@ -133,6 +138,12 @@ def play(request, pid):
 
     results = get_results(party)
     totals = get_totals(party)
+
+    if user.isHost:
+        device = get_active_device(party)
+    else:
+        device = {}
+
     context = {
         'party': party,
         'user' : user,
@@ -142,6 +153,7 @@ def play(request, pid):
         'totals': totals,
         'URL':URL,
         'full': full,
+        'device':device
     }
     
     return render(request, 'game/play.html', context)
@@ -530,8 +542,7 @@ def settings(request, pid):
     if not check_permission(pid, request):
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     party = get_party(pid)
-    invalid = False
-    get_devices(party)
+    device = get_active_device(party)
     if request.method == 'POST':
         form = settingsForm(request.POST, partyObject=party)
         if form.is_valid():
@@ -540,25 +551,20 @@ def settings(request, pid):
                 clean_up_party(party.pk)
                 return HttpResponseRedirect(reverse('index'))   
             else:
-                device = form.cleaned_data['device']
-                if device != None:
-                    party.deviceID=device.deviceID
-                    time = form.cleaned_data['time']
-                    party.time = time
-                    party.device_error = False
-                    party.save()
-                    return HttpResponseRedirect(
-                        reverse('play', kwargs={'pid':pid})
-                    )
-                else:
-                    invalid = True
+                time = form.cleaned_data['time']
+                party.time = time
+                party.device_error = False
+                party.save()
+                return HttpResponseRedirect(
+                    reverse('lobby', kwargs={'pid':pid})
+                )
     else:
         form = settingsForm(partyObject=party, initial={'time':party.time,})
 
     context = {
         'party':party,
         'form':form,
-        'invalid':invalid,
+        'device':device
     }    
     return render(request, 'game/settings.html', context)
 

@@ -1,6 +1,41 @@
 <!DOCTYPE html>
 
 {% extends "base.html" %}
+{% block settings %}
+<style>
+	.device{
+		font-size: 24px;
+	}
+</style>
+
+<script>
+
+	window.onload = function() {
+		setDeviceIcon('{{device.active}}'=='True','{{device.type}}', '{{device.name}}');
+	};
+	var inactivity = false;
+
+		setInterval(function () {
+			if (!inactivity){
+				$.ajax({
+					url: '/party/update_set_device',
+					data: {
+					'pid': {{ party.pk }}
+					},
+					dataType: 'json',
+					success: function (data) {
+						setDeviceIcon(data.device.active, data.device.type, data.device.name)
+						inactivity = data.stop;
+					}
+				});
+			}
+		}, 1000);
+</script>
+
+
+<a><em id="device" class="device"></em></a>
+{% endblock %}
+
 
 {% block page_content %}
 	<div class = "container">

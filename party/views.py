@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from party.models import Party, Users, Devices
 from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
  BlankForm)
-from queue_it_up.settings import IP, PORT, HEROKU
+from queue_it_up.settings import IP, PORT, HEROKU, QDEBUG
 
 
 def auth(request):
@@ -67,6 +67,10 @@ def update_set_device(request):
     pid = request.GET.get('pid', None)
     party = Party.objects.get(pk=pid)
     device = get_active_device(party)
+    if device["id"] != party.deviceID and device["id"]:
+        party.deviceID = device['id']
+        party.save()
+        print(QDEBUG,'Set Party Device')
     if get_inactivity(pid,20):
         stop = True
     else:
@@ -133,6 +137,7 @@ def name_party(request, pid):
     if not check_permission(pid, request):
         return HttpResponseRedirect(reverse('index'))
     party = Party.objects.get(pk=pid)
+    device = get_active_device(party)
     user = get_user(request, party)
     if user == -1:
         return HttpResponseRedirect(reverse('index'))
@@ -165,6 +170,8 @@ def name_party(request, pid):
         )
     context = {
         'form': form,
+        'device': device,
+        'party': party
     }
     return render(request, 'party/name_party.html', context)
 
