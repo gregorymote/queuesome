@@ -50,7 +50,7 @@ class searchResultsForm(forms.Form):
 
 class settingsForm(forms.Form):
 
-    time = forms.IntegerField(validators=[MinValueValidator(30)])
+    time = forms.IntegerField(validators=[MinValueValidator(30)], widget=forms.TextInput(attrs={'class':'form-control',}))
     device = forms.ModelChoiceField(queryset=Devices.objects.all(), required = False, widget=forms.Select(attrs={'class':'form-control'}))
         
     def __init__(self,*args,**kwargs):
