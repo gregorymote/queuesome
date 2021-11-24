@@ -13,6 +13,7 @@
 	$(document).ready(function() {
 		var time = document.getElementById("id_time");
 		time.addEventListener("focusout", validateTime);
+		time.classList.add('form-control');
 	});
 	function validateTime(e){
 		if(e.target.value < 30){
