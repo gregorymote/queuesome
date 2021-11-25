@@ -556,7 +556,7 @@ def settings(request, pid):
                 party.device_error = False
                 party.save()
                 return HttpResponseRedirect(
-                    reverse('lobby', kwargs={'pid':pid})
+                    reverse('start_party', kwargs={'pid':pid})
                 )
     else:
         form = settingsForm(partyObject=party, initial={'time':party.time,})

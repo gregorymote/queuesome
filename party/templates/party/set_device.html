@@ -10,9 +10,9 @@
 		}
 	</style>
 	<script>
-		window.onload = function() {
+		$(document).ready(function() {
 			setActiveProperties('{{device.active}}'=='True','{{device.type}}', '{{device.name}}');
-		};
+		});
 
 		var inactivity = false;
 
@@ -43,7 +43,7 @@
 				<div class = "card">
 					<div class="pl-4 pt-2 pb-2 text-left row">
 						<div class = "col-1 pr-0">
-							<em id="device" class="fas fa-exclamation-circle device"></em>
+							<em id="device" class="device"></em>
 						</div>
 						<div id="name" class="col-11 text-left pl-5 pt-1">
 							No Active Device Found

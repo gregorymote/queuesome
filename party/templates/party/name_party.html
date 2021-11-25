@@ -10,9 +10,9 @@
 
 <script>
 
-	window.onload = function() {
+	$(document).ready(function() {
 		setDeviceIcon('{{device.active}}'=='True','{{device.type}}', '{{device.name}}');
-	};
+	});
 	var inactivity = false;
 
 		setInterval(function () {
@@ -33,7 +33,7 @@
 </script>
 
 
-<a><em id="device" class="device"></em></a>
+<a href="{% url 'settings' pid=party.id %}"><em id="device" class="device"></em></a>
 {% endblock %}
 
 

@@ -10,9 +10,9 @@
 
 <script>
 	if('{{user.isHost}}' == 'True'){
-		window.onload = function() {
+		$(document).ready(function() {
 			setDeviceIcon('{{device.active}}'=='True','{{device.type}}', '{{device.name}}');
-		};
+		});
 		var inactivity = false;
 
 		setInterval(function () {

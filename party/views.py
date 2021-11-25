@@ -81,7 +81,7 @@ def update_set_device(request):
     }
     return JsonResponse(data)
 
-
+#OBE
 def choose_device(request, pid):
     if not check_permission(pid, request):
         return HttpResponseRedirect(reverse('index'))
@@ -105,7 +105,7 @@ def choose_device(request, pid):
     }
     return render(request, 'party/choose_device.html', context)
 
-
+#OBE
 def update_devices(request):
     pid = request.GET.get('pid', None)
     party = Party.objects.get(pk=pid)
@@ -141,7 +141,7 @@ def name_party(request, pid):
     user = get_user(request, party)
     if user == -1:
         return HttpResponseRedirect(reverse('index'))
-    if party.started:
+    if party.name or party.started:
         return HttpResponseRedirect(reverse('lobby', kwargs={'pid': party.pk}))
     if request.method == 'POST':
         form = NamePartyForm(request.POST)
