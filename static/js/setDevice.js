@@ -48,10 +48,10 @@ function setDeviceIcon(active, type, name){
     icon.className = '';
     icon.classList.add('device', c['glyph'], c['sub']);
     if(active){
-        icon.style.color = 'white';
+        icon.style.color = '#1ed760';
     }
     else{
-        icon.style.color = 'lightgray';
+        icon.style.color = 'red';
     }
 }
 
