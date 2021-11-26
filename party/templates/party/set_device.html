@@ -38,7 +38,12 @@
 			{% csrf_token %}
 			<div class = "pt-2">
 				<div class = "pb-3">
-					<h5>Open Spotify to Set Playback Device</h5>
+					<h5>Set Playback Device in Spotify</h5>
+				</div>
+				<div id="message" class = "pl-3 pb-3">
+					<h5>1. Open Spotify</h5>
+					<h5>2. Shuffle Your Fav Playlist</h5>
+					<h5>3. Click Continue Below</h5>
 				</div>
 				<div class = "card">
 					<div class="pl-4 pt-2 pb-2 text-left row">
@@ -50,9 +55,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="text-center">
-					<small id="message" style="color:gray; display:none">inactive device, select play in Spotify to activate device</small>
-				</div>
+
 				<div class="text-right pt-2">
 					<input id="submit" type="submit" class="btn btn-outline-secondary" value="Continue" disabled></div>
 				</div>
