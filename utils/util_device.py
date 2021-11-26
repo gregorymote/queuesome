@@ -90,4 +90,5 @@ def get_active_device(party):
 
 def check_playback(spotify):
     playback = spotify.currently_playing()
+    print(QDEBUG, playback)
     return playback and playback['is_playing']
