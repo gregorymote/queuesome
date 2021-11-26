@@ -193,7 +193,7 @@ def update_play(request):
 
     results = get_results(party)
     totals = get_totals(party)
-
+ 
     party_info = {
 		"device_error" : str(party.device_error),
 		"name" : party.name,
@@ -284,7 +284,6 @@ def run_game(pid):
 
     '''
     while(Party.objects.filter(pk=pid, active=True).first()):
-        count = 0
         if get_inactivity(pid,20):
             clean_up_party(pid)
 
@@ -336,13 +335,7 @@ def run_game(pid):
             party.save()
             print(QDEBUG,'Set Thread to True: ', party.thread)
 
-        if Party.objects.filter(pk=pid,active=True,device_error=True).first():
-            party = Party.objects.get(pk=pid) 
-            party.device_error = activate_device(party_id=party.id)
-            if not party.device_error:
-                party.save()
-                print(QDEBUG, 'Reset Device Error Flag: ', party.device_error)
-    print("exiting task: ", Party.objects.filter(pk=pid, active=True).first())
+    print(QDEBUG, "exiting task: ", Party.objects.filter(pk=pid, active=True).first())
 
 
 def choose_category(request, pid):
@@ -669,7 +662,6 @@ def play_songs(pid):
             try:   
                 token = check_token(token_info=party.token_info, party_id=pid)
                 spotify_object = spotipy.Spotify(auth=token)
-                activate_device(party_id=pid)
                 spotify_object.start_playback(
                     device_id=party.deviceID, uris=[song.uri])
             except Exception as e:
