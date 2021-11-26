@@ -341,7 +341,8 @@ def run_game(pid):
             party.device_error = activate_device(party_id=party.id)
             if not party.device_error:
                 party.save()
-                ('Reset Device Error Flag: ', party.device_error)
+                print(QDEBUG, 'Reset Device Error Flag: ', party.device_error)
+    print("exiting task: ", Party.objects.filter(pk=pid, active=True).first())
 
 
 def choose_category(request, pid):
