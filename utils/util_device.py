@@ -1,6 +1,7 @@
 from party.models import Party, Devices
 from utils.util_auth import check_token
 import spotipy
+from queue_it_up.settings import QDEBUG
 
 def activate_device(party_id):
     p = Party.objects.get(pk = party_id)
@@ -70,6 +71,7 @@ def get_active_device(party):
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
     devices = device_results['devices']
+    print(QDEBUG, devices)
     for device in devices:
         if device['is_active']:
             return {
