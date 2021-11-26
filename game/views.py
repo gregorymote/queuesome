@@ -284,7 +284,9 @@ def run_game(pid):
 
     '''
     while(Party.objects.filter(pk=pid, active=True).first()):
-        
+        count = 0
+        if(count % 1000 == 0):
+            print(QDEBUG , '...')
         if get_inactivity(pid,20):
             clean_up_party(pid)
 
