@@ -78,42 +78,36 @@
 
 		<!-- Button to Open the Modal -->
 		<div class="pt-5 text-center">
-			<button type="button" class="btn btn-outline-danger btn-lg" data-toggle="modal" data-target="#myModal">
+			<button type="button" class="btn btn-outline-danger btn-lg" data-toggle="modal" data-target="#killModal">
 				Kill Party
 			</button>
 		</div>
 
-
-		<!-- The Modal -->
-		<div class="modal fade" id="myModal">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-dialog modal-dialog-scrollable">
-					<div class="modal-content">
-
-						<!-- Modal Header -->
-						<div class="modal-header">
-							<h4 class="modal-title">Kill this Party?</h4>
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-						</div>
-
-						<!-- Modal body -->
-						<div class="modal-body">
-							<i>If we stay here...The Party Dies</i>
-							<div class="text-right">
-								<p>- Cash Levy</p>
-							</div>
-						</div>
-
-						<!-- Modal footer -->
-						<div class="modal-footer">
-							<input type="submit" class="btn btn-outline-danger" name="kill" value="Kill Party"></input>
-						</div>
+		<div class="modal fade" id="killModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<!-- Modal body -->
+				<div class="modal-body">
+					<i>If we stay here...The Party Dies</i>
+					<div class="text-right">
+						<p>- Cash Levy</p>
 					</div>
+				</div>
+
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<input type="submit" class="btn btn-outline-danger" name="kill" value="Kill Party"></input>
 				</div>
 			</div>
 		</div>
+	</div>
 	</form>
 </div>
-
 </html>
 {% endblock %}
