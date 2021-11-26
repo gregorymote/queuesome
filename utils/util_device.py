@@ -46,7 +46,6 @@ def get_devices(party):
     token = check_token(token_info=party.token_info, party_id=party.pk)
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
-    print(device_results)
     device_results = device_results['devices']
     curr_devices = []       
     for result in device_results:
@@ -71,7 +70,6 @@ def get_active_device(party):
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
     devices = device_results['devices']
-    print(QDEBUG, devices)
     for device in devices:
         if device['is_active']:
             return {
@@ -90,5 +88,4 @@ def get_active_device(party):
 
 def check_playback(spotify):
     playback = spotify.currently_playing()
-    print(QDEBUG, playback)
     return playback and playback['is_playing']

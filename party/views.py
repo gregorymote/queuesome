@@ -69,6 +69,7 @@ def update_set_device(request):
     device = get_active_device(party)
     if device["id"] != party.deviceID and device["id"]:
         party.deviceID = device['id']
+        party.device_error = False
         party.save()
         print(QDEBUG,'Set Party Device')
     if get_inactivity(pid,20):
