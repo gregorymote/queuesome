@@ -42,6 +42,7 @@ def is_device_active(party_id):
             return(True)
     return False
 
+
 def get_devices(party):
     token = check_token(token_info=party.token_info, party_id=party.pk)
     spotify_object = spotipy.Spotify(auth=token)
@@ -70,6 +71,7 @@ def get_active_device(party):
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()
     devices = device_results['devices']
+    print(devices)
     for device in devices:
         if device['is_active']:
             return {

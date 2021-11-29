@@ -28,7 +28,6 @@ def index(request):
         if form.is_valid():
             party = Party()
             party.save()
-            print(party.name)
             old_users = Users.objects.filter(sessionID=session_key, active=True)
             for user in old_users:
                 if user.isHost:
