@@ -83,6 +83,9 @@ def update_set_device(request):
         'device': device,
         'stop': stop
     }
+    print(QDEBUG, "++++++++++++++++++++")
+    print(QDEBUG, data)
+    print(QDEBUG, "++++++++++++++++++++")
     return JsonResponse(data)
 
 #OBE
