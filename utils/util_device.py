@@ -72,9 +72,9 @@ def get_active_device(party):
     device_results = spotify_object.devices()
     devices = device_results['devices']
     #print(QDEBUG, spotify_object.current)
-    for device in devices:
-        print(QDEBUG, device["name"], device["type"], device["is_active"])
-    print(QDEBUG, "====================================================")
+    #for device in devices:
+    #    print(QDEBUG, device["name"], device["type"], device["is_active"])
+    #print(QDEBUG, "====================================================")
 
     for device in devices:
         
