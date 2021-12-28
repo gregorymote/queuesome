@@ -70,6 +70,8 @@ def get_url(path, is_cloud, ip, port):
     while path[i] != '\'':
         i = i + 1
     end = i
+    if path[start:end] == '/party/auth/':
+        return 'access_denied'
     if is_cloud:
         url = ip + path[start:end]
     else:
@@ -101,7 +103,7 @@ def create_token(url, scope=SCOPE, client_id=CLIENT_ID,
 def check_token(token_info, party_id, scope=SCOPE, client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET, redirect_uri=URI):
     token_info = literal_eval(token_info)
-    p = Party.objects.get(pk=party_id)
+    party = Party.objects.get(pk=party_id)
     sp_oauth = oauth2.SpotifyOAuth(
         client_id=client_id,
         client_secret=client_secret, 
@@ -110,9 +112,9 @@ def check_token(token_info, party_id, scope=SCOPE, client_id=CLIENT_ID,
     )
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
-        p.token = token_info['access_token']
-        p.token_info = token_info
-        p.save()
-    return p.token
+        party.token = token_info['access_token']
+        party.token_info = token_info
+        party.save()
+    return party.token
 
 

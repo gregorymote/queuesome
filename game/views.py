@@ -33,7 +33,7 @@ def lobby(request, pid):
     party = get_party(pid)
     if party == -1:
         return HttpResponseRedirect(reverse('index'))
-    if get_inactivity(pid,20):
+    if get_inactivity(pid,19):
         clean_up_party(party.pk)
     if request.method == 'POST':
         form = blankForm(request.POST)
@@ -81,18 +81,18 @@ def update_lobby(request):
 
     '''
     pid = request.GET.get('pid', None)
-    p = Party.objects.get(pk = pid)
-    if get_inactivity(pid,20):
-        clean_up_party(p.pk)
+    party = Party.objects.get(pk = pid)
+    if get_inactivity(pid,19):
+        clean_up_party(party.pk)
     users = Users.objects.filter(party=pid, active=True).all()
     names=[]
     for user in users:
         names.append(user.name)
     data = {
         'size': users.count(),
-        'started': p.started,
+        'started': party.started,
         'names': names,
-        'inactive': p.active
+        'inactive': party.active
     }
     return JsonResponse(data)
 
@@ -172,7 +172,7 @@ def update_play(request):
     '''
     pid = request.GET.get('pid', None)
     party = Party.objects.get(pk=pid)
-    if get_inactivity(pid,20):
+    if get_inactivity(pid,19):
         party.active = False
     
     user = get_user(request, pid)
@@ -284,7 +284,7 @@ def run_game(pid):
 
     '''
     while(Party.objects.filter(pk=pid, active=True).first()):
-        if get_inactivity(pid,20):
+        if get_inactivity(pid,19):
             clean_up_party(pid)
 
         if Party.objects.filter(pk=pid,active=True,state='assign').first() or (
@@ -425,7 +425,17 @@ def pick_song(request, pid):
         form = searchForm(request.POST)
         if form.is_valid():
             result = form.cleaned_data['result']
-            if result != '-1':
+            picked_song = Songs.objects.filter(
+                user=user, category=category
+                ).first()
+            if picked_song:
+                user.hasPicked = True
+                user.save()
+                print(QDEBUG,'Set User has Picked: ', user.name, ' - ', user.hasPicked)
+                return HttpResponseRedirect(
+                    reverse('play', kwargs={'pid':pid})
+                )
+            elif result != '-1':
                 search = Searches.objects.filter(uri=result).first()
                 Songs(
                     name=search.name,

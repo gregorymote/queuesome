@@ -39,7 +39,7 @@ class Party(models.Model):
     created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 class Users(models.Model):
     name = models.CharField(max_length=35)
@@ -55,7 +55,7 @@ class Users(models.Model):
     refreshRate = models.IntegerField(default=5, null=True)
     created = models.DateTimeField(auto_now_add=True, blank=True)
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -67,7 +67,7 @@ class Category(models.Model):
     created = models.DateTimeField(auto_now_add=True, blank=True)
     
     def __str__(self):
-        return self.name
+        return self.name or ''
     
 
 class Library(models.Model):
@@ -84,7 +84,7 @@ class Library(models.Model):
         super(Library, self).save(*args, **kwargs) 
 
     def __str__(self):
-        return self.display
+        return self.display or ''
     
 class Songs(models.Model):
     name = models.CharField(max_length=500)
@@ -104,13 +104,13 @@ class Songs(models.Model):
     created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 class Likes(models.Model):
     num = models.IntegerField(default=0)
 
     def __str__(self):
-        return str(self.pk)
+        return str(self.pk) or ''
 
 class Devices(models.Model):
     name = models.CharField(max_length=100)
@@ -119,7 +119,7 @@ class Devices(models.Model):
     created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 class Searches(models.Model):
     name = models.CharField(max_length=500)
@@ -131,4 +131,4 @@ class Searches(models.Model):
     duration=models.IntegerField(default=0, null=True)
     created = models.DateTimeField(auto_now_add=True, blank=True)
     def __str__(self):
-        return self.name
+        return self.name or ''

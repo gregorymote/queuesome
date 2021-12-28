@@ -1,7 +1,7 @@
 import spotipy
 from utils.util_auth import create_token, check_token, get_url
 from utils.util_user import get_user, check_permission
-from utils.util_party import get_inactivity
+from utils.util_party import get_inactivity, clean_up_party
 from utils.util_rand import get_code
 from utils.util_device import get_devices, get_active_device
 from django.shortcuts import render
@@ -11,20 +11,34 @@ from party.models import Party, Users, Devices
 from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
  BlankForm)
 from queue_it_up.settings import IP, PORT, HEROKU, QDEBUG
+from datetime import datetime, timezone
 
 
 def auth(request):
-    try:
-        user = Users.objects.get(
-            sessionID=request.session.session_key,
-            active=True
-        )
-    except Exception:
-        return HttpResponseRedirect(reverse('index'))
-    party = user.party
     url = get_url(str(request.get_full_path), HEROKU, IP, PORT)
     if 'access_denied' in url:
         return HttpResponseRedirect(reverse('index'))
+    if not request.session.session_key:
+        session_key = request.session.create()
+    else:
+        session_key = request.session.session_key
+    party = Party(name=str(datetime.now(timezone.utc)))
+    party.save()
+    old_users = Users.objects.filter(sessionID=session_key, active=True)
+    for user in old_users:
+        if user.isHost:
+            old_party=user.party
+            old_party.active=False
+            old_party.save()
+        user.active = False
+        user.save()
+    user = Users(
+            name='Host',
+            party=party,
+            sessionID=session_key,
+            isHost=True,
+    )
+    user.save()
     party.url = url
     party.save()
     token_info = create_token(url=party.url)
@@ -75,17 +89,16 @@ def update_set_device(request):
         party.device_error = False
         party.save()
         print(QDEBUG,'Reset Party Device Error')
-    if get_inactivity(pid,20):
+    if get_inactivity(pid, 19):
         stop = True
+        clean_up_party(party.pk)
     else:
         stop = False
     data = {
         'device': device,
         'stop': stop
     }
-    #print(QDEBUG, "++++++++++++++++++++")
-    #print(QDEBUG, data)
-    #print(QDEBUG, "++++++++++++++++++++")
+
     return JsonResponse(data)
 
 #OBE
@@ -148,7 +161,7 @@ def name_party(request, pid):
     user = get_user(request, party)
     if user == -1:
         return HttpResponseRedirect(reverse('index'))
-    if party.name or party.started:
+    if party.joinCode or party.started:
         return HttpResponseRedirect(reverse('lobby', kwargs={'pid': party.pk}))
     if request.method == 'POST':
         form = NamePartyForm(request.POST)
