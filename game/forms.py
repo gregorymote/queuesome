@@ -14,7 +14,7 @@ class chooseCategoryForm(forms.Form):
     custom = forms.CharField(label = 'Create Your Own',  required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR OWN',}) )
     artist = forms.CharField(label = 'Artist Name',  required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER THE NAME OF AN ARTIST',}) )
     CHOICES=[('Artist','Artist'),( 'Song','Song')]
-    scatt_radio = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect(attrs={'class':'form-check form-check-inline'}), initial='Song')
+    scatt_radio = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect(attrs={'class':'form-check-inline'}), initial='Song')
 
     def __init__(self,*args,**kwargs):
         self.repo = kwargs.pop('repo')

@@ -6,6 +6,29 @@
 	.device{
 		font-size: 24px;
 	}
+
+	.center{
+		position: relative;
+  		top: 50%;
+  		transform: translate(25%,-50%) !important;
+		bottom: 50%;
+	}
+
+	.square {
+  		width: 50%;	
+	}
+
+	.square:after {
+  		content: "";
+  		display: block;
+  		padding-bottom: 100%;
+	}
+
+	.content {
+  		position: absolute;
+  		width: 100%;
+  		height: 100%;
+	}
 </style>
 
 <script>
@@ -75,7 +98,7 @@
 			for(var i=0; i<names.length; i++){
 				var header = document.createElement('h5');
 				var span = document.createElement('span');
-				span.classList.add("badge","badge-pill","badge-light");
+				span.classList.add("badge","rounded-pill","bg-secondary");
 				span.innerHTML=names[i];
 				header.appendChild(span);
 				name_list.appendChild(header);
@@ -85,16 +108,16 @@
 	</script>
 	
 	<div class = "container">	
-		<h2><span class="badge badge-pill badge-primary">{{party.name}}</span></h2>
+		<h2><span class="badge rounded-pill bg-primary">{{party.name}}</span></h2>
 		
 		<div class = "row">
 			<div class = "col" id="name_list"></div>
 		</div>	
 		
 
-		<div class = "row-12 text-right">
+		<div class = "row-12 text-end">
 			<form action="" method="post">
-				<a class="btn text-white bg-primary btn-lg" data-toggle="modal" data-target="#myModal">QR <em class="fa fa-qrcode"></em></a>
+				<a class="btn text-white bg-primary btn-lg" data-bs-toggle="modal" data-bs-target="#qrModal">QR <em class="fa fa-qrcode"></em></a>
 				{% csrf_token %}
 				{% if access %}
 					<input type="submit" class="btn btn-outline-primary btn-lg" value="Let's Go">
@@ -104,29 +127,20 @@
 	
 		<div class = "row">
 			<div class = "col text-center">
-				<h1 class = "display-3"><span class="badge badge-secondary">{{party.joinCode}}</span></h1>
+				<h1 class="display-3"><span class="badge bg-secondary">{{party.joinCode}}</span></h1>
 				<h6>This is Your Room Code</h6>
 			</div>		
 		</div>
 	</div>
 
-	<!-- Modal -->
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-		aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body text-center">
+	<!-- QR Modal -->
+	<div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog center" role="dialog">
+			<div class="modal-content square">
+				<div class="modal-body content">
 					{% load static %}
-						<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ URL }}/party/join_party/?code={{ party.joinCode }}" class="img-thumbnail" width="200" height="200"
+						<img style="width:100%;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ URL }}/party/join_party/?code={{ party.joinCode }}"
 						alt="" />	
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>

@@ -88,6 +88,8 @@ class Library(models.Model):
     
 class Songs(models.Model):
     name = models.CharField(max_length=500)
+    title = models.CharField(max_length=500, null=True)
+    artist = models.CharField(max_length=500, null=True)
     uri = models.CharField(max_length=500)
     art = models.CharField(max_length=500)
     user = models.ForeignKey('Users',on_delete=models.CASCADE,)
@@ -101,6 +103,7 @@ class Songs(models.Model):
     link = models.CharField(max_length=500, null=True)
     duration=models.IntegerField(default=0, null=True)
     duplicate=models.BooleanField(default=False)
+    color=models.CharField(max_length=128, default='0,0,0')
     created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
@@ -123,6 +126,8 @@ class Devices(models.Model):
 
 class Searches(models.Model):
     name = models.CharField(max_length=500)
+    title = models.CharField(max_length=500, null=True)
+    artist = models.CharField(max_length=500, null=True)
     uri = models.CharField(max_length=500)
     art = models.CharField(max_length=500, null=True)
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)

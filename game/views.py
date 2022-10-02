@@ -7,7 +7,8 @@ from utils.util_user import (get_user, check_permission, assign_leader,
 from utils.util_party import (get_party, clean_up_party, get_inactivity,
      set_lib_repo, get_results, get_totals, get_category_choices,
      create_category, check_duplicate, wait_for_song)
-from utils.util_device import activate_device, get_devices, get_active_device
+from utils.util_device import get_active_device
+from utils.util_song import get_bg_color
 from django.http import HttpResponseRedirect, JsonResponse
 from party.models import Party, Users, Category, Songs, Searches, Devices
 from game.forms import (blankForm, chooseCategoryForm, searchForm,
@@ -151,7 +152,7 @@ def play(request, pid):
         'song' : song,
         'results': results,
         'totals': totals,
-        'URL':URL,
+        'URL': URL,
         'full': full,
         'device':device
     }
@@ -225,9 +226,12 @@ def update_play(request):
 
     song_info= {
 		"name": song.name,
+        "title": song.title,
+        "artist": song.artist,
 		"link": song.link,
 		"user": song_user,
-		"art": song.art
+		"art": song.art,
+        "color": song.color
 	}
     data = {
         'party': party_info,
@@ -431,14 +435,18 @@ def pick_song(request, pid):
             if picked_song:
                 user.hasPicked = True
                 user.save()
-                print(QDEBUG,'Set User has Picked: ', user.name, ' - ', user.hasPicked)
+                print(
+                    QDEBUG,'Set User has Picked: ',user.name,'-',user.hasPicked
+                    )
                 return HttpResponseRedirect(
                     reverse('play', kwargs={'pid':pid})
                 )
             elif result != '-1':
                 search = Searches.objects.filter(uri=result).first()
-                Songs(
+                song = Songs(
                     name=search.name,
+                    title = search.title,
+                    artist = search.artist,
                     uri=search.uri,
                     art=search.art,
                     user=user,
@@ -448,11 +456,16 @@ def pick_song(request, pid):
                     state='not_played',
                     link=search.link,
                     duration=search.duration,
-                ).save()
+                )
+                song.save()
+                thread = threading.Thread(target=get_bg_color, args=(song.id,))
+                thread.start()
                 Searches.objects.filter(user=user, party=party).delete()
                 user.hasPicked = True
                 user.save()
-                print(QDEBUG,'Set User has Picked: ', user.name, ' - ', user.hasPicked)
+                print(
+                    QDEBUG,'Set User has Picked: ',user.name,'-',user.hasPicked
+                    )
                 return HttpResponseRedirect(
                     reverse('play', kwargs={'pid':pid})
                 )
@@ -508,6 +521,8 @@ def update_search(request):
         if not current or current.uri != track_uri:
             search = Searches(
                 name = track_name + ", " + artist_name,
+                title = track_name,
+                artist = artist_name,
                 uri=track_uri,
                 art=album_art,
                 party=party,

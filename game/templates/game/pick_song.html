@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 <style>
 	.buttonIn {
 		position: relative;
@@ -23,11 +23,16 @@
 	}
 	.artwork {
 		width:50px;
-		height:50px;
+		height:50px; 
 		max-height: 50px;
+		vertical-align: middle;
 	}
 	.info {
 		padding-top: 8px;
+		display: inline-block;
+		padding-left: 15px;
+		padding-right: 15px;
+		vertical-align: middle;
 	}
 	.option-padding {
 		padding: 3px 0px;
@@ -117,13 +122,15 @@
 			var option = document.createElement('div');
 			option.classList.add('row','option-padding');
 			option.id = song_list[i].id;
+			var wrapper = document.createElement('div');
+			option.appendChild(wrapper);
 			
 			var art = document.createElement('img');
 			art.src = song_list[i].album_art;
 			art.alt = song_list[i].track_name + ', ' + song_list[i].artist;
 			art.classList.add('artwork', 'img-thumbnail');
 			
-			option.appendChild(art);
+			wrapper.appendChild(art);
 			
 			var text = document.createElement('div');
 			text.classList.add('col','info');
@@ -135,10 +142,10 @@
 			
 			var artist = document.createElement('small');
 			artist.innerHTML = song_list[i].artist;
-			artist.classList.add('muted');
+			artist.classList.add('text-muted');
 			
 			text.appendChild(artist);
-			option.appendChild(text);
+			wrapper.appendChild(text);
 			results.appendChild(option);
 			option.addEventListener("click", getOption);
 		}
@@ -195,7 +202,7 @@
 			</div>
 			<div id="results" class="results"></div>
 			<div style="display:none;">{{ form.result }}</div>
-			<div id="buttons" class = "text-right pb-2">
+			<div id="buttons" class = "text-end pb-2">
 				<a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-primary">Back</a>
 				<input type="submit" class="btn btn-outline-primary" id="add to queue" value="Add to Queue" style="display:none;">
 			</div>			

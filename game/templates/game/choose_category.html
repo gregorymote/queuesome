@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {% extends "base.html" %}
 {% block page_content %}
 
@@ -63,7 +62,7 @@
 			document.getElementById('custom').innerHTML = box;
 			document.getElementById('label').innerHTML = label;
 			document.getElementById('info').innerHTML = info;
-			})
+			});
 		});
 	</script>
 
@@ -79,7 +78,7 @@
 
 			<div class="row">
 				<div id="radio0" style='display:none;'>{{ form.scatt_radio.0 }}</div>
-				<div class = "pl-4" id="radio1" style='display:none;'>{{ form.scatt_radio.1 }}</div>			
+				<div id="radio1" style='display:none;'>{{ form.scatt_radio.1 }}</div>			
 			</div> 
 
 			<div class="row">
@@ -89,13 +88,13 @@
 			<div class="row" id="custom"> 
 			</div>
 
-			<div class = "pt-2 pb-2 text-right">
+			<div class = "pt-2 pb-2 text-end">
 				<a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-primary">Back</a>
 				<input type="submit" class="btn btn-outline-primary" value="Submit"></input>
 			</div>
 				
 			{% if invalid %}
-			<div class=" row alert alert-info">
+			<div class="row alert alert-info">
 				select a vibe before submitting
 			</div>
 			{% endif %}

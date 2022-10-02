@@ -3,80 +3,68 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-<html lang="en">
+<body>
+	<div class="container">
+		<div>
+			<h4>Account Authentication</h4>
+			<form action="" method="post">
+				{% csrf_token %}
+				<h5>{{ form.auth_code.label }}</h5>
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								{{ form.auth_code }}
+							</td>
 
-	
-	<body>
-	
-		
-		<div class="container">
-			
-				<div>
-					
-					<h4>Account Authentication</h4>
-					<form action="" method="post">
-						{% csrf_token %}
-						<h5>{{ form.auth_code.label }}</h5>
-							
-							<table>
-								<tbody>
-									<tr>
-										<td>
-										{{ form.auth_code }}
-										</td>
+						</tr>
 
-									</tr>
-										
-									<tr>
-										<td>
-											<div class = "pt-2">
-												<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
-											</div>
-										</td>
-									<tr>
-								</tbody>
-							</table>
-							
-					</form>
-					
-					
-
-				
-				</div>
-			
+						<tr>
+							<td>
+								<div class="pt-2">
+									<input type="submit" class="btn btn-outline-primary btn-sm" value="Submit">
+								</div>
+							</td>
+						<tr>
+					</tbody>
+				</table>
+			</form>
 		</div>
-	
-	</body>
-	  <!-- Button to Open the Modal -->
-		  <div class = "pt-5 text-right">
-		  <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
-			Help
-		  </button>
-		</div>
-		  <!-- The Modal -->
-		  <div class="modal fade" id="myModal">
-			<div class="modal-dialog">
-			<div class="modal-dialog modal-dialog-scrollable">
-			  <div class="modal-content">
-			  
+	</div>
+
+</body>
+<!-- Button to Open the Modal -->
+<div class="pt-5 text-right">
+	<button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal">
+		Help
+	</button>
+</div>
+<!-- The Modal -->
+<div class="modal fade" id="myModal">
+	<div class="modal-dialog">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content">
+
 				<!-- Modal Header -->
 				<div class="modal-header">
-				  <h4 class="modal-title">About Authentication</h4>
-				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">About Authentication</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
 				</div>
-				
+
 				<!-- Modal body -->
 				<div class="modal-body">
-				 <p>This authentication page is a new tab that was automatically opened in your web browser. To access your authentication code, navigate to the other tab that is opened</p>
+					<p>This authentication page is a new tab that was automatically opened in your web browser. To
+						access your authentication code, navigate to the other tab that is opened</p>
 				</div>
-				
+
 				<!-- Modal footer -->
 				<div class="modal-footer">
-				  <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
 				</div>
-				</div>
-			  </div>
 			</div>
-		  </div>
+		</div>
+	</div>
+</div>
+
 </html>
 {% endblock %}
