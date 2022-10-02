@@ -20,6 +20,7 @@ def get_bg_color(song_id):
     if art_id:
         response = requests.get(song.art, stream=True)
         img_id = 'artwork/img-'+ str(song_id) + '-' + art_id +'.png'
+        print(QDEBUG,img_id)
         try:
             with open(img_id, 'wb') as out_file:
                 shutil.copyfileobj(response.raw, out_file)
@@ -41,6 +42,8 @@ def get_bg_color(song_id):
             song = Songs.objects.get(id=song_id)
             song.color = color
             song.save()
+        except Exception as e:
+            print(QDEBUG,e)
         finally:
             if exists(img_id):
                 remove(img_id)
