@@ -497,8 +497,6 @@ def update_search(request):
     party = Party.objects.get(pk = pid)
     user = get_user(request, party)
     result = request.GET.get('result', None)
-    search = Searches.objects.all()
-
     Searches.objects.filter(user=user, party=party).exclude(uri=result).delete()
     current = Searches.objects.filter(uri=result).first()
     search_text = request.GET.get('text', None)
@@ -535,7 +533,7 @@ def update_search(request):
             search.save()
         else:
             search = current
-        print(QDEBUG, "SEARCH RESULT: ", search.title, search.artist)
+        print(QDEBUG, "SEARCH RESULT: ", search.name, search.uri, search.title, search.artist)
         song_list.append(
             {
             'track_name': track_name,
