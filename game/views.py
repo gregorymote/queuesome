@@ -549,6 +549,7 @@ def update_search(request):
         "song_list": song_list,
 
     }
+    print(QDEBUG, "RUN Search AJAX")
     return JsonResponse(data)
 
 
