@@ -2,11 +2,6 @@
 
 {% extends "base.html" %}
 {% block settings %}
-<style>
-	.device{
-		font-size: 24px;
-	}
-</style>
 
 <script>
 
@@ -38,13 +33,13 @@
 
 
 {% block page_content %}
-	<div class = "container">
+	<div class = "container form-width">
 		<form action="" method="post">
 			{% csrf_token %}
-			<h6>{{ form.party_name.label }}</h6>
+			<h5>{{ form.party_name.label }}</h5>
 			{{ form.party_name }}
 			<div class = "pt-2">
-				<h6>{{ form.user_name.label }}</h6>
+				<h5>{{ form.user_name.label }}</h5>
 				{{ form.user_name }}
 			</div>
 			<div class = "pt-2 text-end">

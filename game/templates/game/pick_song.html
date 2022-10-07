@@ -1,46 +1,4 @@
-<!DOCTYPE html>
-
 <style>
-	.buttonIn {
-		position: relative;
-	}
-	.bar {
-		margin: 0px;
-		padding: 0px;
-		width: 100%;
-		outline: none;
-		height: 30px;
-		border-radius: 5px;
-	}
-	.arrow {
-		position: absolute;
-		top: 15%;
-		right: 3%;
-		z-index: 0px;
-		cursor: pointer;
-		transform: translateX(0px);
-		color: rgb(167, 167, 167);
-	}
-	.artwork {
-		width:50px;
-		height:50px; 
-		max-height: 50px;
-		vertical-align: middle;
-	}
-	.info {
-		padding-top: 8px;
-		display: inline-block;
-		padding-left: 15px;
-		padding-right: 15px;
-		vertical-align: middle;
-	}
-	.option-padding {
-		padding: 3px 0px;
-	}
-	.results {
-		padding-left: 15px;
-		padding-right: 15px;
-	}
 	p {
 		text-overflow: ellipsis;
 		max-width: 220px;
@@ -70,8 +28,8 @@
 		var category = document.getElementById("category");
 		category.style.display = 'block';
 		category.classList.remove("text-center");
-		document.getElementById("artwork").style.display = 'none';
-		document.getElementById("title").style.display = 'none';
+		document.getElementById("artwork_div").style.display = 'none';
+		document.getElementById("title_div").style.display = 'none';
 		document.getElementById("search icon").style.display = 'none';
 		document.getElementById("buttons").style.display = 'none';
 		document.getElementById("arrow").style.display = 'block';
@@ -81,8 +39,13 @@
 		document.getElementById("header").style.display = 'block';
 		var category = document.getElementById("category")
 		category.style.display = 'block';
-		document.getElementById("artwork").style.display = 'block';
-		document.getElementById("title").style.display = 'block';
+		if(document.getElementById('artwork').src != ""){
+			document.getElementById("artwork_div").style.display = 'block';
+		}
+		else{
+			document.getElementById("artwork_div").style.display = 'none';
+		}
+		document.getElementById("title_div").style.display = 'block';
 		document.getElementById("buttons").style.display = 'block';
 		document.getElementById("arrow").style.display = 'none';
 		document.getElementById("results").style.display = 'none';
@@ -100,7 +63,6 @@
 		this.delay = setTimeout(function(){
 			if (e.target.value != ''){
 				var result = document.getElementById("id_result");
-				var artwork = document.getElementById("artwork");
 				$.ajax({
 					url: '/sesh/update_search',
 					data: {
@@ -163,12 +125,15 @@
 		}
 		var art = parent.getElementsByClassName("artwork")[0];
 		var artwork = document.getElementById("artwork");
+		var blur = document.getElementById("blur");
 		var result = document.getElementById("id_result");
-		var title = document.getElementById("title");
-		artwork.innerHTML = '<img src="'+ art.src + '" class="img-thumbnail" width="200" height="200" alt="...">';
+		var songTitle = document.getElementById("song_title");
+		var titleDiv = document.getElementById("title_div");
+		artwork.src= art.src;
+		blur.src = art.src;
 		result.value = parent.id;
-		title.innerHTML = art.alt;
-		title.style.display = "block";
+		songTitle.innerHTML = art.alt;
+		titleDiv.style.display = "block";
 		var submit = document.getElementById("add to queue");
 		submit.style.display = "inline";
 		var searchIcon = document.getElementById("search icon");
@@ -181,38 +146,43 @@
 		
 	}
 </script>
-	<div class = "container">
-		<div id = "labels">
-			<div id="header" class = "text-center">
-				<h6>...and the vibe is:</h6>
-			</div>
-			<div id="category" class ="pt-1">
-				<h6>{{category.name}}</h6>
-			</div>
-			<div id="artwork", class ="pt-1 pb-2 text-center">
-			</div>
-			<h6 id="title" style="display:none;" class="text-center"></h6>
-			<span id="search icon" class="text-center pt-1 pb-2" style="display:none;"><em class="fa fa-search"></em></span>
-		</div>	
-		<form action="" method="post">
-			{% csrf_token %}
-			<div class="buttonIn">
-				<h6>{{ form.search }}</h6>
-				<span id="arrow" class="arrow" style="display:none;"><em class="fa fa-arrow-left"></em></span>
-			</div>
-			<div id="results" class="results"></div>
-			<div style="display:none;">{{ form.result }}</div>
-			<div id="buttons" class = "text-end pb-2">
-				<a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-primary">Back</a>
-				<input type="submit" class="btn btn-outline-primary" id="add to queue" value="Add to Queue" style="display:none;">
-			</div>			
-			{% if invalid %}
-			<div class="alert alert-info">
-				Enter a Song or Artist to Search
-			</div>
-			{% endif %}
-		</form>	
-	</div>
+
+<div class = "container form-width">
+	<div id = "labels">
+		<div id="header" class = "text-center" style="margin-bottom: 0px;">
+			<h6>...and the vibe is:</h6>
+		</div>
+		<div id="category" class ="pt-1 category-name">
+			<h5>{{category.name}}</h5>
+		</div>
+		<div id="artwork_div" class= "text-center" style="display:none">
+			<img id = "blur" class="blurry artwork-square" alt=""/>
+			<img id = "artwork" class="clear artwork-square" height="80%" alt=""/>
+		</div>
+		<div id="title_div" class="song-title" style="display:none;" >
+			<h5 id="song_title" style="position:absolute;"></h5>
+		</div>
+		<span id="search icon" class="text-center pt-1 pb-2" style="display:none;"><em class="fa fa-search"></em></span>
+	</div>	
+	<form action="" method="post">
+		{% csrf_token %}
+		<div class="buttonIn">
+			<h6>{{ form.search }}</h6>
+			<span id="arrow" class="arrow" style="display:none; margin-top:5px;"><em class="fa fa-arrow-left"></em></span>
+		</div>
+		<div id="results" class="results"></div>
+		<div style="display:none;">{{ form.result }}</div>
+		<div id="buttons" class = "text-end pb-2">
+			<a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-primary">Back</a>
+			<input type="submit" class="btn btn-outline-primary" id="add to queue" value="Add to Queue" style="display:none;">
+		</div>			
+		{% if invalid %}
+		<div class="alert alert-info">
+			Enter a Song or Artist to Search
+		</div>
+		{% endif %}
+	</form>	
+</div>
 {% endblock %}
 
 

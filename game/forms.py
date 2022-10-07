@@ -10,11 +10,30 @@ class blankForm(forms.Form):
     
 
 class chooseCategoryForm(forms.Form):
-    cat_choice = forms.ModelChoiceField(label = 'Curate the Vibe', queryset=Library.objects.all(), required=False, widget=forms.Select(attrs={'class':'form-control'})) 
-    custom = forms.CharField(label = 'Create Your Own',  required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR OWN',}) )
-    artist = forms.CharField(label = 'Artist Name',  required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER THE NAME OF AN ARTIST',}) )
+    cat_choice = forms.ModelChoiceField(
+        label = 'Curate the Vibe',
+        queryset=Library.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class':'form-control'})
+    ) 
+    custom = forms.CharField(
+        label = 'Create Your Own',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR OWN',}),
+        max_length=Library._meta.get_field('name').max_length
+    )
+    artist = forms.CharField(
+        label = 'Artist Name',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER THE NAME OF AN ARTIST',}),
+        max_length=Library._meta.get_field('name').max_length
+    )
     CHOICES=[('Artist','Artist'),( 'Song','Song')]
-    scatt_radio = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect(attrs={'class':'form-check-inline'}), initial='Song')
+    scatt_radio = forms.ChoiceField(
+        choices=CHOICES,
+        widget=forms.RadioSelect(attrs={'class':'form-check-inline'}),
+        initial='Song'
+    )
 
     def __init__(self,*args,**kwargs):
         self.repo = kwargs.pop('repo')

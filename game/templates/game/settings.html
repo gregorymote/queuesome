@@ -1,13 +1,5 @@
-<!DOCTYPE html>
-
 {% extends "base.html" %}
 {% block page_content %}
-<style>
-	.device{
-		color:gray;
-		font-size: 30px;
-	}
-</style>
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -40,7 +32,6 @@
 	}, 1000);
 </script>
 
-
 <div class="container" style="width:90%">
 	<div class="text-center">
 		<h5>Settings</h5>
@@ -53,7 +44,7 @@
 		<div class = "card">
 			<div class="ps-4 pt-2 pb-2 text-start row">
 				<div class = "col-1 pe-0">
-					<em id="device" class="device"></em>
+					<em id="device" class="device-set"></em>
 				</div>
 				<div id="name" class="col-11 text-start ps-3 pt-1">
 					No Active Device Found
@@ -102,8 +93,7 @@
 					</div>
 				</div>
 			</div>
-	</div>
+		</div>
 	</form>
 </div>
-</html>
 {% endblock %}

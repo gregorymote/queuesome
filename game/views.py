@@ -458,6 +458,7 @@ def pick_song(request, pid):
                     duration=search.duration,
                 )
                 song.save()
+                print(QDEBUG, "SONG: ", song.title, song.artist)
                 thread = threading.Thread(target=get_bg_color, args=(song.id,))
                 thread.start()
                 Searches.objects.filter(user=user, party=party).delete()

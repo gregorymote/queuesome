@@ -3,66 +3,61 @@
 {% extends "base.html" %}
 {% block page_content %}
 
-	<style>
-		.device{
-			color:gray;
-			font-size: 30px;
-		}
-	</style>
-	<script>
-		$(document).ready(function() {
-			setActiveProperties('{{device.active}}'=='True','{{device.type}}', '{{device.name}}');
-		});
+<script>
+	$(document).ready(function () {
+		setActiveProperties('{{device.active}}' == 'True', '{{device.type}}', '{{device.name}}');
+	});
 
-		var inactivity = false;
+	var inactivity = false;
 
-		setInterval(function () {
-			if (!inactivity){
-				$.ajax({
-					url: '/party/update_set_device',
-					data: {
+	setInterval(function () {
+		if (!inactivity) {
+			$.ajax({
+				url: '/party/update_set_device',
+				data: {
 					'pid': {{ party.pk }}
-					},
-					dataType: 'json',
-					success: function (data) {
-						setActiveProperties(data.device.active, data.device.type, data.device.name)
-						inactivity = data.stop;
-					}
+	},
+		dataType: 'json',
+		success: function (data) {
+			setActiveProperties(data.device.active, data.device.type, data.device.name)
+			inactivity = data.stop;
+		}
 				});
 			}
-			else{
-				window.location.replace('/index');
-			}
+			else {
+		window.location.replace('/index');
+	}
 		
 		}, 1000);
-	</script>
+</script>
 
-	<div class="container">				
-		<form action="" method="post">
-			{% csrf_token %}
-			<div class = "pt-2">
-				<div class = "pb-3">
-					<h5><b>Set Playback Device in Spotify</b></h5>
-				</div>
-				<div id="message" class = "ps-3 pb-3">
-					<h5>1. Open Spotify</h5>
-					<h5>2. Shuffle Your Fav Playlist</h5>
-					<h5>3. Click Continue Below</h5>
-				</div>
-				<div class = "card">
-					<div class="ps-4 pt-2 pb-2 text-start row">
-						<div class = "col-1 pr-0">
-							<em id="device" class="device"></em>
-						</div>
-						<div id="name" class="col-11 text-start ps-3 pt-1">
-							No Active Device Found
-						</div>
+<div class="container form-width">
+	<form action="" method="post">
+		{% csrf_token %}
+		<div class="pt-2">
+			<div class="pb-3">
+				<h5><strong>Set Playback Device in Spotify</strong></h5>
+			</div>
+			<div id="message" class="ps-3 pb-3">
+				<h5>1. Open Spotify</h5>
+				<h5>2. Shuffle Your Fav Playlist</h5>
+				<h5>3. Click Continue Below</h5>
+			</div>
+			<div class="card">
+				<div class="ps-4 pt-2 pb-2 text-start row">
+					<div class="col-1 pr-0">
+						<em id="device" class="device-set"></em>
+					</div>
+					<div id="name" class="col-11 text-start ps-3 pt-1">
+						No Active Device Found
 					</div>
 				</div>
-
-				<div class="text-end pt-2">
-					<input id="submit" type="submit" class="btn btn-outline-secondary" value="Continue" disabled></div>
-				</div>
 			</div>
-		</form>
+
+			<div class="text-end pt-2">
+				<input id="submit" type="submit" class="btn btn-outline-secondary" value="Continue" disabled>
+			</div>
+		</div>
+	</form>
+</div>
 {% endblock %}

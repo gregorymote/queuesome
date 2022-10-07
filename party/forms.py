@@ -1,15 +1,25 @@
 from django import forms
 
-from party.models import Party
-from party.models import Devices
+from party.models import Party, Users, Devices
 
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.Textarea(attrs={"rows":1, "cols":34,"style": "resize: none"}),label = 'Email Address or Username', required=True)
 
 class NamePartyForm(forms.Form):
-    party_name = forms.CharField(label='Sesh Name', required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER A SESH NAME',}))
-    user_name = forms.CharField(label = 'Name', required = True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR NAME',}))
+    party_name = forms.CharField(
+        label='Sesh Name',
+        required=True,
+        widget=forms.TextInput(attrs={'class':'form-control','placeholder': 'ENTER A SESH NAME',}),
+        max_length=Party._meta.get_field('name').max_length
+        )
+    user_name = forms.CharField(
+        label = 'Name',
+        required = True,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR NAME',}),
+        max_length=Users._meta.get_field('name').max_length
+    
+    )
 
 class CreateUserForm(forms.Form):
     party_code = forms.CharField(label = 'Room Code', required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Enter Room Code','style' : 'text-transform:uppercase'})) 

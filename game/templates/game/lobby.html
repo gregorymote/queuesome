@@ -2,34 +2,6 @@
 
 {% extends "base.html" %}
 {% block settings %}
-<style>
-	.device{
-		font-size: 24px;
-	}
-
-	.center{
-		position: relative;
-  		top: 50%;
-  		transform: translate(25%,-50%) !important;
-		bottom: 50%;
-	}
-
-	.square {
-  		width: 50%;	
-	}
-
-	.square:after {
-  		content: "";
-  		display: block;
-  		padding-bottom: 100%;
-	}
-
-	.content {
-  		position: absolute;
-  		width: 100%;
-  		height: 100%;
-	}
-</style>
 
 <script>
 	if('{{access}}' == 'True'){
@@ -107,8 +79,8 @@
 			
 	</script>
 	
-	<div class = "container">	
-		<h2><span class="badge rounded-pill bg-primary">{{party.name}}</span></h2>
+	<div class = "container form-width">	
+		<h5>{{party.name}}</h5>
 		
 		<div class = "row">
 			<div class = "col" id="name_list"></div>
@@ -136,7 +108,7 @@
 	<!-- QR Modal -->
 	<div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog center" role="dialog">
-			<div class="modal-content square">
+			<div class="modal-content qr-square">
 				<div class="modal-body content">
 					{% load static %}
 						<img style="width:100%;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ URL }}/party/join_party/?code={{ party.joinCode }}"

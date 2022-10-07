@@ -2,11 +2,6 @@
 
 {% extends "base.html" %}
 {% block settings %}
-<style>
-	.device{
-		font-size: 24px;
-	}
-</style>
 
 <script>
 	if('{{user.isHost}}' == 'True'){
@@ -36,118 +31,12 @@
 <a href="{% url 'settings' pid=party.id %}" id="settings" style="display:None;"> <em id=device class="device"></em></a>
 {% endblock %}
 
-
-
 {% block page_content %}
 
 <style>
-	.item {
-		width:100px;
-		vertical-align: top;
-		display: inline-block;
-	}
-	.img-badge {
-		width: 100px;
-		height: 100px;
-		padding: 0px 0px 0px;
-		position: relative;
-		display: inline-block;
-		margin-bottom: -10px !important;
-	}
-	.notify-badge{
-		width: 20px; 
-		height: 20px; 
-		line-height:20px;
-		position: absolute;
-		top: -2px;
-		right: 0px;
-		padding: 5px 10px;
-		border-radius: 50%;
-		background: red;
-		color: white;
-		display: flex;
-  		justify-content: center;
-  		align-items: center;
-		font-size:14px;
-	}
-	.art{
-		height: 90px;
-		width: 90px;
-	}
-	.results-song{
-		text-overflow: ellipsis;
-		max-width: 90px;
-		white-space: nowrap;
-		overflow: hidden;
-		padding-left: 6px;
-		font-size: 10px;
-	}
-	.results-user{
-		text-overflow: ellipsis;
-		max-width: 90px;
-		white-space: nowrap;
-		overflow: hidden;
-		padding-right: 6px;
-		font-size: 8px;
-		color: gray;
-		margin-top: -18px !important;
-	}
-	.no-focus{
-		outline: none !important;
-  		box-shadow: none !important;
-	}
 	.btn-outline-primary:hover{
     	color: #007bff;
     	background-color: inherit;
-	}
-	.center{
-		position: relative;
-  		top: 50%;
-  		transform: translate(25%,-50%) !important;
-		bottom: 50%;
-	}
-
-	.qr-square {
-  		width: 50%;	
-	}
-	.qr-square:after {
-  		content: "";
-  		display: block;
-  		padding-bottom: 100%;
-	}
-
-	.artwork-square{
-		width: 80%;
-		max-height: 300px;
-		max-width: 300px;
-	}
-	.artwork-square:after{
-		content: "";
-  		display: block;
-  		padding-bottom: 100%;
-	}
-	.content {
-  		position: absolute;
-  		width: 100%;
-  		height: 100%;
-	}
-
-	.clear {
-		position: relative;
-	}
-	.blurry {
-		position: absolute;
-		filter: blur(15px);
-	}
-	.sub-container {
-  		position: relative;
-	}
-	.song-title {
-		white-space: nowrap;
-		overflow: hidden;
-		position: relative;
-		width: 90%;
-		margin:auto;
 	}
 </style>
 
@@ -211,6 +100,8 @@
 		total.addEventListener("click", setTab);
 		var song_title = document.getElementById('song_title');
 		scroll(song_title);
+		var category_name = document.getElementById('category_name');
+		scroll(category_name);
 	});
 
 	function updatePage(party, user, category, song, results, totals){
@@ -240,11 +131,12 @@
 		
 		if (song.art != "lull"){
 			category_leader.innerHTML=category.leader+"'s Vibe";
+			category_leader.style.color = 'rgb('+ song.color + ')';
 			logo.style.display='initial';
 			song_title.innerHTML= song.title;
 			song_link.href=song.link;
 			song_link.style.display='initial';
-			song_link.style.color = 'rgb('+ song.color + ')'
+			song_link.style.color = 'rgb('+ song.color + ')';
 			song_artist.innerHTML = song.artist;
 
 			if(song.art == 'duplicate'){
@@ -259,6 +151,7 @@
 		}
 		else{
 			category_leader.innerHTML=party.name;
+			category_leader.style.color = 'rgb(130,128,131)';
 			logo.style.display='none';
 			song_link.removeAttribute("href");
 			song_artist.innerHTML = '';
@@ -385,9 +278,9 @@
 				total.append(total_name, total_likes);
 				total_body.append(total);
 			}	
-		}
-		//document.body.style.backgroundColor = 'rgb('+ song.color + ')';	
+		}	
 	};
+
 	function likeSong(e){
 		var like = true;
 		var button = e.target;
@@ -527,13 +420,18 @@
 	}
 </script>
 
-	<div class = "container text-center">
+	<div class = "container text-center form-width">
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
 		</div>
-		<h5 id = "category_name"></h5>
-		<h6 id = "category_leader"></h6>
-		<div class="sub-container">
+		<div class="category-leader" style="margin-bottom:0px;">
+			<h6 id ="category_leader"></h6>
+		</div>
+		<div class="category-name">
+			<h5 id = "category_name" style="position:absolute;"></h5>
+			<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+		</div>
+		<div style="position:relative">
 			<img id = "blur" class="blurry artwork-square" alt=""/>
 			<img id = "artwork" class="clear artwork-square" height="80%" alt=""/>
 		</div>	
@@ -554,32 +452,6 @@
 		</div>
 
 	</div>
-	<style>
-		.animated{
-			-webkit-animation-duration: 5s;
-            animation-duration: 5s;
-            -webkit-animation-fill-mode: both; 
-            animation-fill-mode: both; 
-			animation-iteration-count: infinite;
-         }
-	
-		@-webkit-keyframes bounce { 
-            0%, 20%, 50%, 80%, 100% {-webkit-transform: translateY(0);} 
-            40% {-webkit-transform: translateY(-30px);} 
-            60% {-webkit-transform: translateY(-15px);} 
-         } 
-         
-         @keyframes bounce { 
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 
-            40% {transform: translateY(-30px);} 
-            60% {transform: translateY(-15px);} 
-         }
-         
-         .bounce { 
-            -webkit-animation-name: bounce; 
-            animation-name: bounce; 
-         }
-	</style>
 
 	<div class="fixed-bottom">
 		<div class="text-center bounce animated">
