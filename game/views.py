@@ -535,6 +535,7 @@ def update_search(request):
             search.save()
         else:
             search = current
+        print(QDEBUG, "SEARCH RESULT: ", search.title, search.artist)
         song_list.append(
             {
             'track_name': track_name,
