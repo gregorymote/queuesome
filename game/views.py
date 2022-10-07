@@ -522,7 +522,7 @@ def update_search(request):
             search = Searches(
                 name = track_name + ", " + artist_name,
                 title = track_name,
-                artist = artist_name,
+                artist = "PLACEHOLDER",
                 uri=track_uri,
                 art=album_art,
                 party=party,
@@ -533,7 +533,7 @@ def update_search(request):
             search.save()
         else:
             search = current
-        print(QDEBUG, "SEARCH RESULT: ", search.name, search.uri, search.title, search.artist)
+        print(QDEBUG, "SEARCH RESULT: ", search.id, search.title, search.artist)
         song_list.append(
             {
             'track_name': track_name,
