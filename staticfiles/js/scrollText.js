@@ -4,7 +4,7 @@ async function scroll(element){
     var wait = true;
     setTimeout(()=>{wait=false;}, delay);
     var scroll_text = setInterval(function () {
-        //setWidth(element);
+        setWidth(element);
         if(!wait){
             scrollText(element);
         }
@@ -14,7 +14,8 @@ async function scroll(element){
         var pWidth = getWidth(element.parentElement);
         var cWidth = getWidth(element);
         if(pWidth < cWidth){
-            var left = getLeft(element);
+            //var left = getLeft(element);
+            var left = getTranslateX(element);
             if(subtract && cWidth + left > pWidth){
                 left--;
             }
@@ -31,10 +32,12 @@ async function scroll(element){
                 wait = true;
                 setTimeout(()=>{wait=false;}, delay);
             }
-            element.style.left = left.toString() + "px";
+            //element.style.left = left.toString() + "px";
+            element.style.transform = "translateX(" + left.toString() + "px)";
         }
         else{
-            element.style.left = "0px";
+            //element.style.left = "0px";
+            element.style.transform = "translateX(0px)";
             subtract =true;
         }
     }
@@ -50,6 +53,11 @@ async function scroll(element){
         left = parseInt(left.split("px")[0]);
         return left;
     }
+    function getTranslateX(e){
+        var style = window.getComputedStyle(e);
+        var matrix = new WebKitCSSMatrix(style.transform);
+        return matrix.m41;
+     }
     function setWidth(e){
         element.style.width = "auto";
         var pWidth = getWidth(element.parentElement);
