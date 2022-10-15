@@ -442,7 +442,11 @@ def pick_song(request, pid):
                     reverse('play', kwargs={'pid':pid})
                 )
             elif result != '-1':
-                search = Searches.objects.filter(uri=result).first()
+                search = Searches.objects.filter(
+                    uri=result,
+                    user=user, 
+                    party=party
+                ).first()
                 song = Songs(
                     name=search.name,
                     title = search.title,
@@ -458,8 +462,6 @@ def pick_song(request, pid):
                     duration=search.duration,
                 )
                 song.save()
-                print(QDEBUG, "Search: ", search.title, search.artist)
-                print(QDEBUG, "SONG: ", song.title, song.artist)
                 thread = threading.Thread(target=get_bg_color, args=(song.id,))
                 thread.start()
                 Searches.objects.filter(user=user, party=party).delete()
@@ -497,8 +499,12 @@ def update_search(request):
     party = Party.objects.get(pk = pid)
     user = get_user(request, party)
     result = request.GET.get('result', None)
-    Searches.objects.filter(user=user, party=party).exclude(uri=result).delete()
-    current = Searches.objects.filter(uri=result).first()
+    Searches.objects.filter(
+        user=user,
+        party=party
+    ).exclude(uri=result,user=user, party=party).delete()
+    current = Searches.objects.filter(
+        uri=result, user=user, party=party).first()
     search_text = request.GET.get('text', None)
     token = check_token(token_info=party.token_info,party_id=pid)
     spotify_object = spotipy.Spotify(auth=token)
@@ -522,7 +528,7 @@ def update_search(request):
             search = Searches(
                 name = track_name + ", " + artist_name,
                 title = track_name,
-                artist = "PLACEHOLDER",
+                artist = artist_name,
                 uri=track_uri,
                 art=album_art,
                 party=party,
@@ -533,7 +539,6 @@ def update_search(request):
             search.save()
         else:
             search = current
-        print(QDEBUG, "SEARCH RESULT: ", search.id, search.title, search.artist)
         song_list.append(
             {
             'track_name': track_name,
@@ -545,9 +550,7 @@ def update_search(request):
     data={
         "success": 'True',
         "song_list": song_list,
-
     }
-    print(QDEBUG, "RUN Search AJAX")
     return JsonResponse(data)
 
 

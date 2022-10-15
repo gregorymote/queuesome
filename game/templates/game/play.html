@@ -38,6 +38,10 @@
     	color: #007bff;
     	background-color: inherit;
 	}
+	h6{
+		display: inline-block;
+		line-height: normal;
+	}
 </style>
 
 <script type="text/javascript">
@@ -346,68 +350,6 @@
 			other.classList.remove("active");
 			other.classList.add("text-muted");
 		}
-		
-	}
-
-	async function scroll(element){
-		var delay = 2500;
-		var subtract = true;
-		var wait = true;
-		setTimeout(()=>{wait=false;}, delay);
-		var scroll_text = setInterval(function () {
-			setWidth(element);
-			if(!wait){
-				scrollText(element);
-			}
-		}, 28);
-		function scrollText(element) {
-			var pWidth = getWidth(element.parentElement);
-			var cWidth = getWidth(element);
-			if(pWidth < cWidth){
-				var left = getLeft(element);
-				if(subtract && cWidth + left > pWidth){
-					left--;
-				}
-				else if (!subtract && left < 0){
-					left++;
-				}
-				if(cWidth + left == pWidth){
-					subtract = false;
-					wait = true;
-					setTimeout(()=>{wait=false;}, delay);
-				}
-				else if(left == 0 && !subtract){
-					subtract = true;
-					wait = true;
-					setTimeout(()=>{wait=false;}, delay);
-				}
-				element.style.left = left.toString() + "px";
-			}
-			else{
-				element.style.left = "0px";
-				subtract =true;
-			}
-		}
-		function getWidth(e){
-			var style = getComputedStyle(e);
-			var width = style.getPropertyValue("width");
-			width = parseInt(width.split("px")[0]);
-			return width;
-		}
-		function getLeft(e){
-			var style = getComputedStyle(element);
-			var left = style.getPropertyValue("left");
-			left = parseInt(left.split("px")[0]);
-			return left;
-		}
-		function setWidth(e){
-			element.style.width = "auto";
-			var pWidth = getWidth(element.parentElement);
-			var cWidth = getWidth(element);
-			if(cWidth < pWidth){
-				element.style.width = "100%";
-			}
-		}
 	}
 
 	function decodeBool(input){
@@ -433,8 +375,8 @@
 		</div>
 		<div style="position:relative">
 			<img id = "blur" class="blurry artwork-square" alt=""/>
-			<img id = "artwork" class="clear artwork-square" height="80%" alt=""/>
-		</div>	
+			<img id = "artwork" class="clear artwork-square" alt=""/>
+		</div>
 		<div class="pt-1">
 			{% load static %}
 			<img id= "logo" style='display:none;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
@@ -450,7 +392,6 @@
 				<button id="dislike"class="btn btn-outline-primary no-focus" name = "dislike" style='display:none;' ><em class="fa fa-thumbs-o-down"></em></button>
 			</div>
 		</div>
-
 	</div>
 
 	<div class="fixed-bottom">
