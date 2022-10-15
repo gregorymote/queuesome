@@ -4,7 +4,7 @@ async function scroll(element){
     var wait = true;
     setTimeout(()=>{wait=false;}, delay);
     var scroll_text = setInterval(function () {
-        setWidth(element);
+        //setWidth(element);
         if(!wait){
             scrollText(element);
         }
