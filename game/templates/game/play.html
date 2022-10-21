@@ -409,7 +409,7 @@
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 			}
-			else{
+			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
 			}
 		}
