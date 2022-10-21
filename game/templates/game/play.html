@@ -143,8 +143,10 @@
 			category_leader.innerHTML=category.leader+"'s Vibe";
 			category_leader.style.color = 'rgb('+ song.color + ')';
 			logo.style.display='initial';
-			song_title.innerHTML= song.title;
-			song_title_hidden.innerHTML= song.title;
+			if(song_title.innerHTML != song.title){
+				song_title.innerHTML = song.title;
+				song_title_hidden.innerHTML= song.title;
+			}
 			song_link.href=song.link;
 			song_link.style.display='initial';
 			song_link.style.color = 'rgb('+ song.color + ')';
@@ -171,13 +173,17 @@
 			artwork.src = "{% static 'images/queue_it_to_it_brah.png' %}";
 			blur.src = "{% static 'images/queue_it_to_it_brah.png' %}";
 			
-			if (party.state == 'pick_song'){
-				song_title.innerHTML="Someone Needs to Pick a Song";
-				song_title_hidden.innerHTML="Someone Needs to Pick a Song";
+			if(party.state == 'pick_song'){
+				if(song_title.innerHTML != "Someone Needs to Pick a Song"){
+					song_title.innerHTML="Someone Needs to Pick a Song";
+					song_title_hidden.innerHTML="Someone Needs to Pick a Song";
+				}
 			}
 			else{
-				song_title.innerHTML="Someone Needs to Curate the Vibe";
-				song_title_hidden.innerHTML="Someone Needs to Curate the Vibe";
+				if(song_title.innerHTML !="Someone Needs to Curate the Vibe"){
+					song_title.innerHTML="Someone Needs to Curate the Vibe";
+					song_title_hidden.innerHTML="Someone Needs to Curate the Vibe";
+				}
 			}
 		}
 		var action = document.getElementById('action');
