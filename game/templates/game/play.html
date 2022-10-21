@@ -42,6 +42,9 @@
 		display: inline-block;
 		line-height: normal;
 	}
+	h5 {
+  		transition-duration: 5s;
+	}
 </style>
 
 <script type="text/javascript">
@@ -104,8 +107,8 @@
 		total.addEventListener("click", setTab);
 		var song_title = document.getElementById('song_title');
 		var song_title_hidden = document.getElementById('song_title_hidden');
-		//pan(song_title, song_title_hidden);
-		scroll(song_title_hidden);
+		pan(song_title, song_title_hidden);
+		//scroll(song_title_hidden);
 		var category_name = document.getElementById('category_name');
 		//scroll(category_name);
 	});
@@ -369,8 +372,10 @@
 
 	async function pan(element, hidden){
 		var delay = 2500;
+		var animation = 5000;
 		var subtract = true;
 		var wait = true;
+		element.style.width = "auto";
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
 			setWidth(element, hidden);
@@ -382,12 +387,26 @@
 		function panText(element, hidden) {
 			var pWidth = getWidth(hidden.parentElement);
 			var cWidth = getWidth(element);
-			var hWidth = getWidth(hidden);
-			console.log(cWidth + ' : ' + hWidth + ' : ' +  pWidth);
-			//if(pWidth < cWidth){
-			//}
+			var translateX = getTranslateX(element);
+			console.log(pWidth + " : " + cWidth);
+			console.log(getTranslateX(element));
+			if(pWidth < cWidth){
+				if(translateX >= 0){
+					width = pWidth - cWidth
+					element.style.transform = "translateX(" + width +"px)";
+					wait = true;
+					setTimeout(()=>{wait=false;}, animation + delay);
+				}
+				else{
+					element.style.transform = "translateX(0px)";
+					wait = true;
+					setTimeout(()=>{wait=false;}, animation + delay);
+				}
+			}
+			else{
+				element.style.transform = "translateX(0px)";
+			}
 		}
-
 		function setWidth(element, hidden){
 			hidden.style.width = "auto";
 			var pWidth = getWidth(hidden.parentElement);
@@ -404,7 +423,11 @@
 			return width;
 		}
 
-
+		function getTranslateX(element){
+			var style = window.getComputedStyle(element);
+			var matrix = new WebKitCSSMatrix(style.transform);
+			return matrix.m41;
+		}
 	}
 </script>
 
