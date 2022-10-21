@@ -76,7 +76,7 @@
 
 .blurry {
     position: absolute;
-    filter: blur(35px);
+    filter: blur(30px);
 }
 
 .buttonIn {
