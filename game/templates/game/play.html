@@ -452,14 +452,14 @@
 					refreshElement(parent);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
-					setTimeout(()=>{refresh=true;}, animation);
+					setTimeout(()=>{refresh=true;}, animation - 5);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
 					refreshElement(parent);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
-					setTimeout(()=>{refresh=true;}, animation);
+					setTimeout(()=>{refresh=true;}, animation - 5);
 				}
 			}
 			else if (getTranslateX(element) != 0){
