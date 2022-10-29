@@ -300,7 +300,10 @@
 				total.append(total_name, total_likes);
 				total_body.append(total);
 			}	
-		}	
+		}
+		//Force Redraw
+		document.getElementById('parent').style.display = 'none';
+		document.getElementById('parent').style.display = 'block';
 	};
 
 	function likeSong(e){
@@ -440,7 +443,7 @@
 	}
 </script>
 
-	<div class = "container text-center form-width">
+	<div id="parent" class = "container text-center form-width">
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
 		</div>
