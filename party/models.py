@@ -103,7 +103,7 @@ class Songs(models.Model):
     link = models.CharField(max_length=500, null=True)
     duration=models.IntegerField(default=0, null=True)
     duplicate=models.BooleanField(default=False)
-    color=models.CharField(max_length=128, default='0,0,0')
+    color=models.CharField(max_length=128, default='0, 0, 0')
     created = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):

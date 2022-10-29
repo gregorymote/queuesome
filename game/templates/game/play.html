@@ -111,6 +111,7 @@
 	});
 
 	function updatePage(party, user, category, song, results, totals){
+		var redraw = false;
 		var inactive = decodeBool(party.inactive);
 		if (inactive){
 			window.location.replace('/index');
@@ -136,19 +137,23 @@
 		
 		if (category_name.innerHTML != category.name){
 			category_name.innerHTML = category.name;
+			redraw = true;
 		}
 		
 		if (song.art != "lull"){
 			if(category_leader.innerHTML != category.leader+"'s Vibe"){
 				category_leader.innerHTML=category.leader+"'s Vibe";
+				redraw = true;
 			}
 			if(category_leader.style.color != 'rgb('+ song.color + ')'){
 				category_leader.style.color = 'rgb('+ song.color + ')';
+				redraw = true;
 			}
 			logo.style.display='initial';
 			if(song_title.innerHTML != song.title){
 				song_title.innerHTML = song.title;
 				song_title_hidden.innerHTML= song.title;
+				redraw = true;
 			}
 			song_link.href=song.link;
 			song_link.style.display='initial';
@@ -157,12 +162,18 @@
 
 			if(song.art == 'duplicate'){
 				{% load static %}
-				artwork.src = "{% static 'images/twosome.png' %}";
-				blur.src = "{% static 'images/twosome.png' %}";
+				if(artwork.src != "{% static 'images/twosome.png' %}"){
+					artwork.src = "{% static 'images/twosome.png' %}";
+					blur.src = "{% static 'images/twosome.png' %}";
+					redraw = true;
+				}
 			}
 			else{
-				artwork.src = song.art;
-				blur.src = song.art;
+				if(artwork.src != song.art){
+					artwork.src = song.art;
+					blur.src = song.art;
+					redraw = true;
+				}
 			}
 		}
 		else{
@@ -180,12 +191,14 @@
 				if(song_title.innerHTML != "Someone Needs to Pick a Song"){
 					song_title.innerHTML="Someone Needs to Pick a Song";
 					song_title_hidden.innerHTML="Someone Needs to Pick a Song";
+					redraw = true;
 				}
 			}
 			else{
 				if(song_title.innerHTML !="Someone Needs to Curate the Vibe"){
 					song_title.innerHTML="Someone Needs to Curate the Vibe";
 					song_title_hidden.innerHTML="Someone Needs to Curate the Vibe";
+					redraw = true;
 				}
 			}
 		}
@@ -302,8 +315,11 @@
 			}	
 		}
 		//Force Redraw
-		var parent = document.getElementById('parent');
-		forceRedraw(parent);
+		if(redraw){
+			var parent = document.getElementById('parent');
+			forceRedraw(parent);
+			console.log("REDRAW PAGE");
+		}
 	};
 
 	var forceRedraw = function(element){
@@ -319,7 +335,7 @@
 		setTimeout(function(){
 			element.style.display = disp;
 			n.parentNode.removeChild(n);
-		},1); // you can play with this timeout to make it as short as possible
+		},1);
 	}
 
 	function likeSong(e){
@@ -404,12 +420,13 @@
 		var subtract = true;
 		var wait = true;
 		element.style.width = "auto";
+		var auto = true;
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
-			//setWidth(element, hidden);
-			if(!wait){
-				panText(element, hidden);
-			}
+			auto = setWidth(element, hidden, auto);
+		//	if(!wait){
+		//		panText(element, hidden);
+		//	}
     	}, 28);
 
 		function panText(element, hidden) {
@@ -435,13 +452,24 @@
 				element.style.transform = "translateX(0px)";
 			}
 		}
-		function setWidth(element, hidden){
+		function setWidth(element, hidden, auto){
 			hidden.style.width = "auto";
 			var pWidth = getWidth(hidden.parentElement);
 			var cWidth = getWidth(hidden);
 			if(cWidth < pWidth){
 				hidden.style.width = "100%";
+				if(auto){
+					element.style.width = "100%";
+					auto = false;
+				}
 			}
+			else{
+				if(!auto){
+					element.style.width = "auto";
+					auto = true;
+				}
+			}
+			return auto;
 		}
 
 		function getWidth(element){
