@@ -434,6 +434,7 @@
     	}, 28);
 
 		function panText(element) {
+			var parent = document.getElementById('parent');
 			var pWidth = getWidth(element.parentElement);
 			var cWidth = getWidth(element);
 			var translateX = getTranslateX(element);
@@ -441,14 +442,14 @@
 				if(translateX >= 0){
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
-					refreshElement(element);
+					refreshElement(parent);
 					console.log(width);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
-					refreshElement(element);
+					refreshElement(parent);
 					console.log("0-1");
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
@@ -456,7 +457,7 @@
 			}
 			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
-				refreshElement(element);
+				refreshElement(parent);
 				console.log("0-2")
 			}
 		}
