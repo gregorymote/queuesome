@@ -441,14 +441,14 @@
 				if(translateX >= 0){
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
-					refreshElement(element.parentElement);
+					refreshElement(element);
 					console.log(width);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
-					refreshElement(element.parentElement);
+					refreshElement(element);
 					console.log("0-1");
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
@@ -456,7 +456,7 @@
 			}
 			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
-				refreshElement(element.parentElement);
+				refreshElement(element);
 				console.log("0-2")
 			}
 		}
