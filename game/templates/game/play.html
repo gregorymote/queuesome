@@ -324,7 +324,6 @@
 	};
 
 	function forceRedraw(element){
-		console.log("REDRAW PAGE");
 		if (!element) { return; }
 
 		var n = document.createTextNode(' ');
@@ -341,11 +340,9 @@
 
 	function refreshElement(element){
 		element.style.border = 'solid 1px transparent';
-		console.log("border");
-		setTimeout(function(){
+		//setTimeout(function(){
 			element.style.border = 'solid 0px transparent';
-			console.log("no border");
-		},1);
+		//},1);
 
 	}
 
@@ -447,14 +444,12 @@
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
 					refreshElement(parent);
-					console.log(width);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
 					refreshElement(parent);
-					console.log("0-1");
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
@@ -462,7 +457,6 @@
 			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
 				refreshElement(parent);
-				console.log("0-2")
 			}
 		}
 		
