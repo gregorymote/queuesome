@@ -107,12 +107,8 @@
 		total.addEventListener("click", setTab);
 		var song_title = document.getElementById('song_title');
 		var song_title_hidden = document.getElementById('song_title_hidden');
-		pan(song_title, song_title_hidden);
+		//pan(song_title, song_title_hidden);
 	});
-
-	function testScript(e){
-		console.log("song_title updated");
-	}
 
 	function updatePage(party, user, category, song, results, totals){
 		var inactive = decodeBool(party.inactive);
@@ -146,7 +142,9 @@
 			if(category_leader.innerHTML != category.leader+"'s Vibe"){
 				category_leader.innerHTML=category.leader+"'s Vibe";
 			}
-			category_leader.style.color = 'rgb('+ song.color + ')';
+			if(category_leader.style.color != 'rgb('+ song.color + ')'){
+				category_leader.style.color = 'rgb('+ song.color + ')';
+			}
 			logo.style.display='initial';
 			if(song_title.innerHTML != song.title){
 				song_title.innerHTML = song.title;
