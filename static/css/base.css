@@ -92,13 +92,7 @@
     margin:auto;
 }
 
-.category-name {
-    white-space: nowrap;
-    overflow: hidden;
-    position: relative;
-    width: 75%;
-    margin:auto;
-}
+
 
 .center{
     position: relative;

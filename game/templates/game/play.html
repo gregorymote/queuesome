@@ -515,6 +515,7 @@
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
 		</div>
+		<!--
 		<div class="category-leader" style="margin-bottom:0px;">
 			<h6 id ="category_leader"></h6>
 		</div>
@@ -522,6 +523,7 @@
 			<h5 id = "category_name" style="position:absolute;"></h5>
 			<h5 id= "category_name_hidden" style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
 		</div>
+		-->
 		<div style="position:relative">
 			<img id = "blur" class="blurry artwork-square" alt=""/>
 			<img id = "artwork" class="clear artwork-square" alt=""/>
@@ -537,16 +539,61 @@
 		<a id = "song_link" style='display:none; text-decoration:none;'><h6 id = "song_artist"></h6></a>
 		<div class = "row">
 			<div class = "col text-center pt-2 pb-2">
-				<button id="like" class="btn btn-outline-primary no-focus" name = "like" style='display:none;' ><em class="fa fa-thumbs-o-up"></em></button>
-				<button id="dislike"class="btn btn-outline-primary no-focus" name = "dislike" style='display:none;' ><em class="fa fa-thumbs-o-down"></em></button>
+				
 			</div>
 		</div>
 	</div>
+	<style>
+		.category-name {
+			white-space: nowrap;
+			overflow: hidden;
+			position: relative;
+			width: 90%;
+			margin:auto;
+		}
 
+		.bar{
+			border-color: lightgray;
+			border-width: 2px;
+			border-style: solid;
+			border-radius: 12px;
+			height: auto;
+			border-bottom:none;
+			border-left: none;
+			border-right: none;
+			border-bottom-left-radius: 0px;
+			border-bottom-right-radius: 0px;
+			max-width:800px;
+			margin-left: auto;
+  			margin-right: auto;
+		}
+
+		.action{
+			width: 100%; 
+			border-radius:16px; 
+			color:white !important;
+			border-bottom-left-radius: 0px;
+			border-bottom-right-radius: 0px;
+		}
+	</style>
 	<div class="fixed-bottom">
-		<div class="text-center">
-			<h2><em class="fa-solid fa-chevron-up"></em></h2>
-			<a id="action" style='display:none; text-decoration: none; color:black'></a>
+		<div class="text-left bar">
+			<div class="row">
+				<div class="col-8 pt-2">
+					<div class="category-name">
+						<h5 id = "category_name" style="position:absolute;"></h5>
+						<h5 id= "category_name_hidden" style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+						<h6 id ="category_leader" style="margin-top:-2px"></h6>
+					</div>
+				</div>
+				<div class="col-4 pt-3">
+					<button  id="like" class="btn btn-outline-primary no-focus" name = "like" style='display:inline-block;outline: none;' ><em class="fa-regular fa-thumbs-up"></em></button>
+					<button id="dislike" class="btn btn-outline-primary no-focus" name = "dislike" style='display:inline-block;' ><em class="fa-regular fa-thumbs-down"></em></button>
+				</div>
+			</div>
+			<div class="text-center">
+				<a id="action" class ="btn btn-dark btn-lg text-primary display:none; action" role="button"></a>
+			</div>
 		</div>
 
 		<nav class="navbar navbar-light">
