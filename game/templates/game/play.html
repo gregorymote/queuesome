@@ -107,7 +107,7 @@
 		total.addEventListener("click", setTab);
 		var song_title = document.getElementById('song_title');
 		var song_title_hidden = document.getElementById('song_title_hidden');
-		//pan(song_title, song_title_hidden);
+		pan(song_title, song_title_hidden);
 	});
 
 	function updatePage(party, user, category, song, results, totals){
@@ -418,66 +418,38 @@
 		var animation = 5000;
 		var subtract = true;
 		var wait = true;
-		element.style.width = "auto";
-		var auto = true;
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
-			auto = setWidth(element, hidden, auto);
-		//	if(!wait){
-		//		panText(element, hidden);
-		//	}
+			if(!wait){
+				panText(element, hidden);
+			}
     	}, 28);
 
 		function panText(element, hidden) {
 			var pWidth = getWidth(hidden.parentElement);
 			var cWidth = getWidth(element);
 			var translateX = getTranslateX(element);
-			//console.log(pWidth + " : " + cWidth);
-			//console.log(getTranslateX(element));
 			if(pWidth < cWidth){
 				if(translateX >= 0){
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
+					console.log(width);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
+					console.log("0-1");
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 			}
 			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
+				console.log("0-2")
 			}
 		}
-		function setWidth(element, hidden, auto){
-			hidden.style.width = "auto";
-			var pWidth = getWidth(hidden.parentElement);
-			var cWidth = getWidth(hidden);
-			if(cWidth < pWidth){
-				hidden.style.width = "100%";
-				if(auto){
-					element.style.width = "100%";
-					auto = false;
-				}
-			}
-			else{
-				if(!auto){
-					element.style.width = "auto";
-					auto = true;
-				}
-			}
-			return auto;
-		}
-
-		function getWidth(element){
-			var style = getComputedStyle(element);
-			var width = style.getPropertyValue("width");
-			width = parseInt(width.split("px")[0]);
-			return width;
-		}
-
+		
 		function getTranslateX(element){
 			var style = window.getComputedStyle(element);
 			var matrix = new WebKitCSSMatrix(style.transform);
