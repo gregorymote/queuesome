@@ -106,8 +106,7 @@
 		var total = document.getElementById('total_title');
 		total.addEventListener("click", setTab);
 		var song_title = document.getElementById('song_title');
-		var song_title_hidden = document.getElementById('song_title_hidden');
-		pan(song_title, song_title_hidden);
+		pan(song_title);
 	});
 
 	function updatePage(party, user, category, song, results, totals){
@@ -317,12 +316,11 @@
 		if(redraw){
 			var parent = document.getElementById('parent');
 			forceRedraw(parent);
-			console.log("REDRAW PAGE");
 		}
 	};
 
-	var forceRedraw = function(element){
-
+	function forceRedraw(element){
+		console.log("REDRAW PAGE");
 		if (!element) { return; }
 
 		var n = document.createTextNode(' ');
@@ -413,7 +411,7 @@
 		}
 	}
 
-	async function pan(element, hidden){
+	async function pan(element){
 		var delay = 2500;
 		var animation = 5000;
 		var subtract = true;
@@ -421,24 +419,26 @@
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
 			if(!wait){
-				panText(element, hidden);
+				panText(element);
 			}
     	}, 28);
 
-		function panText(element, hidden) {
-			var pWidth = getWidth(hidden.parentElement);
+		function panText(element) {
+			var pWidth = getWidth(element.parentElement);
 			var cWidth = getWidth(element);
 			var translateX = getTranslateX(element);
 			if(pWidth < cWidth){
 				if(translateX >= 0){
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
+					element.parentElement.transform = "translateZ(0)";
 					console.log(width);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
+					element.parentElement.transform = "translateZ(2)";
 					console.log("0-1");
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
@@ -446,6 +446,7 @@
 			}
 			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
+				element.parentElement.transform = "translateZ(1)";
 				console.log("0-2")
 			}
 		}
@@ -497,7 +498,6 @@
 		</div>
 		<div class="song-title">
 			<h5 id="song_title" style="position:absolute;"></h5>
-			<h5 id="song_title_hidden" style="visibility:hidden; position:absolute;"></h5>
 			<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
 		</div>
 		<a id = "song_link" style='display:none; text-decoration:none;'><h6 id = "song_artist"></h6></a>
