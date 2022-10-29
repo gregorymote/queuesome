@@ -135,6 +135,7 @@
 		
 		if (category_name.innerHTML != category.name){
 			category_name.innerHTML = category.name;
+			setWidth(category_name);
 			redraw = true;
 		}
 		
@@ -423,12 +424,12 @@
 	}
 
 	async function pan(element){
-		var parent = document.getElementById('parent');
 		var delay = 2500;
 		var animation = 5000;
-		var subtract = true;
+		var speed = 28;
 		var wait = true;
 		var refresh = false;
+		var parent = document.getElementById('parent');
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
 			if(!wait){
@@ -438,14 +439,29 @@
 				refreshElement(parent);
 				refresh = false;
 			}
+			else{
+				initializePos(element);
+			}
     	}, 1);
 
+		function initializePos(element){
+			var pWidth = getWidth(element.parentElement);
+			var cWidth = getWidth(element);
+			var translateX = getTranslateX(element);
+			if ((pWidth >= cWidth) && getTranslateX(element) != 0) {
+				element.style.transitionDuration = '0s';
+				element.style.transform = "translateX(0px)";
+				refreshElement(parent);
+			}
+		}
+
 		function panText(element, parent) {
-			
 			var pWidth = getWidth(element.parentElement);
 			var cWidth = getWidth(element);
 			var translateX = getTranslateX(element);
 			if(pWidth < cWidth){
+				animation = (cWidth - pWidth) * speed
+				element.style.transitionDuration = (animation / 1000).toString() + 's';
 				if(translateX >= 0){
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
@@ -463,16 +479,14 @@
 				}
 			}
 			else if (getTranslateX(element) != 0){
+				console.log(getTranslateX(element));
+				element.style.transitionDuration = '0s';
 				element.style.transform = "translateX(0px)";
 				refreshElement(parent);
 			}
 		}
 		
-		function getTranslateX(element){
-			var style = window.getComputedStyle(element);
-			var matrix = new WebKitCSSMatrix(style.transform);
-			return matrix.m41;
-		}
+
 	}
 
 	function setWidth(element){
@@ -482,9 +496,6 @@
 		if(cWidth < pWidth){
 			element.style.width = "100%";
 		}
-		else{
-			element.style.width = "auto";
-		}
 	}
 	function getWidth(element){
 			var style = getComputedStyle(element);
@@ -492,6 +503,12 @@
 			width = parseInt(width.split("px")[0]);
 			return width;
 	}
+
+	function getTranslateX(element){
+			var style = window.getComputedStyle(element);
+			var matrix = new WebKitCSSMatrix(style.transform);
+			return matrix.m41;
+		}
 </script>
 
 	<div id="parent" class = "container text-center form-width">
