@@ -335,6 +335,16 @@
 		},1);
 	}
 
+	function refreshElement(element){
+		element.style.backgroundColor = 'lightblue';
+		console.log("lightblue");
+		setTimeout(function(){
+			element.style.backgroundColor = 'transparent';
+			console.log("transparent");
+		},1000);
+
+	}
+
 	function likeSong(e){
 		var like = true;
 		var button = e.target;
@@ -431,14 +441,14 @@
 				if(translateX >= 0){
 					width = pWidth - cWidth
 					element.style.transform = "translateX(" + width +"px)";
-					element.parentElement.transform = "translateZ(0)";
+					refreshElement(element.parentElement);
 					console.log(width);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
-					element.parentElement.transform = "translateZ(2)";
+					refreshElement(element.parentElement);
 					console.log("0-1");
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
@@ -446,7 +456,7 @@
 			}
 			else if (getTranslateX(element) != 0){
 				element.style.transform = "translateX(0px)";
-				element.parentElement.transform = "translateZ(1)";
+				refreshElement(element.parentElement);
 				console.log("0-2")
 			}
 		}
