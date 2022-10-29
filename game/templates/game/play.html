@@ -147,7 +147,9 @@
 				category_leader.style.color = 'rgb('+ song.color + ')';
 				redraw = true;
 			}
-			logo.style.display='initial';
+			if (logo.style.display != 'initial'){
+				logo.style.display = 'initial';
+			}
 			if(song_title.innerHTML != song.title){
 				song_title.innerHTML = song.title;
 				setWidth(song_title);
@@ -177,7 +179,9 @@
 		else{
 			category_leader.innerHTML=party.name;
 			category_leader.style.color = 'rgb(130,128,131)';
-			logo.style.display='none';
+			if(logo.style.display != 'none'){
+				logo.style.display='none';
+			}
 			song_link.removeAttribute("href");
 			song_artist.innerHTML = '';
 			song_link.style.display='none';
