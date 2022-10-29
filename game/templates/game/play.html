@@ -423,19 +423,25 @@
 	}
 
 	async function pan(element){
+		var parent = document.getElementById('parent');
 		var delay = 2500;
 		var animation = 5000;
 		var subtract = true;
 		var wait = true;
+		var refresh = false;
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
 			if(!wait){
-				panText(element);
+				panText(element, parent);
+			}
+			else if(refresh){
+				refreshElement(parent);
+				refresh = false;
 			}
     	}, 28);
 
-		function panText(element) {
-			var parent = document.getElementById('parent');
+		function panText(element, parent) {
+			
 			var pWidth = getWidth(element.parentElement);
 			var cWidth = getWidth(element);
 			var translateX = getTranslateX(element);
@@ -446,12 +452,14 @@
 					refreshElement(parent);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
+					setTimeout(()=>{refresh=true;}, animation);
 				}
 				else{
 					element.style.transform = "translateX(0px)";
 					refreshElement(parent);
 					wait = true;
 					setTimeout(()=>{wait=false;}, animation + delay);
+					setTimeout(()=>{refresh=true;}, animation);
 				}
 			}
 			else if (getTranslateX(element) != 0){
