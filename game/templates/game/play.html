@@ -129,6 +129,7 @@
 		var blur = document.getElementById('blur');
 		var artwork = document.getElementById('artwork');
 		var logo = document.getElementById('logo');
+		var logo_placeholder = document.getElementById('logo_placeholder');
 		var song_title = document.getElementById('song_title');
 		var song_link = document.getElementById('song_link');
 		var song_artist = document.getElementById('song_artist');
@@ -146,6 +147,7 @@
 			}
 			if (logo.style.display != 'initial'){
 				logo.style.display = 'initial';
+				logo_placeholder.style.display='none';
 			}
 			if(song_title.innerHTML != song.title){
 				song_title.innerHTML = song.title;
@@ -153,7 +155,7 @@
 				redraw = true;
 			}
 			song_link.href=song.link;
-			song_link.style.display='initial';
+			song_link.style.visibility='initial';
 			song_artist.innerHTML = song.artist;
 
 			if(song.art == 'duplicate'){
@@ -176,10 +178,11 @@
 			category_leader.innerHTML=party.name;
 			if(logo.style.display != 'none'){
 				logo.style.display='none';
+				logo_placeholder.style.display='initial';
 			}
 			song_link.removeAttribute("href");
 			song_artist.innerHTML = '';
-			song_link.style.display='none';
+			song_link.style.visibility='hidden';
 			{% load static %}
 			artwork.src = "{% static 'images/queue_it_to_it_brah.png' %}";
 			blur.src = "{% static 'images/queue_it_to_it_brah.png' %}";
@@ -595,7 +598,11 @@
 			<h5 id="song_title" style="position:absolute;"></h5>
 			<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
 		</div>
-		<a id = "song_link" style='display:none; position:relative; bottom: .5em;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
+		<a id = "song_link" style='visibility:hidden; position:relative; bottom: .5em;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
+		<div class="pt-1">
+			{% load static %}
+			<img id = "logo_placeholder" style='visibility:hidden;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+		</div>
 	</div>
 	<div class="play-bar">
 		<div class="row pb-2">
