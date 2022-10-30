@@ -524,8 +524,59 @@
 			return matrix.m41;
 		}
 </script>
+<style>
+	.song-link{
+		text-decoration:none;
+	}
 
-	<div id="parent" class = "container text-center form-width">
+	.category-name {
+		white-space: nowrap;
+		overflow: hidden;
+		position: relative;
+		width: 90%;
+		margin:auto;
+	}
+
+	.play-bar{
+		border-color: lightgray;
+		border-width: 2px;
+		border-style: solid;
+		border-radius: 12px;
+		height: auto;
+		border-bottom:none;
+		border-left: none;
+		border-right: none;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+		max-width:800px;
+		margin-left: auto;
+		  margin-right: auto;
+		background-color: white;
+	}
+
+	.action{
+		width: 85%; 
+		border-radius:16px; 
+		color:white !important;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+	}
+
+	.like{
+		display:inline-block;
+		font-size: 2em;
+		position: relative;
+	}
+	.song-color{
+		color: rgb(130, 128, 131);
+	}
+	.right-align{
+		text-align: right;
+	}
+</style>
+
+<div class="fixed-bottom">
+	<div id="parent" class = "container text-center form-width" style="padding-bottom:1em;">
 		<div style="visibility:hidden">
 			<p style="margin-bottom:0; line-height:.5em;">Rendering</p>
 		</div>
@@ -546,90 +597,37 @@
 		</div>
 		<a id = "song_link" style='display:none; position:relative; bottom: .5em;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
 	</div>
-
-	<style>
-		.song-link{
-			text-decoration:none;
-		}
-
-		.category-name {
-			white-space: nowrap;
-			overflow: hidden;
-			position: relative;
-			width: 90%;
-			margin:auto;
-		}
-
-		.play-bar{
-			border-color: lightgray;
-			border-width: 2px;
-			border-style: solid;
-			border-radius: 12px;
-			height: auto;
-			border-bottom:none;
-			border-left: none;
-			border-right: none;
-			border-bottom-left-radius: 0px;
-			border-bottom-right-radius: 0px;
-			max-width:800px;
-			margin-left: auto;
-  			margin-right: auto;
-			background-color: white;
-		}
-
-		.action{
-			width: 85%; 
-			border-radius:16px; 
-			color:white !important;
-			border-bottom-left-radius: 0px;
-			border-bottom-right-radius: 0px;
-		}
-
-		.like{
-			display:inline-block;
-			font-size: 2em;
-			position: relative;
-		}
-		.song-color{
-			color: rgb(130, 128, 131);
-		}
-		.right-align{
-			text-align: right;
-		}
-	</style>
-
-	<div class="fixed-bottom">
-		<div class="play-bar">
-			<div class="row pb-2">
-				<div class="col-8 pt-2 text-left ">
-					<div class="category-name">
-						<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
-						<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
-						<h6 id ="category_leader" class="category-leader song-color"></h6>
-					</div>
-				</div>
-				<div class="col-4 pe-4 pt-2 right-align">
-					<div id="like" class="like song-color pe-2" style="bottom:.20em">
-						<em id="like_icon" class="fa-regular fa-thumbs-up"></em>
-					</div>
-					<div id="dislike" class="like song-color pe-2" style="top:.10em">
-						<em id="dislike_icon" class="fa-regular fa-thumbs-down"></em>
-					</div>
+	<div class="play-bar">
+		<div class="row pb-2">
+			<div class="col-8 pt-2 text-left ">
+				<div class="category-name">
+					<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
+					<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
+					<h6 id ="category_leader" class="category-leader song-color"></h6>
 				</div>
 			</div>
-			<div class="text-center">
-				<a id="action" class ="btn btn-dark btn-lg text-primary display:none; action" role="button"></a>
+			<div class="col-4 pe-4 pt-2 right-align">
+				<div id="like" class="like song-color pe-2" style="bottom:.20em">
+					<em id="like_icon" class="fa-regular fa-thumbs-up"></em>
+				</div>
+				<div id="dislike" class="like song-color pe-2" style="top:.10em">
+					<em id="dislike_icon" class="fa-regular fa-thumbs-down"></em>
+				</div>
 			</div>
 		</div>
-
-		<nav class="navbar navbar-light">
-			<a href="{% url 'users' pid=party.id %}" class="btn navbar-btn"> <em class="fa fa-users"></em></a>
-			<div class=" ps-5 text-white text-center">
-				<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#qrModal"><strong id="party_code"></strong> <em class="fa fa-qrcode"></em></a>
-			</div>	
-			<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
-		</nav>
+		<div class="text-center">
+			<a id="action" class ="btn btn-dark btn-lg text-primary display:none; action" role="button"></a>
+		</div>
 	</div>
+
+	<nav class="navbar navbar-light">
+		<a href="{% url 'users' pid=party.id %}" class="btn navbar-btn"> <em class="fa fa-users"></em></a>
+		<div class=" ps-5 text-white text-center">
+			<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#qrModal"><strong id="party_code"></strong> <em class="fa fa-qrcode"></em></a>
+		</div>	
+		<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
+	</nav>
+</div>
 	<!-- Results Modal -->
 	<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
