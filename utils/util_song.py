@@ -11,7 +11,7 @@ from queue_it_up.settings import QDEBUG
 
 
 def get_bg_color(song_id):
-    color = '255, 255, 255'
+    color = '130, 128, 131'
     song = Songs.objects.get(id=song_id)
     if song and len(song.art.split('image/')) > 1:
         art_id = song.art.split('image/')[1]
@@ -34,8 +34,6 @@ def get_bg_color(song_id):
                 intensity = (colors[0]*0.299 + colors[1]*0.587 + colors[2]*0.114)
                 if intensity < 186:
                     color = str(round(colors[0])) +', '+ str(round(colors[1])) +', '+ str(round(colors[2]))
-                else:
-                    color = '130, 128, 131'
             except Exception:
                 print(QDEBUG,'Unable to Find Background color for ' + song.name)
             song = Songs.objects.get(id=song_id)

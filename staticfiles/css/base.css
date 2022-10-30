@@ -76,7 +76,7 @@
 
 .blurry {
     position: absolute;
-    filter: blur(30px);
+    filter: blur(20px);
 }
 
 .buttonIn {
@@ -88,15 +88,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     position: relative;
-    width: 60%;
-    margin:auto;
-}
-
-.category-name {
-    white-space: nowrap;
-    overflow: hidden;
-    position: relative;
-    width: 75%;
+    width: 85%;
     margin:auto;
 }
 

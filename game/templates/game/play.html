@@ -60,7 +60,7 @@
 		"hasPicked": "{{user.hasPicked}}",
 		"turn": "{{user.turn}}",
 		"hasLiked": "{{user.hasLiked}}",
-		"hasSkip": "{{user.hasSkip}}",
+		"hasDislike": "{{user.hasSkip}}",
 		"user": "{{user.pk}}",
 		"name": "{{user.name}}"
 	}
@@ -82,7 +82,7 @@
 	var totals = {{ totals|safe }};
 
 	window.onload = function() {
-		updatePage(party, user, category, song, results, totals);
+		updatePage(party, user, category, song, results, totals, onLoad=true);
 	};
 	setInterval(function () {
 		$.ajax({
@@ -109,7 +109,7 @@
 		pan(song_title);
 	});
 
-	function updatePage(party, user, category, song, results, totals){
+	function updatePage(party, user, category, song, results, totals, onLoad=false){
 		var redraw = false;
 		var inactive = decodeBool(party.inactive);
 		if (inactive){
@@ -144,10 +144,6 @@
 				category_leader.innerHTML=category.leader+"'s Vibe";
 				redraw = true;
 			}
-			if(category_leader.style.color != 'rgb('+ song.color + ')'){
-				category_leader.style.color = 'rgb('+ song.color + ')';
-				redraw = true;
-			}
 			if (logo.style.display != 'initial'){
 				logo.style.display = 'initial';
 			}
@@ -158,7 +154,6 @@
 			}
 			song_link.href=song.link;
 			song_link.style.display='initial';
-			song_link.style.color = 'rgb('+ song.color + ')';
 			song_artist.innerHTML = song.artist;
 
 			if(song.art == 'duplicate'){
@@ -179,7 +174,6 @@
 		}
 		else{
 			category_leader.innerHTML=party.name;
-			category_leader.style.color = 'rgb(130,128,131)';
 			if(logo.style.display != 'none'){
 				logo.style.display='none';
 			}
@@ -222,35 +216,35 @@
 			action.style.display = 'none';
 		}
 
-		var like = document.getElementById('like');
-		var dislike = document.getElementById('dislike');
-		var hasLiked = decodeBool(user.hasLiked)
-		var hasSkip = decodeBool(user.hasSkip)
-		if (song.art != "lull" && song.user != user.user){
-			like.style.display = 'initial';
-			like.classList.remove("hover")
-			if(hasLiked){
-				like.classList.add('active');
-				like.setAttribute('aria-pressed', true);
+		if(onLoad){
+			var like = document.getElementById('like');
+			var dislike = document.getElementById('dislike');
+			var hasLiked = decodeBool(user.hasLiked)
+			var hasDislike = decodeBool(user.hasDislike)
+			if (song.art != "lull" && song.user != user.user){
+				like.style.display = 'initial';
+				if(hasLiked){
+					like.classList.remove('fa-regular');
+					like.classList.add('fa-solid');
+				}
+				else{
+					like.classList.remove('fa-solid');
+					like.classList.add('fa-regular');
+				}
+				dislike.style.display = 'initial';
+				if(hasDislike){
+					like.classList.remove('fa-regular');
+					like.classList.add('fa-solid');
+				}
+				else{
+					like.classList.remove('fa-solid');
+					like.classList.add('fa-regular');
+				}
 			}
-			else{
-				like.classList.remove('active');
-				like.setAttribute('aria-pressed', false);
-			}
-			dislike.style.display = 'initial';
-			dislike.classList.remove("hover")
-			if(hasSkip){
-				dislike.classList.add('active');
-				dislike.setAttribute('aria-pressed', true);
-			}
-			else{
-				dislike.classList.remove('active');
-				dislike.setAttribute('aria-pressed', false);
-			}
-		}
-		else{
-			like.style.display = 'none';
-			dislike.style.display = 'none';
+			//else{
+			//	like.style.display = 'none';
+			//	dislike.style.display = 'none';
+			//}
 		}
 
 		var party_code = document.getElementById('party_code');
@@ -317,6 +311,11 @@
 				total_body.append(total);
 			}	
 		}
+
+		if(updateColor('song-color', 'rgb('+ song.color + ')')){
+			redraw = true;
+		}
+
 		//Force Redraw
 		if(redraw){
 			var parent = document.getElementById('parent');
@@ -347,33 +346,49 @@
 
 	}
 
+	function updateColor(name, color) {
+		var update = false;
+		var cols = document.getElementsByClassName(name);
+		for(i = 0; i < cols.length; i++) {
+			if(cols[i].style.color != color){
+				cols[i].style.color = color;
+				update = true;
+			}
+		}
+		return update;
+	}
+
 	function likeSong(e){
 		var like = true;
 		var button = e.target;
+		var other;
 		if(button.id == ""){
 			button = button.parentElement;
 		}
-		var other;
-		if (button.id == 'like'){
-			other = document.getElementById('dislike');	
+		console.log(button.id);
+		if (button.id.indexOf('dislike') > -1){
+			button = document.getElementById('dislike_icon');	
+			other = document.getElementById('like_icon');
 		}
 		else{
-			other = document.getElementById('like');	
+			button = document.getElementById('like_icon');	
+			other = document.getElementById('dislike_icon');
 		}
-		var isActive = button.classList.contains('active');
-		if((button.id == 'like' && isActive) ||
+		other.classList.remove('fa-solid');
+		other.classList.add('fa-regular');
+
+		var isActive = button.classList.contains('fa-solid');
+		if ((button.id == 'like' && isActive) ||
 			(button.id == 'dislike' && !isActive)){
 			like = false;
 		}
 		if (isActive){
-			button.classList.remove('active');
-			button.setAttribute('aria-pressed', false);
+			button.classList.remove('fa-solid');
+			button.classList.add('fa-regular');
 		}
 		else{
-			button.classList.add('active');
-			button.setAttribute('aria-pressed', true);
-			other.classList.remove('active');
-			other.setAttribute('aria-pressed', false);
+			button.classList.remove('fa-regular');
+			button.classList.add('fa-solid');
 		}
 		$.ajax({
 			url: '/sesh/update_like',
@@ -384,7 +399,6 @@
 			},
 			dataType: 'json',
 			success: function (data) {
-				
 		} });
 	}
 
@@ -515,15 +529,6 @@
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
 		</div>
-		<!--
-		<div class="category-leader" style="margin-bottom:0px;">
-			<h6 id ="category_leader"></h6>
-		</div>
-		<div class="category-name">
-			<h5 id = "category_name" style="position:absolute;"></h5>
-			<h5 id= "category_name_hidden" style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
-		</div>
-		-->
 		<div style="position:relative">
 			<img id = "blur" class="blurry artwork-square" alt=""/>
 			<img id = "artwork" class="clear artwork-square" alt=""/>
@@ -536,14 +541,14 @@
 			<h5 id="song_title" style="position:absolute;"></h5>
 			<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
 		</div>
-		<a id = "song_link" style='display:none; text-decoration:none;'><h6 id = "song_artist"></h6></a>
-		<div class = "row">
-			<div class = "col text-center pt-2 pb-2">
-				
-			</div>
-		</div>
+		<a id = "song_link" style='display:none;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
 	</div>
+
 	<style>
+		.song-link{
+			text-decoration:none;
+		}
+
 		.category-name {
 			white-space: nowrap;
 			overflow: hidden;
@@ -552,7 +557,7 @@
 			margin:auto;
 		}
 
-		.bar{
+		.play-bar{
 			border-color: lightgray;
 			border-width: 2px;
 			border-style: solid;
@@ -566,29 +571,47 @@
 			max-width:800px;
 			margin-left: auto;
   			margin-right: auto;
+			background-color: white;
 		}
 
 		.action{
-			width: 100%; 
+			width: 85%; 
 			border-radius:16px; 
 			color:white !important;
 			border-bottom-left-radius: 0px;
 			border-bottom-right-radius: 0px;
 		}
+
+		.like{
+			display:inline-block;
+			font-size: 2em;
+			position: relative;
+		}
+		.song-color{
+			color: rgb(130, 128, 131);
+		}
+		.right-align{
+			text-align: right;
+		}
 	</style>
+
 	<div class="fixed-bottom">
-		<div class="text-left bar">
-			<div class="row">
-				<div class="col-8 pt-2">
+		<div class="play-bar">
+			<div class="row pb-2">
+				<div class="col-8 pt-2 text-left ">
 					<div class="category-name">
-						<h5 id = "category_name" style="position:absolute;"></h5>
-						<h5 id= "category_name_hidden" style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
-						<h6 id ="category_leader" style="margin-top:-2px"></h6>
+						<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
+						<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
+						<h6 id ="category_leader" class="category-leader song-color"></h6>
 					</div>
 				</div>
-				<div class="col-4 pt-3">
-					<button  id="like" class="btn btn-outline-primary no-focus" name = "like" style='display:inline-block;outline: none;' ><em class="fa-regular fa-thumbs-up"></em></button>
-					<button id="dislike" class="btn btn-outline-primary no-focus" name = "dislike" style='display:inline-block;' ><em class="fa-regular fa-thumbs-down"></em></button>
+				<div class="col-4 pe-4 pt-2 right-align">
+					<div id="like" class="like song-color pe-2" style="bottom:.20em">
+						<em id="like_icon" class="fa-regular fa-thumbs-up"></em>
+					</div>
+					<div id="dislike" class="like song-color pe-2" style="top:.10em">
+						<em id="dislike_icon" class="fa-regular fa-thumbs-down"></em>
+					</div>
 				</div>
 			</div>
 			<div class="text-center">
@@ -597,13 +620,10 @@
 		</div>
 
 		<nav class="navbar navbar-light">
-			
 			<a href="{% url 'users' pid=party.id %}" class="btn navbar-btn"> <em class="fa fa-users"></em></a>
-							
 			<div class=" ps-5 text-white text-center">
 				<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#qrModal"><strong id="party_code"></strong> <em class="fa fa-qrcode"></em></a>
 			</div>	
-			
 			<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
 		</nav>
 	</div>

@@ -207,7 +207,7 @@ def update_play(request):
 		"hasPicked": str(user.hasPicked),
 		"turn": user.turn,
 		"hasLiked": str(user.hasLiked),
-        "hasSkip" : str(user.hasSkip),
+        "hasDislike" : str(user.hasSkip),
 		"user": user.pk
 	}
     try:
