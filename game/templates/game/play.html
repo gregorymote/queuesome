@@ -438,7 +438,7 @@
 	}
 
 	async function pan(element){
-		var delay = 2500;
+		var delay = 3000;
 		var animation = 5000;
 		var speed = 28;
 		var wait = true;
@@ -525,7 +525,10 @@
 		}
 </script>
 
-	<div id="parent" class = "container text-center form-width pt-4">
+	<div id="parent" class = "container text-center form-width">
+		<div style="visibility:hidden">
+			<h5>Rendering</h5>
+		</div>
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
 		</div>
