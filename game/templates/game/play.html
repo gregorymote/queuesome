@@ -208,7 +208,7 @@
 			action.href = "{% url 'choose_category' pid=party.id %}" 
 		}
 		else if(party.state == "pick_song" && !hasPicked && !full){
-			action.innerHTML = "Pick Song";
+			action.innerHTML = "Pick a Song";
 			action.style.display = '';
 			action.href = "{% url 'pick_song' pid=party.id %}" 
 		}
@@ -527,7 +527,7 @@
 
 	<div id="parent" class = "container text-center form-width">
 		<div style="visibility:hidden">
-			<h5>Rendering</h5>
+			<p style="margin-bottom:0; line-height:.1em;">Rendering</p>
 		</div>
 		<div class="alert alert-danger" id='device_error' style='display:none;'>
 			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
@@ -544,7 +544,7 @@
 			<h5 id="song_title" style="position:absolute;"></h5>
 			<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
 		</div>
-		<a id = "song_link" style='display:none;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
+		<a id = "song_link" style='display:none; position:relative; bottom: .5em;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
 	</div>
 
 	<style>
