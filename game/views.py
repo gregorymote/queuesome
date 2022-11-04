@@ -257,16 +257,16 @@ def update_like(request):
     like = request.GET.get('like', None)
     action = request.GET.get('action', None)
     user = get_user(request, pid)   
-    
+    print(action, like)
     if like == 'true':
-        if action == 'like': 
+        if action == 'like_icon': 
             user.hasLiked = True
             user.hasSkip = False
         else:
             user.hasLiked = False
             user.hasSkip = False
     else:
-        if action == 'dislike':
+        if action == 'dislike_icon':
             user.hasLiked = False
             user.hasSkip = True
         else:

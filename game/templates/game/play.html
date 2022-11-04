@@ -106,7 +106,11 @@
 		var total = document.getElementById('total_title');
 		total.addEventListener("click", setTab);
 		var song_title = document.getElementById('song_title');
-		pan(song_title);
+		var parent = document.getElementById('parent');
+		pan(song_title, parent, 3000)
+		var category_name = document.getElementById('category_name');
+		var play_bar = document.getElementById('play_bar');
+		pan(category_name, play_bar, 5000);
 	});
 
 	function updatePage(party, user, category, song, results, totals, onLoad=false){
@@ -219,7 +223,7 @@
 			action.style.display = 'none';
 		}
 
-		if(onLoad){
+		if(onLoad || redraw){
 			var like = document.getElementById('like');
 			var dislike = document.getElementById('dislike');
 			var hasLiked = decodeBool(user.hasLiked)
@@ -244,10 +248,10 @@
 					like.classList.add('fa-regular');
 				}
 			}
-			//else{
-			//	like.style.display = 'none';
-			//	dislike.style.display = 'none';
-			//}
+			else{
+				like.style.display = 'none';
+				dislike.style.display = 'none';
+			}
 		}
 
 		var party_code = document.getElementById('party_code');
@@ -261,6 +265,7 @@
 			settings.style.display = 'none';
 		}
 		
+		//Update Results Modal
 		var results_header = document.getElementById('results_header');
 		results_header.innerHTML = results[0].category_result;
 		if (results[0].category_result != "No Results Yet"){
@@ -368,7 +373,6 @@
 		if(button.id == ""){
 			button = button.parentElement;
 		}
-		console.log(button.id);
 		if (button.id.indexOf('dislike') > -1){
 			button = document.getElementById('dislike_icon');	
 			other = document.getElementById('like_icon');
@@ -381,8 +385,8 @@
 		other.classList.add('fa-regular');
 
 		var isActive = button.classList.contains('fa-solid');
-		if ((button.id == 'like' && isActive) ||
-			(button.id == 'dislike' && !isActive)){
+		if ((button.id == 'like_icon' && isActive) ||
+			(button.id == 'dislike_icon' && !isActive)){
 			like = false;
 		}
 		if (isActive){
@@ -440,13 +444,11 @@
 		}
 	}
 
-	async function pan(element){
-		var delay = 3000;
+	async function pan(element, parent, delay){
 		var animation = 5000;
 		var speed = 28;
 		var wait = true;
 		var refresh = false;
-		var parent = document.getElementById('parent');
 		setTimeout(()=>{wait=false;}, delay);
 		setInterval(function () {
 			if(!wait){
@@ -605,7 +607,7 @@
 </div>
 
 <div class="fixed-bottom">
-	<div class="play-bar">
+	<div id="play_bar" class="play-bar">
 		<div class="row pb-2">
 			<div class="col-8 pt-2 text-left ">
 				<div class="category-name">
