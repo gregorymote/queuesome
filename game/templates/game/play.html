@@ -48,7 +48,7 @@
 </style>
 
 <script type="text/javascript">
-	var refresh_rate = 1;//{{user.refreshRate}} * 1000;
+	var refresh_rate = {{user.refreshRate}} * 1000;
 	var party = {
 		"device_error" : "{{party.device_error}}",
 		"name" : "{{party.name}}",
@@ -578,32 +578,33 @@
 	}
 </style>
 
-<div class="fixed-bottom">
-	<div id="parent" class = "container text-center form-width" style="padding-bottom:1em;">
-		<div style="visibility:hidden">
-			<p style="margin-bottom:0; line-height:.5em;">Rendering</p>
-		</div>
-		<div class="alert alert-danger" id='device_error' style='display:none;'>
-			Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
-		</div>
-		<div style="position:relative">
-			<img id = "blur" class="blurry artwork-square" alt=""/>
-			<img id = "artwork" class="clear artwork-square" alt=""/>
-		</div>
-		<div class="pt-1">
-			{% load static %}
-			<img id = "logo" style='display:none;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
-		</div>
-		<div class="song-title">
-			<h5 id="song_title" style="position:absolute;"></h5>
-			<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
-		</div>
-		<a id = "song_link" style='visibility:hidden; position:relative; bottom: .5em;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
-		<div class="pt-1">
-			{% load static %}
-			<img id = "logo_placeholder" style='visibility:hidden;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
-		</div>
+<div id="parent" class = "container text-center form-width">
+	<div style="visibility:hidden">
+		<p style="margin-bottom:0; line-height:.5em;">Rendering</p>
 	</div>
+	<div class="alert alert-danger" id='device_error' style='display:none;'>
+		Playback Device is No Longer Active, Reopen Device or Click <a href="{%url 'settings' party.id %}">Here</a> to Change Device
+	</div>
+	<div style="position:relative">
+		<img id = "blur" class="blurry artwork-square" alt=""/>
+		<img id = "artwork" class="clear artwork-square" alt=""/>
+	</div>
+	<div class="pt-1">
+		{% load static %}
+		<img id = "logo" style='display:none;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+	</div>
+	<div class="song-title">
+		<h5 id="song_title" style="position:absolute;"></h5>
+		<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+	</div>
+	<a id = "song_link" style='visibility:hidden; position:relative; bottom: .5em;' class="song-link song-color"><h6 id = "song_artist"></h6></a>
+	<div class="pt-1">
+		{% load static %}
+		<img id = "logo_placeholder" style='visibility:hidden;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+	</div>
+</div>
+
+<div class="fixed-bottom">
 	<div class="play-bar">
 		<div class="row pb-2">
 			<div class="col-8 pt-2 text-left ">
