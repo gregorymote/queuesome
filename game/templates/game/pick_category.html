@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block page_content %}
+
+
+<style>
+	/* CARDS */
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.card {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-top: 10px;
+  padding-left: 10px;
+  width: auto;
+  height: 50px;
+  display: grid;
+  border-radius: 10px;
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s;
+  background: white;
+}
+
+.card:hover {
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+  transform: scale(1.01);
+}
+
+.card__title {
+  font-weight: 400;
+  color: black;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+</style>
+
+	<script type="text/javascript">
+		var cats = {{ cats|safe }};
+		window.onload = function() {
+			populateCats(cats);
+		}
+
+		$(document).ready(function() {
+				var search = document.getElementById("id_search");
+				search.autocomplete="off";
+				search.addEventListener("input", update_categories);
+		});
+
+		function update_categories(e){
+			clearTimeout(this.delay);
+			this.delay = setTimeout(function(){
+				if (e.target.value != ''){
+					$.ajax({
+						url: '/sesh/update_categories',
+						data: {
+						'pid': {{ party.pk }},
+						'text': e.target.value,
+						},
+						dataType: 'json',
+						success: function (data) {
+							populateCats(data.cats);
+					} });
+				}
+			}, 300);
+		}
+
+		function populateCats(cats){
+			var categories = document.getElementById("categories");
+			categories.innerHTML = "";
+			for(var i=0; i<cats.length;i++){
+				var card = document.createElement('div');
+				card.classList.add('card', 'text-left');
+				card.id = cats[i].id;
+				var name = document.createElement('h5');
+				name.classList.add('card__title');
+				name.innerHTML = cats[i].name;
+				name.setAttribute('data-description', cats[i].description)
+				card.appendChild(name);
+				card.addEventListener("click", setForm);
+				categories.appendChild(card);
+			}
+		}
+
+		function setForm(e){
+			var id = -1;
+			var name = "";
+			var description = "";
+
+			if(e.target.id){
+				id = e.target.id;
+				name = e.target.firstChild.innerHTML;
+				description = e.target.firstChild.dataset.description;
+			}
+			else{
+				id = e.target.parentElement.id;
+				name = e.target.innerHTML;  
+				description = e.target.dataset.description;
+			}
+
+			var result = document.getElementById("id_result");
+			result.value = id;
+			var form_name = document.getElementById("form_name");
+			form_name.innerHTML = name;
+			var form_description = document.getElementById("form_description");
+			form_description.innerHTML = description;
+			var form_custom = document.getElementById("form_custom");
+			var form_custom_name = document.getElementById("id_custom");
+			var form_custom_desc = document.getElementById("id_custom_desc");
+	
+			if(name == "Custom"){
+				form_description.style.display = "none";
+				form_custom.style.display = "block";
+				form_custom_name.value = document.getElementById("id_search").value;
+			}
+			else{
+				form_description.style.display = "block";
+				form_custom.style.display = "none";
+				form_custom_name.value = "";
+				form_custom_desc.value ="";
+			}
+			$('#form_modal').modal('show');
+		}
+	</script>
+
+	<div class = "container form-width ps-3 pe-3" >
+		<div id="header" class = "text-center" style="margin-bottom: 0px;">
+			<h5>Curate the Vibe</h5>
+		</div>
+
+		<div class="buttonIn">
+			<h6 id="search">{{ form.search }}</h6>
+			
+		</div>
+		<div id="categories"></div>
+	</div>
+
+	<div class="modal fade" id="form_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<form action="" method="post">
+					{% csrf_token %}
+				<div id="form_body" class="modal-body text-left">
+					<h4 id="form_name"></h4>
+					<small id="form_description" class="text-muted"></small>
+					<div id="form_custom" style="display:none;">
+						<div id="form_custom_name" class="pb-2">{{ form.custom }}</div>
+						<div id="form_custom_desc">{{ form.custom_desc }}</div>
+					</div>
+					<p style="display:none;">{{ form.result }}</p>
+					<input type="submit" class="btn btn-dark btn-lg block text-primary button-black" style="margin-top:.5em" value="let's go with this one"></input>
+					
+				</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}

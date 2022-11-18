@@ -208,7 +208,7 @@
 		if (user.turn == "picking" && party.state == "choose_category"){
 			action.innerHTML = "Curate the Vibe";
 			action.style.display = '';
-			action.href = "{% url 'choose_category' pid=party.id %}" 
+			action.href = "{% url 'pick_category' pid=party.id %}" 
 		}
 		else if(party.state == "pick_song" && !hasPicked && !full){
 			action.innerHTML = "Pick a Song";

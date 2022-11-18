@@ -19,8 +19,14 @@ class chooseCategoryForm(forms.Form):
     custom = forms.CharField(
         label = 'Create Your Own',
         required = False,
-        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR OWN',}),
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'NAME',}),
         max_length=Library._meta.get_field('name').max_length
+    )
+    custom_desc = forms.CharField(
+        label = 'Create Your Own',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'DESCRIPTION',}),
+        max_length=Library._meta.get_field('description').max_length
     )
     artist = forms.CharField(
         label = 'Artist Name',
@@ -35,11 +41,32 @@ class chooseCategoryForm(forms.Form):
         initial='Song'
     )
 
+    search = forms.CharField(required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Search for Vibes',}))
+    result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
+
     def __init__(self,*args,**kwargs):
         self.repo = kwargs.pop('repo')
         super(chooseCategoryForm,self).__init__(*args,**kwargs)
         combined_query = Library.objects.filter(pk__in=self.repo, visible=True) | Library.objects.filter(special=True, visible=True)
         self.fields['cat_choice'].queryset = combined_query.order_by('order','name')
+
+
+class pickCategoryForm(forms.Form):
+    custom = forms.CharField(
+        label = 'Create Your Own',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'NAME',}),
+        max_length=Library._meta.get_field('name').max_length
+    )
+    custom_desc = forms.CharField(
+        label = 'Create Your Own',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'DESCRIPTION',}),
+        max_length=Library._meta.get_field('description').max_length
+    )
+    search = forms.CharField(required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Search for Vibes',}))
+    result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
+
 
 
 class searchForm(forms.Form):

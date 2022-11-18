@@ -73,6 +73,7 @@ class Category(models.Model):
 class Library(models.Model):
     name = models.CharField(max_length=100)
     display = models.CharField(max_length=120, default="No display name avaialable")
+    description = models.CharField(max_length=255, default="")
     structure = models.CharField(max_length=64, choices=STRUCTURE_CHOICES, default="{}")
     visible = models.BooleanField(default = False)
     special = models.BooleanField(default=False)

@@ -83,6 +83,12 @@
     position: relative;
 }
 
+.button-black{
+    width:100%;
+    border-radius:16px;
+    color:white !important;
+}
+
 .category-leader {
     white-space: nowrap;
     overflow: hidden;

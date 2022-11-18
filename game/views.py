@@ -10,9 +10,9 @@ from utils.util_party import (get_party, clean_up_party, get_inactivity,
 from utils.util_device import get_active_device
 from utils.util_song import get_bg_color
 from django.http import HttpResponseRedirect, JsonResponse
-from party.models import Party, Users, Category, Songs, Searches, Devices
-from game.forms import (blankForm, chooseCategoryForm, searchForm,
-     settingsForm)
+from party.models import Party, Users, Category, Songs, Searches, Devices, Library
+from game.forms import (blankForm, chooseCategoryForm, pickCategoryForm,
+    searchForm, settingsForm)
 import spotipy
 import time
 import threading
@@ -395,12 +395,115 @@ def choose_category(request, pid):
         form = chooseCategoryForm(repo=choices,
                     initial={'cat_choice': '','custom': '',}
         )
+
     context = {
         'form':form,
         'party':party,
         'invalid': not valid,
     }
     return render(request, 'game/choose_category.html', context)
+
+
+def pick_category(request, pid):
+    ''' Allows User with turn in picking state to create a category object
+
+    Parameters:
+
+        - request - web request
+        - pid - Primary Key of the Party the User belongs to
+
+    '''
+
+    party = get_party(pid)
+    user = get_user(request, pid)
+    if party == -1 or user == -1:
+        return HttpResponseRedirect(reverse('index'))
+    if user.turn != 'picking':
+        return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+    valid=True
+    choices = get_category_choices(request, party)
+    if request.method == 'POST':
+        form = pickCategoryForm(request.POST)
+        if form.is_valid():
+            category = form.cleaned_data['result']
+            category = Library.objects.get(id=category)
+            valid = create_category(
+                party=party,
+                user=user,
+                category=category,
+                artist="",
+                custom=form.cleaned_data['custom'],
+                sc_type=""
+            )
+            if valid:
+                party.state = 'pick_song'
+                party.roundTotal = party.roundTotal + 1
+                party.save()
+                print(QDEBUG,'Set state to pick_song: ', party.state, ' Round Total: ',
+                    party.roundTotal)
+                party = Party.objects.get(pk=pid)
+                remaining_users = Users.objects.filter(
+                    party=party,
+                    active=True,
+                    turn='not_picked'
+                ).all()
+                if not remaining_users:
+                    user.turn = 'has_picked_last'
+                else:
+                    user.turn = 'has_picked'
+                user.save()
+                print(QDEBUG,'Set Leader Turn to: ',user.name, ' - ', user.turn)
+                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+    else:
+        form = pickCategoryForm()
+
+    libraries = (Library.objects.filter(pk__in=choices, visible=True) | 
+        Library.objects.filter(special=True, visible=True)).order_by('order','name')
+    cats=[]
+    for library in libraries:
+        cats.append(
+            {
+                'id' : library.id,
+                'name': library.name,
+                'description': library.description
+            }
+        )
+    context = {
+        'form':form,
+        'party':party,
+        'cats': cats,
+        'invalid': not valid,
+    }
+    return render(request, 'game/pick_category.html', context)
+
+
+def update_categories(request):
+    ''' Ajax request made to update search results 
+
+    Parameters:
+
+        - request - web request
+
+    ''' 
+    search_text = request.GET.get('text', None)
+    libraries = (
+        Library.objects.filter(name__icontains=search_text, visible=True) | 
+        Library.objects.filter(name='Custom', visible=True)
+        ).order_by('order','name')[:10]
+    cats = []
+    for library in libraries:
+        cats.append(
+            {
+                'id' : library.id,
+                'name': library.name,
+                'description': library.description
+                
+            }
+        )
+    data={
+        'cats' : cats
+    }
+    return JsonResponse(data)
 
 
 def pick_song(request, pid):
