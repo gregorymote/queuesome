@@ -98,7 +98,7 @@ def get_category_choices(request, party):
     return repo
 
 
-def create_category(party, user, category, artist, custom, sc_type):
+def create_category(party, user, category, artist, custom, custom_desc, sc_type):
     valid = True
     if not category:
         return not valid
@@ -113,7 +113,9 @@ def create_category(party, user, category, artist, custom, sc_type):
     elif choice == 'Custom': 
         if custom != '':
             name = custom
-            library = Library.objects.filter(name=custom).all()
+            library = Library.objects.filter(
+                name=custom, description=custom_desc
+                ).all()
             if not library:
                 Library(name=custom).save()
         else:

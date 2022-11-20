@@ -64,9 +64,22 @@ class pickCategoryForm(forms.Form):
         widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'DESCRIPTION',}),
         max_length=Library._meta.get_field('description').max_length
     )
-    search = forms.CharField(required = False, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Search for Vibes',}))
-    result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
-
+    search = forms.CharField(
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Search for Vibes',})
+    )
+    result = forms.CharField(
+        label = 'result pk',
+        initial='-1',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control',})
+    )
+    artist = forms.CharField(
+        label = 'Artist Name',
+        required = False,
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER THE NAME OF AN ARTIST',}),
+        max_length=Library._meta.get_field('name').max_length
+    )
 
 
 class searchForm(forms.Form):

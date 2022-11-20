@@ -51,7 +51,6 @@ async function pan(element, parent, delay){
             }
         }
         else if (getTranslateX(element) != 0){
-            console.log(getTranslateX(element));
             element.style.transitionDuration = '0s';
             element.style.transform = "translateX(0px)";
             refreshElement(parent);
@@ -62,7 +61,6 @@ function setWidth(element){
     element.style.width = "auto";
     var pWidth = getWidth(element.parentElement);
     var cWidth = getWidth(element);
-    console.log(pWidth + " : " + cWidth);
     if(cWidth < pWidth){
         element.style.width = "100%";
     }

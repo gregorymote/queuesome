@@ -113,17 +113,29 @@
 			var form_custom = document.getElementById("form_custom");
 			var form_custom_name = document.getElementById("id_custom");
 			var form_custom_desc = document.getElementById("id_custom_desc");
-	
+			var form_artist = document.getElementById("form_artist");
+			var form_artist_input = document.getElementById("id_artist");
 			if(name == "Custom"){
 				form_description.style.display = "none";
 				form_custom.style.display = "block";
 				form_custom_name.value = document.getElementById("id_search").value;
+				form_artist.style.display = "none";
+				form_artist_input.value = "";
+			}
+			else if(name == "Songs by this Artist"){
+				form_description.style.display = "block";
+				form_custom.style.display = "none";
+				form_custom_name.value = "";
+				form_custom_desc.value ="";
+				form_artist.style.display = "block";
 			}
 			else{
 				form_description.style.display = "block";
 				form_custom.style.display = "none";
 				form_custom_name.value = "";
 				form_custom_desc.value ="";
+				form_artist.style.display = "none";
+				form_artist_input.value = "";
 			}
 			$('#form_modal').modal('show');
 		}
@@ -153,9 +165,9 @@
 						<div id="form_custom_name" class="pb-2">{{ form.custom }}</div>
 						<div id="form_custom_desc">{{ form.custom_desc }}</div>
 					</div>
+					<div id="form_artist" class="pt-2" style="display:none;">{{ form.artist }}</div>
 					<p style="display:none;">{{ form.result }}</p>
 					<input type="submit" class="btn btn-dark btn-lg block text-primary button-black" style="margin-top:.5em" value="let's go with this one"></input>
-					
 				</div>
 				</form>
 			</div>

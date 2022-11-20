@@ -39,7 +39,7 @@ def lobby(request, pid):
     if request.method == 'POST':
         form = blankForm(request.POST)
         if form.is_valid():
-            category = Category(name='Looks Like We Got A Lull', party=party)
+            category = Category(name='New queue Coming Soon...', party=party)
             category.save()
             party.lib_repo = set_lib_repo()
             party.started = True
@@ -431,8 +431,9 @@ def pick_category(request, pid):
                 party=party,
                 user=user,
                 category=category,
-                artist="",
+                artist=form.cleaned_data['artist'],
                 custom=form.cleaned_data['custom'],
+                custom_desc=form.cleaned_data['custom_desc'],
                 sc_type=""
             )
             if valid:
