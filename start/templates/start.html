@@ -332,8 +332,7 @@
 
 </style>
 
-<div class="test" style="background: rgb(247,255,0);
-background: linear-gradient(0deg, rgba(247,255,0,1) 5%, rgba(255,175,0,1) 5%, rgba(255,117,12,1) 10%, rgba(255,0,35,1) 10%, rgba(228,63,55,1) 15%, rgba(184,101,240,1) 15%, rgba(178,111,237,1) 20%, rgba(53,70,255,1) 20%, rgba(0,123,255,1) 90%);">
+<div class="test" style="background: rgb(255,255,255);">
     {% load static %}
     <div class="boundary" id="boundary">
         <img src="{% static 'images/no_reels.png' %}" class="logo" id="logo" alt="...">
@@ -343,22 +342,22 @@ background: linear-gradient(0deg, rgba(247,255,0,1) 5%, rgba(255,175,0,1) 5%, rg
     <form action="" method="post">
     {% csrf_token %}	
         <div class="hidden text-center main" id="main">
-            <h1 style="color:white; text-shadow: 2px 2px #fc466b; font-size:50px; font-family: 'Righteous', cursive;">queuesome</h1>
-            <p style="color:white;">Let's get something going</p>
+            <h1 style="color:rgb(255, 255, 255); text-shadow: 0px 0px 15px rgb(255, 192, 115),4px 4px 15px rgb(255, 204, 133),4px 4px rgb(100, 58, 0); font-size:50px; font-family: 'Righteous', cursive;">queuesome</h1>
+            <p style="color:black;">Let's get something going</p>
             <div class="row">
-                <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; max-width: 100%; border:3px solid white; border-radius:16px;" value="Start Sesh">
+                <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; border:3px solid black; border-radius:16px; color:black" value="Start Sesh">
             </div>
             <div class="row pt-2">
-                <a href ="party/join_party/" class ="btn btn-light btn-lg block text-primary" role="button" style="width: 100%; max-width: 100%; border-radius:16px;">Join Sesh</a>
+                <a href ="party/join_party/" class ="btn btn-dark btn-lg block text-primary button-black" role="button">Join Sesh</a>
             </div>
             <div class = "row">
                 <div class ="col-2"></div>
                 <div class=" col-8 pt-5 text-center">
-                    <a class="small" href ="https://www.tiktok.com/@queuesome?lang=en" target="_blank" style="color:white;"><em class="iconify" data-icon="simple-icons:tiktok"></em></a>
-                    <a class = "pl-2" style="color:white;" href="https://www.instagram.com/queuesome_" target="_blank"><em class="fa fa-instagram" style="font-size:24px"></em></a>
-                    <a class = "pl-2 pr-2" style="color:white;" href ="https://twitter.com/queuesome" target="_blank"><em class="fa fa-twitter" style="font-size:24px"></em></a>
-                    <a class = "pr-2" style="color:white;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md" target="_blank"><em class="fa fa-github" style="font-size:24px"></em></a>
-                    <a class="small" href ="https://www.queuesome.com/blog/" target="_blank" style="color:white;"><em class="iconify" data-icon="uil:book-reader"></em></a>
+                    <a class="small" href ="https://www.tiktok.com/@queuesome?lang=en" target="_blank" style="color:black;"><em class="iconify" data-icon="simple-icons:tiktok"></em></a>
+                    <a class = "pl-2" style="color:black;" href="https://www.instagram.com/queuesome_" target="_blank"><em class="fa fa-instagram" style="font-size:24px"></em></a>
+                    <a class = "pl-2 pr-2" style="color:black;" href ="https://twitter.com/queuesome" target="_blank"><em class="fa fa-twitter" style="font-size:24px"></em></a>
+                    <a class = "pr-2" style="color:black;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md" target="_blank"><em class="fa fa-github" style="font-size:24px"></em></a>
+                    <a class="small" href ="https://www.queuesome.com/blog/" target="_blank" style="color:black;"><em class="iconify" data-icon="uil:book-reader"></em></a>
                 </div>
                 <div class = "col-2 pt-3">
                     <a style="color:white;" data-toggle="modal" data-target="#myModal"><em class="fa fa-info-circle" style="font-size:20px"></em></a>
