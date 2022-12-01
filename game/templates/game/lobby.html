@@ -89,10 +89,10 @@
 
 		<div class = "row-12 text-end">
 			<form action="" method="post">
-				<a class="btn text-white bg-primary btn-lg" data-bs-toggle="modal" data-bs-target="#qrModal">QR <em class="fa fa-qrcode"></em></a>
+				<a class="btn btn-dark btn-black btn-lg block" data-bs-toggle="modal" data-bs-target="#qrModal" style= "border:3px solid black; border-radius:16px; color: white">QR <em class="fa fa-qrcode" style= "color:rgb(255, 255, 255)"></em></a>
 				{% csrf_token %}
 				{% if access %}
-					<input type="submit" class="btn btn-outline-primary btn-lg" value="Let's Go">
+					<input type="submit" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" value="Let's Go">
 				{% endif %}
 			</form>
 		</div>
