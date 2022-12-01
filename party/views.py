@@ -18,12 +18,12 @@ def auth(request):
     url = get_url(str(request.get_full_path), HEROKU, IP, PORT)
     if 'access_denied' in url:
         return HttpResponseRedirect(reverse('index'))
-    if not request.session.session_key:
-        session_key = request.session.create()
-    else:
-        session_key = request.session.session_key
     party = Party(name=str(datetime.now(timezone.utc)))
     party.save()
+    if request.session.session_key is None:
+        session_key = request.session.create()      
+    else:
+        session_key = request.session.session_key
     old_users = Users.objects.filter(sessionID=session_key, active=True)
     for user in old_users:
         if user.isHost:
@@ -32,13 +32,6 @@ def auth(request):
             old_party.save()
         user.active = False
         user.save()
-    user = Users(
-            name='Host',
-            party=party,
-            sessionID=session_key,
-            isHost=True,
-    )
-    user.save()
     party.url = url
     party.save()
     token_info = create_token(url=party.url)
@@ -48,6 +41,20 @@ def auth(request):
         party.save()
     else:
         return HttpResponseRedirect(reverse('index'))
+    
+    if request.session.session_key is None:
+        session_key = request.session.create()      
+    else:
+        session_key = request.session.session_key
+
+    user = Users(
+            name='Host',
+            party=party,
+            sessionID=session_key,
+            isHost=True,
+    )
+    user.save()
+
     return HttpResponseRedirect(
         reverse('set_device', kwargs={'pid': party.pk,})
     )

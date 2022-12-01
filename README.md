@@ -81,12 +81,12 @@
 
    Paste the Following code with new Categories in the cats list
 
-   <I>from party.Models import Library</I>
+   <I>from party.models import Library</I>
 
    <I>cats = ["new cat1", "new cat2"]</I>
 
    <I>for x in cats:</I>
-       <I>l = Library(name = x)</I>
+       <I>l = library(name = x)</I>
        <I>l.save()</I>
 
 

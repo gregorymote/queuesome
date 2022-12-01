@@ -2,14 +2,12 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-
-<div class="outside" style="background: rgb(247,255,0);
-background: linear-gradient(0deg, rgba(247,255,0,1) 5%, rgba(255,175,0,1) 5%, rgba(255,117,12,1) 10%, rgba(255,0,35,1) 10%, rgba(228,63,55,1) 15%, rgba(184,101,240,1) 15%, rgba(178,111,237,1) 20%, rgb(255, 255, 255) 20%, rgb(255, 255, 255) 90%);">
+<div class="outside" style="background: rgb(255,255,255);">
     {% load static %}
     <form action="" method="post">
     {% csrf_token %}	
         <div class="text-center main form-width" id="main"> 
-            <h1 style="color:black; text-shadow: 2px 2px #fcd146; font-size:50px; font-family: 'Righteous', cursive;">queuesome</h1>
+            <h1 style="color:rgb(255, 255, 255); text-shadow: 0px 0px 15px rgb(255, 192, 115),4px 4px 15px rgb(255, 204, 133),4px 4px rgb(100, 58, 0); font-size:50px; font-family: 'Righteous', cursive;">queuesome</h1>
             <p style="color:black;">Let's get something going</p>
             <div class="row">
                 <input type="submit" class ="btn btn-outline-light btn-lg block"  role="button" style="width: 100%; border:3px solid black; border-radius:16px; color:black" value="Start Sesh">
@@ -94,7 +92,6 @@ background: linear-gradient(0deg, rgba(247,255,0,1) 5%, rgba(255,175,0,1) 5%, rg
         </div>
     </div>
 </div>
-  
 
 
 {% endblock %}
