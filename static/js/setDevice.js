@@ -1,5 +1,5 @@
 function setActiveProperties(active, type, name){
-    var submit = document.getElementById("submit");
+    var device_continue = document.getElementById("device_continue");
     var device_name = document.getElementById("name");
     var message = document.getElementById('message');
     var icon = document.getElementById('device');
@@ -8,16 +8,14 @@ function setActiveProperties(active, type, name){
     icon.classList.add('device', c['glyph'], c['sub']);
     if(active){
         icon.style.color = '#1ed760';
-        submit.disabled = false;
-        submit.classList.add('btn-outline-primary');
-        submit.classList.remove('btn-outline-secondary');
+        device_continue.disabled = false;
+        device_continue.style.display = 'block';
         message.style.display = 'none';
     }
     else{
         icon.style.color = 'gray';
-        submit.disabled = true;
-        submit.classList.add('btn-outline-secondary');
-        submit.classList.remove('btn-outline-primary');
+        device_continue.disabled = true;
+        device_continue.style.display = 'none';
         message.style.display = 'block';
     }
     device_name.innerHTML = name;

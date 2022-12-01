@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block right_header %}<a href="/blog"><em><span style="font-family: 'Righteous', cursive; color:white;">the blog</span></em></a>{% endblock %}
+{% block right_header %}<a href="/blog"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">the blog</a></em></a>{% endblock %}
 
 {% block page_content %}
 
@@ -25,7 +25,7 @@
                     {% else %}
                     <p class="card-text">{{post.content|slice:":200" }}</p>
                     {% endif %}
-                    <a href="{% url 'post_detail' post.slug  %}" class="btn btn-outline-primary">Read More &rarr;</a>
+                    <a href="{% url 'post_detail' post.slug  %}" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" >Read More &rarr;</a>
                 </div>
             </div>
             {% endfor %}
