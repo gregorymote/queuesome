@@ -186,6 +186,13 @@
     }
 }
 
+.form-control:focus { /* You can also use .element.text:focus here */
+	border-color: rgb(255, 192, 115) !important;
+	outline: 0;
+	-webkit-box-shadow: inset 0px 1px 1px rgb(255, 192, 115),0px 0px 8px rgb(255, 204, 133) !important;
+	box-shadow: inset 0px 1px 1px rgb(255, 192, 115),0px 0px 8px rgb(255, 204, 133) !important;
+}  
+
 .form-width{
     max-width: 500px;
 }
