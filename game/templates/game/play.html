@@ -10,7 +10,7 @@
 		});
 		var inactivity = false;
 
-		setInterval(function () {
+		function getDeviceData(){
 			if (!inactivity){
 				$.ajax({
 					url: '/party/update_set_device',
@@ -21,10 +21,14 @@
 					success: function (data) {
 						setDeviceIcon(data.device.active, data.device.type, data.device.name)
 						inactivity = data.stop;
+					},
+					complete: function (data){
+						setTimeout(getDeviceData, 1000);
 					}
 				});
 			}
-		}, 1000);
+		}
+		setTimeout(getDeviceData, 1000);
 	}
 </script>
 
@@ -44,7 +48,8 @@
 </style>
 
 <script type="text/javascript">
-	var refresh_rate = {{user.refreshRate}} * 1000;
+	var refresh_rate = 1000;//{{user.refreshRate}} * 1000;
+	var wait = true;
 	var party = {
 		"device_error" : "{{party.device_error}}",
 		"name" : "{{party.name}}",
@@ -80,7 +85,8 @@
 	window.onload = function() {
 		updatePage(party, user, category, song, results, totals, onLoad=true);
 	};
-	setInterval(function () {
+	
+	function getPlayData(){
 		$.ajax({
 			url: '/sesh/update_play',
 			data: {
@@ -89,8 +95,13 @@
 			dataType: 'json',
 			success: function (data) {
 				updatePage(data.party, data.user, data.category, data.song, data.results, data.totals);			
-		} });
-	}, refresh_rate);
+			},
+			complete: function (data){
+				setTimeout(getPlayData, refresh_rate);
+			}
+	 	});
+	}
+	setTimeout(getPlayData, refresh_rate);
 
 	$(document).ready(function() {
 		var like = document.getElementById("like");
@@ -183,25 +194,32 @@
 			song_link.removeAttribute("href");
 			song_artist.innerHTML = '';
 			song_link.style.visibility='hidden';
-			{% load static %}
-			artwork.src = "{% static 'images/queue_it_to_it_brah.png' %}";
-			blur.src = "{% static 'images/queue_it_to_it_brah.png' %}";
-			
-			if(party.state == 'pick_song'){
-				if(song_title.innerHTML != "Someone Needs to Pick a Song"){
-					song_title.innerHTML="Someone Needs to Pick a Song";
-					setWidth(song_title);
-					redraw = true;
+			if(onLoad || !wait){
+				{% load static %}
+				artwork.src = "{% static 'images/queue_it_to_it_brah.png' %}";
+				blur.src = "{% static 'images/queue_it_to_it_brah.png' %}";
+				
+				if(party.state == 'pick_song'){
+					if(song_title.innerHTML != "Someone Needs to Pick a Song"){
+						song_title.innerHTML="Someone Needs to Pick a Song";
+						setWidth(song_title);
+						redraw = true;
+					}
 				}
+				else{
+					if(song_title.innerHTML !="Someone Needs to Curate the Vibe"){
+						song_title.innerHTML="Someone Needs to Curate the Vibe";
+						setWidth(song_title);
+						redraw = true;
+					}
+				}
+				wait = true;
 			}
 			else{
-				if(song_title.innerHTML !="Someone Needs to Curate the Vibe"){
-					song_title.innerHTML="Someone Needs to Curate the Vibe";
-					setWidth(song_title);
-					redraw = true;
-				}
+				wait = false;
 			}
 		}
+	
 		var action = document.getElementById('action');
 		var hasPicked = decodeBool(user.hasPicked)
 		var full = decodeBool(category.full);

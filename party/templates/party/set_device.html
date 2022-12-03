@@ -10,25 +10,28 @@
 
 	var inactivity = false;
 
-	setInterval(function () {
+	function getDeviceData() {
 		if (!inactivity) {
 			$.ajax({
 				url: '/party/update_set_device',
 				data: {
 					'pid': {{ party.pk }}
-	},
-		dataType: 'json',
-		success: function (data) {
-			setActiveProperties(data.device.active, data.device.type, data.device.name)
-			inactivity = data.stop;
+				},
+				dataType: 'json',
+				success: function (data) {
+					setActiveProperties(data.device.active, data.device.type, data.device.name)
+					inactivity = data.stop;
+				},
+				complete: function(data){
+					setTimeout(getDeviceData, 1000);
+				}
+			});
 		}
-				});
-			}
-			else {
-		window.location.replace('/index');
+		else {
+			window.location.replace('/index');
+		}	
 	}
-		
-		}, 1000);
+	setTimeout(getDeviceData, 1000);
 </script>
 
 <div class="container form-width">

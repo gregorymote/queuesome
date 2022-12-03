@@ -7,7 +7,7 @@
 	<script>
 		var inactivity = false;
 
-		setInterval(function () {
+		function getDeviceData() {
 			if (!inactivity){
 				$.ajax({
 					url: '/party/update_devices',
@@ -20,10 +20,14 @@
 							location.reload();
 						}
 						inactivity = data.stop;
+					},
+					complete: function (data){
+						setTimeout(getDeviceData, 1000);
 					}
 				});
 			}
-		}, 5000);
+		}
+		setTimeout(getDeviceData, 1000);
 			
 	</script>
 
