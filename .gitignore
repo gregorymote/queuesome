@@ -6,7 +6,4 @@ venv/
 db.sqlite3
 *.cache
 *.cache-temp
-staticfiles/admin
-staticfiles/css
-staticfiles/images
-staticfiles/js
+staticfiles/
