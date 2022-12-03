@@ -4,24 +4,14 @@
 {% block page_content %}
 
 <script>
-	setTimeout(function() {
-        var logo = document.getElementById("logo");
-        var reel = document.getElementById("reel");
-	}, 1000);
     setTimeout(function() {
         var main = document.getElementById("main");
         main.classList.add("slide-up-fade-in");
 	}, 2000);
     setTimeout(function(){
-        var logo = document.getElementById("logo");
+        var logo = document.getElementById("boundary");
         logo.style.WebkitTransition = 'opacity .75s ease-in-out';
         logo.style.opacity = '0';
-        var reel = document.getElementById("reel");
-        reel.style.WebkitTransition = 'opacity .75s ease-in-out';
-        reel.style.opacity = '0';
-        var reel2 = document.getElementById("reel2");
-        reel2.style.WebkitTransition = 'opacity .75s ease-in-out';
-        reel2.style.opacity = '0';
     }, 2100);
     setTimeout(function() {
         var main = document.getElementById("main");
@@ -36,312 +26,20 @@
 	}, 3200);
 </script>
 
-<style>
-    .small{
-        font-size:24px;
-        line-height:24px;
-    }
-    .test {
-        position: fixed;
-	    top: -30;
-	    left: 0;
-	    right: 0;
-	    bottom: 0;
-        height: 100%;
-        width:100%;
-	    z-index: -1;
-    }
-    .center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 50%;
-        
-    }
-
-    .boundary{
-        width: 175px;
-	    height: 117px;
-	    position: relative;
-	    position: absolute;
-	    top: 38%;
-	    left: 27%;
-    }
-
-    .logo{
-        width: 175px;
-	    height: 117px;
-	    position: absolute;
-	    top: 0%;
-	    left: 0%;
-    }
-    .reel_1{
-        width: 81px;
-	    height: 81px;   
-	    position: absolute;
-	    top: 0%;
-	    left: 1%;
-    }
-
-    .reel_2{
-        width: 81px;
-	    height: 81px;
-	    position: absolute;
-	    top: 0%;
-	    left: 53%;
-    }
-
-    .main{
-        position: fixed;
-        width: 80%;
-        top: 30%;
-        left: 10%;
-
-    }
-
-    .guide{
-        width: 5px;
-	    height: 5px;
-	    position: relative;
-	    position: absolute;
-	    top: 50%;
-	    left: 50%;
-    }
-
-    .fade-in {
-        animation: fadeIn ease 2.5s;
-        -webkit-animation: fadeIn ease 2.5s;
-        -moz-animation: fadeIn ease 2.5s;
-        -o-animation: fadeIn ease 2.5s;
-        -ms-animation: fadeIn ease 2.5s;
-    }
-    .rotate{
-        transform:          rotate(90deg);
-        -ms-transform:      rotate(90deg);
-        -moz-transform:     rotate(90deg);
-        -webkit-transform:  rotate(90deg);
-        -o-transform:       rotate(90deg);
-    }
-
-    .spin{
-        -webkit-animation:spin 2.5s linear;
-        -moz-animation:spin 2.5s linear;
-        animation:spin 2.5s linear;
-    }
-    .hidden{
-        opacity:0;
-    }   
-@-moz-keyframes spin {
-     100% { -moz-transform: rotate(720deg);}
-    }
-@-webkit-keyframes spin {
-    100% { -webkit-transform: rotate(720deg); }
-    }
-@keyframes spin {
-    100% { -webkit-transform: rotate(720deg);
-            transform:rotate(720deg); }
-    }
-
-@keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
-    }
-
-@-moz-keyframes fadeIn {
-0% {opacity:0;}
-100% {opacity:1;}
-}
-
-@-webkit-keyframes fadeIn {
-0% {opacity:0;}
-100% {opacity:1;}
-}
-
-@-o-keyframes fadeIn {
-0% {opacity:0;}
-100% {opacity:1;}
-}
-
-@-ms-keyframes fadeIn {
-0% {opacity:0;}
-100% {opacity:1;}
-}
-.slide-down-fade-in{
-    animation: slide-down-fade-in ease 1.5s;
-    animation-iteration-count: 1;
-    transform-origin: 50% 50%;
-   
-    -webkit-animation: slide-down-fade-in ease 1.5s;
-    -webkit-animation-iteration-count: 1;
-    -webkit-transform-origin: 50% 50%;
-
-    -moz-animation: slide-down-fade-in ease 1.5s;
-    -moz-animation-iteration-count: 1;
-    -moz-transform-origin: 50% 50%;
-
-    -o-animation: slide-down-fade-in ease 1.5s;
-    -o-animation-iteration-count: 1;
-    -o-transform-origin: 50% 50%;
-
-    -ms-animation: slide-down-fade-in ease 1.5s;
-    -ms-animation-iteration-count: 1;
-    -ms-transform-origin: 50% 50%;
-
-
-    opacity:0;
-    opacity: 1\9;
-
-}
-
-@keyframes slide-down-fade-in{
-    0% {
-        opacity:0;
-        transform:  translate(0px,-40px)  ;
-    }
-    100% {
-        opacity:1;
-        transform:  translate(0px,0px)  ;
-    }
-}
-
-@-moz-keyframes slide-down-fade-in{
-    0% {
-        opacity:0;
-        -moz-transform:  translate(0px,-40px)  ;
-    }
-    100% {
-        opacity:1;
-        -moz-transform:  translate(0px,0px)  ;
-    }
-}
-
-@-webkit-keyframes slide-down-fade-in {
-    0% {
-        opacity:0;
-        -webkit-transform:  translate(0px,-40px)  ;
-    }
-    100% {
-        opacity:1;
-        -webkit-transform:  translate(0px,0px)  ;
-    }
-}
-
-@-o-keyframes slide-down-fade-in {
-    0% {
-        opacity:0;
-        -o-transform:  translate(0px,-40px)  ;
-    }
-    100% {
-        opacity:1;
-        -o-transform:  translate(0px,0px)  ;
-    }
-}
-
-@-ms-keyframes slide-down-fade-in {
-    0% {
-        opacity:0;
-        -ms-transform:  translate(0px, -40px)  ;
-    }
-    100% {
-        opacity:1;
-        -ms-transform:  translate(0px,0px)  ;
-    }
-}
-
-.slide-up-fade-in{
-    animation: slide-up-fade-in ease 1.5s;
-    animation-iteration-count: 1;
-    transform-origin: 50% 50%;
-   
-    -webkit-animation: slide-up-fade-in ease 1.5s;
-    -webkit-animation-iteration-count: 1;
-    -webkit-transform-origin: 50% 50%;
-
-    -moz-animation: slide-up-fade-in ease 1.5s;
-    -moz-animation-iteration-count: 1;
-    -moz-transform-origin: 50% 50%;
-
-    -o-animation: slide-up-fade-in ease 1.5s;
-    -o-animation-iteration-count: 1;
-    -o-transform-origin: 50% 50%;
-
-    -ms-animation: slide-up-fade-in ease 1.5s;
-    -ms-animation-iteration-count: 1;
-    -ms-transform-origin: 50% 50%;
-
-
-    opacity:0;
-    opacity: 1\9;
-
-}
-
-@keyframes slide-up-fade-in{
-    0% {
-        opacity:0;
-        transform:  translate(0px, 40px)  ;
-    }
-    100% {
-        opacity:1;
-        transform:  translate(0px,0px)  ;
-    }
-}
-
-@-moz-keyframes slide-up-fade-in{
-    0% {
-        opacity:0;
-        -moz-transform:  translate(0px, 40px)  ;
-    }
-    100% {
-        opacity:1;
-        -moz-transform:  translate(0px,0px)  ;
-    }
-}
-
-@-webkit-keyframes slide-up-fade-in {
-    0% {
-        opacity:0;
-        -webkit-transform:  translate(0px, 40px)  ;
-    }
-    100% {
-        opacity:1;
-        -webkit-transform:  translate(0px,0px)  ;
-    }
-}
-
-@-o-keyframes slide-up-fade-in {
-    0% {
-        opacity:0;
-        -o-transform:  translate(0px, 40px)  ;
-    }
-    100% {
-        opacity:1;
-        -o-transform:  translate(0px,0px)  ;
-    }
-}
-
-@-ms-keyframes slide-up-fade-in {
-    0% {
-        opacity:0;
-        -ms-transform:  translate(0px, 40px)  ;
-    }
-    100% {
-        opacity:1;
-        -ms-transform:  translate(0px,0px)  ;
-    }
-}
-
-</style>
-
-<div class="test" style="background: rgb(255,255,255);">
+<div class="outside" style="background: rgb(255,255,255);">
     {% load static %}
-    <div class="boundary" id="boundary">
-        <img src="{% static 'images/no_reels.png' %}" class="logo" id="logo" alt="...">
-        <img src="{% static 'images/reel1.png' %}" class="reel_1 spin" id="reel" alt="...">
-        <img src="{% static 'images/reel1.png' %}" class="reel_2 rotate spin" id="reel2" alt="...">
+    <div id="boundary">
+        <div class="boundary">
+            <img src="{% static 'images/no_reels.png' %}" class="logo" id="logo" alt="...">
+        </div>
+        <div class="boundary"  style="border-bottom-width:33px;">
+            <img src="{% static 'images/reel1.png' %}" class="reel_1 spin" id="reel" alt="...">
+            <img src="{% static 'images/reel1.png' %}" class="reel_2 rotate spin" id="reel2" alt="...">
+        </div>
     </div>
     <form action="" method="post">
-    {% csrf_token %}	
-        <div class="hidden text-center main" id="main">
+        {% csrf_token %}	
+        <div class="hidden text-center main form-width" id="main"> 
             <h1 style="color:rgb(255, 255, 255); text-shadow: 0px 0px 15px rgb(255, 192, 115),4px 4px 15px rgb(255, 204, 133),4px 4px rgb(100, 58, 0); font-size:50px; font-family: 'Righteous', cursive;">queuesome</h1>
             <p style="color:black;">Let's get something going</p>
             <div class="row">
@@ -353,84 +51,18 @@
             <div class = "row">
                 <div class ="col-2"></div>
                 <div class=" col-8 pt-5 text-center">
-                    <a class="small" href ="https://www.tiktok.com/@queuesome?lang=en" target="_blank" style="color:black;"><em class="iconify" data-icon="simple-icons:tiktok"></em></a>
-                    <a class = "pl-2" style="color:black;" href="https://www.instagram.com/queuesome_" target="_blank"><em class="fa fa-instagram" style="font-size:24px"></em></a>
-                    <a class = "pl-2 pr-2" style="color:black;" href ="https://twitter.com/queuesome" target="_blank"><em class="fa fa-twitter" style="font-size:24px"></em></a>
-                    <a class = "pr-2" style="color:black;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md" target="_blank"><em class="fa fa-github" style="font-size:24px"></em></a>
-                    <a class="small" href ="https://www.queuesome.com/blog/" target="_blank" style="color:black;"><em class="iconify" data-icon="uil:book-reader"></em></a>
+                    <a class="small"  style="color:black;" href ="https://www.tiktok.com/@queuesome?lang=en" target="_blank"><em class="fa-brands fa-tiktok" data-bs-icon="simple-icons:tiktok"></em></a>
+                    <a class = "ps-2" style="color:black;" href="https://www.instagram.com/queuesome_" target="_blank"><em class="fa fa-instagram" style="font-size:24px"></em></a>
+                    <a class = "ps-2 pe-2" style="color:black;" href ="https://twitter.com/queuesome" target="_blank"><em class="fa fa-twitter" style="font-size:24px"></em></a>
+                    <a class = "pe-2" style="color:black;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md" target="_blank"><em class="fa fa-github" style="font-size:24px"></em></a>
+                    <a class="small" href ="/blog/" target="_blank" style="color:black;"><em class="fa-solid fa-book" data-bs-icon="uil:book-reader"></em></a>
                 </div>
                 <div class = "col-2 pt-3">
-                    <a style="color:white;" data-toggle="modal" data-target="#myModal"><em class="fa fa-info-circle" style="font-size:20px"></em></a>
+                    <a style="color:black;" data-bs-toggle="modal" data-bs-target="#myModal"><em class="fa fa-info-circle" style="font-size:20px"></em></a>
                 </div>
             </div>
         </div>
     </form>
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="myModalLabel">What is this? <a style="color:black;" href ="https://github.com/gregorymote/queue_it_up/blob/master/README.md"><em class="fa fa-github" style="font-size:24px"></em></a></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
-            <div class="modal-body">
-                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active" style="filter: invert(100%);"></li>
-                      <li data-target="#carouselExampleIndicators" data-slide-to="1" style="filter: invert(100%);"></li>
-                      <li data-target="#carouselExampleIndicators" data-slide-to="2" style="filter: invert(100%);"></li>
-                    </ol>
-                    {% load static %}
-                    <div class="carousel-inner">
-                      <div class="carousel-item active">
-                        <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
-                            <h6 style="color:black;">queuesome songs together based on whatever the vibe is...</h6>
-                          </div>
-                        <img class="d-block w-100" src="{% static 'images/headphones.jpg' %}" alt="Music vector created by pch.vector - www.freepik.com">
-                        <div class="text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
-                            <a class="text-secondary" href='https://www.freepik.com/vectors/music' style="font-size:14px;"><small>Music vector created by pch.vector - www.freepik.com</small></a>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
-                            <h6 style="color:black;">...take turns choosing vibes and picking songs that fit...</h6>
-                          </div>
-                        <img class="d-block w-100" src="{% static 'images/people_phones.jpg' %}" alt="People vector created by pikisuperstar - www.freepik.com">
-                        <div class="text-center text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
-                            <a class="text-secondary" href="https://www.freepik.com/vectors/people" style="font-size:14px;"><small>People vector created by pikisuperstar - www.freepik.com</small></a>
-                        </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="carousel-caption" style="position:relative; left:auto; right:auto;">
-                                <h6 style="color:black;">...Log in to Spotify to get something started or join another sesh</h6>
-                              </div>
-                            <img class="d-block w-100" src="{% static 'images/dancing.jpg' %}" alt="Music vector created by pch.vector - www.freepik.com">
-                            <div class="text-center text-center carousel-caption d-none d-md-block" style="position:relative; left:auto; right:auto;">
-                                <a class="text-secondary" href='https://www.freepik.com/vectors/music' style="font-size:14px;"><small>Music vector created by pch.vector - www.freepik.com</small></a>
-                            </div>
-                        </div>
-                    </div>
-                    <a class="carousel-control-prev" style="filter: invert(100%);" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" style="filter: invert(100%);" href="#carouselExampleIndicators" role="button" data-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="sr-only">Next</span>
-                    </a>
-                  </div>
-            </div>
-            <div class="text-right pr-3">
-                <a href="about">Learn More</a>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-        </div>
-    </div>
 </div>
   
 
