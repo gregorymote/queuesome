@@ -268,9 +268,10 @@
 			}
 		}
 
-		var party_code = document.getElementById('party_code');
-		party_code.innerHTML = party.joinCode;
-
+		if(onLoad){
+			var party_code = document.getElementById('party_code');
+			party_code.innerHTML = party.joinCode;
+		}
 		var settings = document.getElementById('settings');
 		if(isHost){
 			settings.style.display = 'initial';
@@ -337,13 +338,12 @@
 		if(updateColor('song-color', 'rgb('+ song.color + ')')){
 			redraw = true;
 		}
-
 		//Force Redraw
 		if(redraw){
 			var parent = document.getElementById('parent');
 			forceRedraw(parent);
 		}
-	};
+	}
 
 	function updateColor(name, color) {
 		var update = false;
@@ -532,13 +532,13 @@
 			</div>
 		</div>
 		<div class="text-center">
-			<a id="action" class ="btn btn-dark btn-lg text-primary display:none; action" role="button"></a>
+			<a id="action" class ="btn btn-dark btn-lg display:none; action" role="button"></a>
 		</div>
 	</div>
 
 	<nav class="navbar navbar-light">
 		<a href="{% url 'users' pid=party.id %}" class="btn navbar-btn"> <em class="fa fa-users"></em></a>
-		<div class=" ps-5 text-white text-center">
+		<div class=" ps-5 text-center">
 			<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#qrModal"><strong id="party_code"></strong> <em class="fa fa-qrcode"></em></a>
 		</div>	
 		<a class="btn navbar-btn" data-bs-toggle="modal" data-bs-target="#resultsModal">Results <em class="fa fa-bar-chart"></em></a>
