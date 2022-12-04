@@ -164,13 +164,16 @@
 				setWidth(song_title);
 				redraw = true;
 			}
-			song_link.href=song.link;
-			song_link.style.visibility='initial';
-			song_artist.innerHTML = song.artist;
+
+			if(song_artist.innerHTML != encodeText(song.artist)){
+				song_link.href=song.link;
+				song_link.style.visibility='initial';
+				song_artist.innerHTML = song.artist;
+			}
 
 			if(song.art == 'duplicate'){
 				{% load static %}
-				if(artwork.src != "{% static 'images/twosome.png' %}"){
+				if(artwork.src.indexOf('twosome') == -1){
 					artwork.src = "{% static 'images/twosome.png' %}";
 					blur.src = "{% static 'images/twosome.png' %}";
 					redraw = true;
@@ -183,6 +186,7 @@
 					redraw = true;
 				}
 			}
+			wait = true;
 		}
 		else{
 			category_leader.innerHTML = party.name;
@@ -216,6 +220,7 @@
 			}
 			else{
 				wait = false;
+				redraw = false;
 			}
 		}
 	
