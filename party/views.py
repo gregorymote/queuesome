@@ -12,6 +12,7 @@ from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
  BlankForm)
 from queue_it_up.settings import IP, PORT, HEROKU, QDEBUG
 from datetime import datetime, timezone
+from html import escape
 
 
 def auth(request):
@@ -173,7 +174,8 @@ def name_party(request, pid):
     if request.method == 'POST':
         form = NamePartyForm(request.POST)
         if form.is_valid():
-            party.name = form.cleaned_data['party_name']
+            party_name = escape(form.cleaned_data['party_name'])
+            party.name = party_name[:Party._meta.get_field('name').max_length]
             unique = False
             while not unique:
                 join_code = get_code(4)
@@ -183,7 +185,8 @@ def name_party(request, pid):
                     party.joinCode = join_code
                     unique = True
             party.save()
-            user.name = form.cleaned_data['user_name']
+            user_name = escape(form.cleaned_data['user_name'])
+            user.name = user_name[:Users._meta.get_field('name').max_length]
             user.save()
             return HttpResponseRedirect(
                 reverse('lobby', kwargs={'pid': party.pk})
@@ -214,10 +217,11 @@ def join_party(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            code = form.cleaned_data['party_code'].upper() 
+            code = escape(form.cleaned_data['party_code'].upper())
             party = Party.objects.filter(joinCode=code, active=True).first()
             if party:  
-                name = form.cleaned_data['user_name']
+                name = escape(form.cleaned_data['user_name'])
+                name = name[:Users._meta.get_field('name').max_length]
                 user = Users.objects.filter(
                     party=party, sessionID=session_key, active=True).first()
                 if user:

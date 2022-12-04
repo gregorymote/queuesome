@@ -18,12 +18,32 @@ class NamePartyForm(forms.Form):
         required = True,
         widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR NAME',}),
         max_length=Users._meta.get_field('name').max_length
-    
     )
 
 class CreateUserForm(forms.Form):
-    party_code = forms.CharField(label = 'Room Code', required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Enter Room Code','style' : 'text-transform:uppercase'})) 
-    user_name = forms.CharField(label = 'Name', required = True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER YOUR NAME',}))
+    party_code = forms.CharField(
+        label = 'Room Code',
+        required=True, 
+        widget=forms.TextInput(
+            attrs={
+                'class':'form-control',
+                'placeholder': 'Enter Room Code',
+                'style' : 'text-transform:uppercase'
+            }
+        ),
+        max_length=4
+    ) 
+    user_name = forms.CharField(
+        label = 'Name',
+        required = True,
+        widget=forms.TextInput(
+            attrs={
+                'class':'form-control',
+                'placeholder': 'ENTER YOUR NAME'
+            }
+        ),
+        max_length=Users._meta.get_field('name').max_length
+    )
 
 class AuthForm(forms.Form):
     auth_code = forms.CharField(label = 'Enter code', required=True)

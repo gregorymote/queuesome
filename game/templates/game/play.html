@@ -144,15 +144,14 @@
 		var song_title = document.getElementById('song_title');
 		var song_link = document.getElementById('song_link');
 		var song_artist = document.getElementById('song_artist');
-		
-		if (category_name.innerHTML != category.name){
+
+		if (category_name.innerHTML != encodeText(category.name)){
 			category_name.innerHTML = category.name;
 			setWidth(category_name);
 			redraw = true;
 		}
-		
 		if (song.art != "lull"){
-			if(category_leader.innerHTML != category.leader+"'s Vibe"){
+			if(category_leader.innerHTML != encodeText(category.leader+"'s Vibe")){
 				category_leader.innerHTML=category.leader+"'s Vibe";
 				redraw = true;
 			}
@@ -160,7 +159,7 @@
 				logo.style.display = 'initial';
 				logo_placeholder.style.display='none';
 			}
-			if(song_title.innerHTML != song.title){
+			if(song_title.innerHTML != encodeText(song.title)){
 				song_title.innerHTML = song.title;
 				setWidth(song_title);
 				redraw = true;
@@ -186,7 +185,7 @@
 			}
 		}
 		else{
-			category_leader.innerHTML=party.name;
+			category_leader.innerHTML = party.name;
 			if(logo.style.display != 'none'){
 				logo.style.display='none';
 				logo_placeholder.style.display='initial';
@@ -355,6 +354,12 @@
 			}
 		}
 		return update;
+	}
+
+	function encodeText(str){
+		var p = document.createElement('p');
+		p.innerHTML = str;
+		return p.innerHTML;
 	}
 
 	function likeSong(e){

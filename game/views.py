@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from party.models import Party, Users, Category, Songs, Searches, Devices, Library
 from game.forms import (blankForm, chooseCategoryForm, pickCategoryForm,
     searchForm, settingsForm)
+from html import escape
 import spotipy
 import time
 import threading
@@ -364,12 +365,16 @@ def choose_category(request, pid):
         form = chooseCategoryForm(request.POST, repo=choices)
         if form.is_valid():
             category = form.cleaned_data['cat_choice']
+            artist = escape(form.cleaned_data['artist'])
+            artist = artist[:Library._meta.get_field('name').max_length - 15]
+            custom = escape(form.cleaned_data['custom'])
+            custom = custom[:Library._meta.get_field('name').max_length]
             valid = create_category(
                 party=party,
                 user=user,
                 category=category,
-                artist=form.cleaned_data['artist'],
-                custom=form.cleaned_data['custom'],
+                artist=artist,
+                custom=custom,
                 sc_type=form.cleaned_data['scatt_radio']
             )
             if valid:
@@ -427,13 +432,19 @@ def pick_category(request, pid):
         if form.is_valid():
             category = form.cleaned_data['result']
             category = Library.objects.get(id=category)
+            artist = escape(form.cleaned_data['artist'])
+            artist = artist[:Library._meta.get_field('name').max_length - 15]
+            custom = escape(form.cleaned_data['custom'])
+            custom = custom[:Library._meta.get_field('name').max_length]
+            custom_desc = escape(form.cleaned_data['custom_desc'])
+            custom_desc = custom_desc[:Library._meta.get_field('description').max_length]
             valid = create_category(
                 party=party,
                 user=user,
                 category=category,
-                artist=form.cleaned_data['artist'],
-                custom=form.cleaned_data['custom'],
-                custom_desc=form.cleaned_data['custom_desc'],
+                artist=artist,
+                custom=custom,
+                custom_desc=custom_desc,
                 sc_type=""
             )
             if valid:
@@ -630,9 +641,9 @@ def update_search(request):
         ) if len(track_name) > 255 else track_name
         if not current or current.uri != track_uri:
             search = Searches(
-                name = track_name + ", " + artist_name,
-                title = track_name,
-                artist = artist_name,
+                name = escape(track_name + ", " + artist_name),
+                title = escape(track_name),
+                artist = escape(artist_name),
                 uri=track_uri,
                 art=album_art,
                 party=party,

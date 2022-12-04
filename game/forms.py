@@ -78,7 +78,7 @@ class pickCategoryForm(forms.Form):
         label = 'Artist Name',
         required = False,
         widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER THE NAME OF AN ARTIST',}),
-        max_length=Library._meta.get_field('name').max_length
+        max_length=Library._meta.get_field('name').max_length - 15
     )
 
 
