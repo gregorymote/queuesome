@@ -1,8 +1,13 @@
 <!DOCTYPE html>
-
 {% extends "base.html" %}
 {% block settings %}
+<style>
+  .enjoyhint_close_btn{
+    bottom: 10px !important;
+    top: auto !important;
+  }
 
+</style>
 <script>
 
 	$(document).ready(function() {
@@ -50,4 +55,37 @@
 			</div>
 		</form>	
 	</div>
+  <script>
+
+    //initialize instance
+    var enjoyhint_instance = new EnjoyHint({});
+    
+    //simple config.
+
+    var enjoyhint_script_steps = [
+        {
+          'next .device' : 'Change Settings Here'
+        },
+        {
+          'next #id_party_name.form-control' : 'Enter a Name for the SESH',
+          showPrev : false
+        },
+        {
+          'next #id_user_name.form-control' : 'Enter Your Name',
+          showPrev : false
+        }
+
+    ];
+    
+    //set script config
+    enjoyhint_instance.set(enjoyhint_script_steps);
+    
+    //run Enjoyhint script on first page load
+    window.onload = function () {
+      if (!('hasCodeRunBefore' in localStorage)) {
+        enjoyhint_instance.run();
+        localStorage.setItem("hasCodeRunBefore", true);
+    }
+}
+  </script>
 {% endblock %}
