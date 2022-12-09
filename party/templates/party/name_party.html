@@ -64,15 +64,8 @@
 
     var enjoyhint_script_steps = [
         {
-          'next .device' : 'Change Settings Here'
-        },
-        {
-          'next #id_party_name.form-control' : 'Enter a Name for the SESH',
-          showPrev : false
-        },
-        {
-          'next #id_user_name.form-control' : 'Enter Your Name',
-          showPrev : false
+          'next .device' : 'Change Settings Here',
+		  shape : 'circle'
         }
 
     ];
@@ -84,7 +77,7 @@
     window.onload = function () {
       if (!('hasCodeRunBefore' in localStorage)) {
         enjoyhint_instance.run();
-        localStorage.setItem("hasCodeRunBefore", true);
+       localStorage.setItem("hasCodeRunBefore", true);
     }
 }
   </script>
