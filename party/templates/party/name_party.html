@@ -2,11 +2,15 @@
 {% extends "base.html" %}
 {% block settings %}
 <style>
-  .enjoyhint_close_btn{
-    bottom: 10px !important;
-    top: auto !important;
-  }
-
+	.enjoyhint_close_btn,
+	.enjoyhint_skip_btn,
+	.enjoyhint_next_btn,
+	.enjoyhint_prev_btn{
+		display:none;
+	}
+	.enjoyhint_disable_events{
+		pointer-events: none;
+	}
 </style>
 <script>
 
@@ -64,7 +68,7 @@
 
     var enjoyhint_script_steps = [
         {
-          'next .device' : 'Change Settings Here',
+          'next .device' : 'psst, settings are right here if you ever need em',
 		  shape : 'circle'
         }
 
@@ -75,10 +79,15 @@
     
     //run Enjoyhint script on first page load
     window.onload = function () {
-      if (!('hasCodeRunBefore' in localStorage)) {
-        enjoyhint_instance.run();
-       localStorage.setItem("hasCodeRunBefore", true);
-    }
-}
+		if (!('hasCodeRunBefore' in localStorage)) {
+			enjoyhint_instance.run();
+			localStorage.setItem("hasCodeRunBefore", true);
+			document.addEventListener('click', stopTour);	
+		}	
+	}
+
+	function stopTour(e){
+		enjoyhint_instance.stop();
+	}
   </script>
 {% endblock %}
