@@ -55,7 +55,7 @@ class pickCategoryForm(forms.Form):
     custom = forms.CharField(
         label = 'Create Your Own',
         required = False,
-        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'NAME',}),
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'ENTER SOME WORDS HERE...',}),
         max_length=Library._meta.get_field('name').max_length
     )
     custom_desc = forms.CharField(

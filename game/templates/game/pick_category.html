@@ -8,6 +8,7 @@
 		.categories{
 			display: inline-flex;
 			flex-wrap: wrap;
+			justify-content: center;
 		}
 		
 		/* CARDS */
@@ -88,15 +89,14 @@
 
 		function populateCats(cats){
 			var categories = document.getElementById("categories");
-			categories.classList.add("categories");
 			categories.innerHTML = "";
 			for(var i=0; i<cats.length;i++){
 				var card = document.createElement('div');
 				card.classList.add('card1', 'text-center');
-				card.style.marginLeft = Math.floor(Math.random() * 50) + "px";
+				//card.style.marginLeft = Math.floor(Math.random() * 50) + "px";
 				card.style.backgroundColor = COLORS[Math.floor(Math.random() * 5)];
 				card.id = cats[i].id;
-				var name = document.createElement('h5');
+				var name = document.createElement('h6');
 				name.classList.add('card1__title');
 				name.innerHTML = cats[i].name;
 				name.setAttribute('data-description', cats[i].description)
@@ -136,7 +136,7 @@
 			var form_custom_desc = document.getElementById("id_custom_desc");
 			var form_artist = document.getElementById("form_artist");
 			var form_artist_input = document.getElementById("id_artist");
-			if(name == "Custom"){
+			if(name == "Create Your Own"){
 				form_description.style.display = "none";
 				form_custom.style.display = "block";
 				form_custom_name.value = document.getElementById("id_search").value;
@@ -163,14 +163,13 @@
 	</script>
 
 	<div class = "container form-width ps-3 pe-3" >
-		<div id="header" class = "text-center" style="margin-bottom: 0px;">
+		<div id="header" class = "text-center card1" style="margin-bottom: 0px;">
 			<h5>Curate the Vibe</h5>
 		</div>
-
 		<div class="buttonIn" style="display:none;">
 			<h6 id="search">{{ form.search }}</h6>
 		</div>
-		<div id="categories"></div>
+		<div id="categories" class="categories"></div>
 	</div>
 
 	<div class="modal fade" id="form_modal" tabindex="-1" role="dialog">
@@ -183,7 +182,7 @@
 					<small id="form_description" class="text-muted"></small>
 					<div id="form_custom" style="display:none;">
 						<div id="form_custom_name" class="pb-2">{{ form.custom }}</div>
-						<div id="form_custom_desc">{{ form.custom_desc }}</div>
+						<div id="form_custom_desc" style="display: none;">{{ form.custom_desc }}</div>
 					</div>
 					<div id="form_artist" class="pt-2" style="display:none;">{{ form.artist }}</div>
 					<p style="display:none;">{{ form.result }}</p>

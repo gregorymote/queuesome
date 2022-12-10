@@ -110,7 +110,7 @@ def create_category(party, user, category, artist, custom, custom_desc, sc_type)
             name ='Songs by ' + artist
         else:
             return not valid
-    elif choice == 'Custom': 
+    elif choice == 'Create Your Own': 
         if custom != '':
             name = custom
             library = Library.objects.filter(
