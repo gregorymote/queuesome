@@ -3,45 +3,50 @@
 {% block page_content %}
 
 
-<style>
-	/* CARDS */
+	<style>
 
-.cards {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
+		.categories{
+			display: inline-flex;
+			flex-wrap: wrap;
+		}
+		
+		/* CARDS */
 
-.card {
-  margin-top: 1em;
-  margin-bottom: 1em;
-  padding-top: 10px;
-  padding-left: 10px;
-  width: auto;
-  height: 50px;
-  display: grid;
-  border-radius: 10px;
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25);
-  transition: all 0.2s;
-  background: white;
-}
+		.cards {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+		}
 
-.card:hover {
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
-  transform: scale(1.01);
-}
+		.card1 {
+			margin-right: 1em;
+			margin-top: 1em;
+			margin-bottom: 1em;
+			padding: .25em;
+			width: auto;
+			height: auto;
+			display: grid;
+			transition: all 0.2s;
+			box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+		}
 
-.card__title {
-  font-weight: 400;
-  color: black;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+		.card1:hover {
+			box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+			transform: scale(1.01);
+		}
 
-</style>
+		.card1__title {
+			font-weight: 400;
+			color: black;
+			margin: .25em;
+		}
+
+	</style>
 
 	<script type="text/javascript">
+		var COLORS = ['#ff7eb9', '#ff65a3', '#7afcff', '#feff9c', '#fff740'];
+		var COLORS2 = ['#D9D9D9', '#667799', '#0D99FF', '#9747FF',
+		'#FF24BD', '#F24822', '#FFA629','#FFCD29', '#14AE5C', '#00A1C2'];
 		var cats = {{ cats|safe }};
 		window.onload = function() {
 			populateCats(cats);
@@ -56,6 +61,7 @@
 		function update_categories(e){
 			clearTimeout(this.delay);
 			this.delay = setTimeout(function(){
+				console.log("input: " + e.target.value);
 				if (e.target.value != ''){
 					$.ajax({
 						url: '/sesh/update_categories',
@@ -68,18 +74,24 @@
 							populateCats(data.cats);
 					} });
 				}
+				else{
+					populateCats(cats);
+				}
 			}, 300);
 		}
 
 		function populateCats(cats){
 			var categories = document.getElementById("categories");
+			categories.classList.add("categories");
 			categories.innerHTML = "";
 			for(var i=0; i<cats.length;i++){
 				var card = document.createElement('div');
-				card.classList.add('card', 'text-left');
+				card.classList.add('card1', 'text-center');
+				card.style.marginLeft = Math.floor(Math.random() * 75) + "px";
+				card.style.backgroundColor = COLORS[Math.floor(Math.random() * 5)];
 				card.id = cats[i].id;
 				var name = document.createElement('h5');
-				name.classList.add('card__title');
+				name.classList.add('card1__title');
 				name.innerHTML = cats[i].name;
 				name.setAttribute('data-description', cats[i].description)
 				card.appendChild(name);
@@ -92,18 +104,21 @@
 			var id = -1;
 			var name = "";
 			var description = "";
-
+			var color = "";
 			if(e.target.id){
 				id = e.target.id;
 				name = e.target.firstChild.innerHTML;
 				description = e.target.firstChild.dataset.description;
+				color = e.target.style.backgroundColor;
 			}
 			else{
 				id = e.target.parentElement.id;
 				name = e.target.innerHTML;  
 				description = e.target.dataset.description;
+				color = e.target.parentElement.style.backgroundColor;
 			}
-
+			var modal = document.getElementById('form_modal');
+			modal.style.backgroundColor = color;
 			var result = document.getElementById("id_result");
 			result.value = id;
 			var form_name = document.getElementById("form_name");
@@ -155,7 +170,7 @@
 
 	<div class="modal fade" id="form_modal" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content">
+			<div class="modal-content" id="form_content">
 				<form action="" method="post">
 					{% csrf_token %}
 				<div id="form_body" class="modal-body text-left">
