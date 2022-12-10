@@ -28,6 +28,7 @@
 			display: grid;
 			transition: all 0.2s;
 			box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+			border-radius: 5px;
 		}
 
 		.card1:hover {
@@ -41,6 +42,11 @@
 			margin: .25em;
 		}
 
+		.modal-body{
+			margin: 1em;
+			background-color: white;
+			border-radius: 5px;
+		}
 	</style>
 
 	<script type="text/javascript">
@@ -87,7 +93,7 @@
 			for(var i=0; i<cats.length;i++){
 				var card = document.createElement('div');
 				card.classList.add('card1', 'text-center');
-				card.style.marginLeft = Math.floor(Math.random() * 75) + "px";
+				card.style.marginLeft = Math.floor(Math.random() * 15) + "px";
 				card.style.backgroundColor = COLORS[Math.floor(Math.random() * 5)];
 				card.id = cats[i].id;
 				var name = document.createElement('h5');
@@ -117,7 +123,7 @@
 				description = e.target.dataset.description;
 				color = e.target.parentElement.style.backgroundColor;
 			}
-			var modal = document.getElementById('form_modal');
+			var modal = document.getElementById('form_content');
 			modal.style.backgroundColor = color;
 			var result = document.getElementById("id_result");
 			result.value = id;
