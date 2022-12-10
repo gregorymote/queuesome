@@ -4,11 +4,29 @@
 
 
 	<style>
+		.header{
+			background-color: white;
+			height: 6em;
+			z-index: 0;
+		}
+
+		.title{
+			position: absolute;
+			bottom: 0px;
+			width:100%;
+		}
+
+		.separator{
+			border-bottom: solid;
+			border-color: lightgray;
+			border-width: 1px;
+		}
 
 		.categories{
 			display: inline-flex;
 			flex-wrap: wrap;
 			justify-content: center;
+			margin-top: 5em;
 		}
 		
 		/* CARDS */
@@ -63,6 +81,8 @@
 				var search = document.getElementById("id_search");
 				search.autocomplete="off";
 				search.addEventListener("input", update_categories);
+				var nav = document.getElementById('nav');
+				nav.classList.add('fixed-top');
 		});
 
 		function update_categories(e){
@@ -161,11 +181,14 @@
 			$('#form_modal').modal('show');
 		}
 	</script>
-
-	<div class = "container form-width ps-3 pe-3" >
-		<div id="header" class = "text-center" style="margin-bottom: 0px;">
+	<div id="header" class="header fixed-top" style="margin-bottom: 0px;">
+		<div class="title text-center">
 			<h5>Curate the Vibe</h5>
+			<div class="container form-width separator"></div>
 		</div>
+		
+	</div>
+	<div class = "container form-width ps-3 pe-3" >
 		<div class="buttonIn" style="display:none;">
 			<h6 id="search">{{ form.search }}</h6>
 		</div>
