@@ -96,7 +96,7 @@
 				//card.style.marginLeft = Math.floor(Math.random() * 50) + "px";
 				card.style.backgroundColor = COLORS[Math.floor(Math.random() * 5)];
 				card.id = cats[i].id;
-				var name = document.createElement('h6');
+				var name = document.createElement('h5');
 				name.classList.add('card1__title');
 				name.innerHTML = cats[i].name;
 				name.setAttribute('data-description', cats[i].description)
@@ -163,7 +163,7 @@
 	</script>
 
 	<div class = "container form-width ps-3 pe-3" >
-		<div id="header" class = "text-center card1" style="margin-bottom: 0px;">
+		<div id="header" class = "text-center" style="margin-bottom: 0px;">
 			<h5>Curate the Vibe</h5>
 		</div>
 		<div class="buttonIn" style="display:none;">
