@@ -470,7 +470,7 @@ def pick_category(request, pid):
         form = pickCategoryForm()
 
     libraries = (Library.objects.filter(pk__in=choices, visible=True) | 
-        Library.objects.filter(special=True, visible=True)).order_by('order','name')
+        Library.objects.filter(special=True, visible=True)).order_by('order','id')
     cats=[]
     for library in libraries:
         cats.append(

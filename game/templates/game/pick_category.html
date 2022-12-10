@@ -160,23 +160,29 @@
 				form_description.style.display = "none";
 				form_custom.style.display = "block";
 				form_custom_name.value = document.getElementById("id_search").value;
+				form_custom_name.required = true;
 				form_artist.style.display = "none";
 				form_artist_input.value = "";
+				form_artist_input.required = false;
 			}
 			else if(name == "Songs by this Artist"){
 				form_description.style.display = "block";
 				form_custom.style.display = "none";
 				form_custom_name.value = "";
+				form_custom_name.required = false;
 				form_custom_desc.value ="";
 				form_artist.style.display = "block";
+				form_artist_input.required = true;
 			}
 			else{
 				form_description.style.display = "block";
 				form_custom.style.display = "none";
 				form_custom_name.value = "";
+				form_custom_name.required = false;
 				form_custom_desc.value ="";
 				form_artist.style.display = "none";
 				form_artist_input.value = "";
+				form_artist_input.required = false;
 			}
 			$('#form_modal').modal('show');
 		}
