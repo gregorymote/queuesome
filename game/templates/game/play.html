@@ -116,8 +116,8 @@
 		var parent = document.getElementById('parent');
 		pan(song_title, parent, 3000)
 		var category_name = document.getElementById('category_name');
-		var play_bar = document.getElementById('play_bar');
-		pan(category_name, play_bar, 5000);
+		var category_parent = document.getElementById('category_parent');
+		pan(category_name, category_parent, 5000);
 	});
 
 	function updatePage(party, user, category, song, results, totals, onLoad=false){
@@ -481,6 +481,7 @@
 		color:white !important;
 		border-bottom-left-radius: 0px;
 		border-bottom-right-radius: 0px;
+		text-decoration: none;
 	}
 
 	.like{
@@ -529,7 +530,7 @@
 	<div id="play_bar" class="play-bar">
 		<div class="row pb-2">
 			<div class="col-8 pt-2 text-left ">
-				<div class="category-name">
+				<div id="category_parent" class="category-name">
 					<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
 					<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
 					<h6 id ="category_leader" class="category-leader song-color"></h6>
@@ -545,7 +546,7 @@
 			</div>
 		</div>
 		<div class="text-center">
-			<a id="action" class ="btn btn-dark btn-lg display:none; action" role="button"></a>
+			<a id="action" class ="btn btn-dark btn-lg action" style="display: none;" role="button"></a>
 		</div>
 	</div>
 
