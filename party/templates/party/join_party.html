@@ -22,7 +22,7 @@
 		}
 		var main = document.getElementById('main');
 		initPos(main);
-		//main.addEventListener('scroll', scrollVisible);
+		main.addEventListener('scroll', scrollVisible);
 	});
 
 	function initPos(main){
@@ -58,11 +58,13 @@
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
+		var debug = document.getElementById('debug');
+		debug.innerHTML = width + " : " + main.scrollLeft;
 		if(width == main.scrollLeft){
 			main.style.visibility = 'visible';
-			main.removeEventListener('scroll', scrollVisible);
-			main.addEventListener('scroll', scrollSubmit);
-			main.addEventListener('scroll', scrollAnimate);
+			//main.removeEventListener('scroll', scrollVisible);
+			//main.addEventListener('scroll', scrollSubmit);
+			//main.addEventListener('scroll', scrollAnimate);
 		}
 	}
 
@@ -406,7 +408,7 @@
 		<div id="name_validator" class="ps-3 validator">
 			<em>need some text here...could be anything</em>
 		</div>
-
+		<p id="debug"></p>
 		<div id="button" class="pt-2 text-end">
 			<input type="submit" class="btn btn-outline-light btn-lg block"
 				style="border:3px solid black; border-radius:16px; color:black; display:block;" value="Submit">
