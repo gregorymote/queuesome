@@ -47,7 +47,7 @@
 		var names = {{ names|safe }};
 		var size = {{ names|safe }}.length;
 		window.onload = function() {
-			updatePage(names)
+			updatePage(names);
 		};
 		function getLobbyData() {
 			$.ajax({
@@ -74,6 +74,7 @@
 
 		function updatePage(names){
 			var name_list = document.getElementById('name_list');
+	
 			name_list.innerHTML = '';
 			for(var i=0; i<names.length; i++){
 				var header = document.createElement('h5');
@@ -84,11 +85,16 @@
 				name_list.appendChild(header);
 			}
 		}
-			
+		
+		function encodeText(str){
+			var p = document.createElement('p');
+			p.innerHTML = str;
+			return p.innerHTML;
+		}
 	</script>
 	
 	<div class = "container form-width">	
-		<h5>{{party.name}}</h5>
+		<h5 id = "party_name">{{party.name | safe}}</h5>
 		
 		<div class = "row">
 			<div class = "col" id="name_list"></div>
