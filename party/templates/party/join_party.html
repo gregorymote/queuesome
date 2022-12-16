@@ -51,7 +51,7 @@
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
 		var text = document.getElementById('swipe_content');
-		text.style.opacity = (main.scrollLeft / width) * 100 + '%';
+		text.style.opacity = ((main.scrollLeft / width) * 100 * 2) + '%';
 	}
 
 	const scrollVisible = () => {
