@@ -59,9 +59,10 @@
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
 		var debug = document.getElementById('debug');
+		var swipe_icon = document.getElementById('swipe_icon');
 		debug.innerHTML = width + " : " + main.scrollLeft;
 		if(width == main.scrollLeft){
-			main.style.visibility = 'visible';
+			swipe_icon.style.visibility = 'visible';
 			//main.removeEventListener('scroll', scrollVisible);
 			//main.addEventListener('scroll', scrollSubmit);
 			//main.addEventListener('scroll', scrollAnimate);
@@ -416,13 +417,13 @@
 		</div>
 		<div id="swipe" style="position:relative">
 			<section id="carousel" class="carousel" style="margin-top:1em;">
-				<ol id="main" class="carousel__viewport scroll-snap-man" style="visibility: visible;">
+				<ol id="main" class="carousel__viewport scroll-snap-man">
 					<li id="carousel__slide1" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
 						<div class="carousel__snapper"></div>
 					</li>
 					<li id="carousel__slide2" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
 						<div class="carousel__snapper" style="text-align:left; color:lightgray ">
-							<div class="swipe-icon">
+							<div id ="swipe_icon" class="swipe-icon" style="visibility: hidden;">
 								<i class="fa-solid fa-chevron-right"></i>
 							</div>
 						</div>
