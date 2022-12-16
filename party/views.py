@@ -262,3 +262,15 @@ def join_party(request):
         'host': host
     }
     return render(request, 'party/join_party.html', context)
+
+
+def validate_code(request):
+    valid = False
+    code = escape(request.GET.get('code', None))
+    party = Party.objects.filter(joinCode=code.upper(), active=True).first()
+    if party:
+        valid = True
+    data = {
+        'valid': valid
+    }
+    return JsonResponse(data)

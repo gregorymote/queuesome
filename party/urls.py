@@ -9,5 +9,6 @@ urlpatterns = [
     path('<int:pid>/set_device/', views.set_device, name='set_device'),
     path('update_devices', views.update_devices, name='update_devices'),
     path('update_set_device', views.update_set_device, name='update_set_device'),
+    path('validate_code', views.validate_code, name='validate_code'),
     
 ]

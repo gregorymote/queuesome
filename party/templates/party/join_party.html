@@ -3,33 +3,444 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-	<div class = "container form-width">
-		<form action="" method="post">
-			{% csrf_token %}
-			{% if not party_name %}
-			<h5>{{ form.party_code.label }}</h5>
-			{{ form.party_code }}
-			{% else %}
-			<div class="d-none">{{ form.party_code }}</div>
-			<h6>Join {{host}}'s Sesh</h6>
-			<div class="text-center">
-			<strong>{{ party_name }}</strong>
-			</div>
-			{% endif %}
-			{% if invalid %}
-			<div class="alert alert-info">
-				invalid room code
-			</div>
-			{% endif %}
-			
-			<div class = "pt-2">
-				<h5>{{ form.user_name.label }}</h5>
-				{{ form.user_name }}
-			</div>
 
-			<div class = "pt-2 text-end">
-				<input type="submit" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" value="Submit">
-			</div>	
-		</form>
-	</div>
+<script>
+	var invalid = "{{invalid}}";
+	$(document).ready(function () {
+		var button = document.getElementById('button');
+		var carousel = document.getElementById('swipe');
+		if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+			button.style.display = 'none';
+			carousel.style.display = 'block';
+		}
+		else{
+			button.style.display = 'block';
+			carousel.style.display = 'none';
+		}
+		if(invalid == 'True'){
+			document.getElementById('code_validator').style.display = 'block';
+		}
+		var main = document.getElementById('main');
+		initPos(main);
+		main.addEventListener('scroll', scrollVisible);
+	});
+
+	function initPos(main){
+		var slide = document.getElementById('carousel__slide1');
+		var width = getWidth(slide);
+		main.scroll(width, 0);
+	}
+
+	const scrollSubmit = () => {
+		var slide = document.getElementById('carousel__slide1');
+		var width = getWidth(slide);
+		var main = document.getElementById('main');
+		if(main.scrollLeft ==  0){
+			var valid = validateInput();
+			if(valid){
+				document.joinParty.submit();
+			}
+			else{
+				initPos(main);
+			}
+		}
+	}
+
+	const scrollAnimate = () => {
+		var slide = document.getElementById('carousel__slide1');
+		var width = getWidth(slide);
+		var main = document.getElementById('main');
+		var text = document.getElementById('placeholder');
+		text.style.opacity = (main.scrollLeft / width) * 100 + '%';
+	}
+
+	const scrollVisible = () => {
+		var slide = document.getElementById('carousel__slide1');
+		var width = getWidth(slide);
+		var main = document.getElementById('main');
+		if(width == main.scrollLeft){
+			main.style.visibility = 'visible';
+			main.removeEventListener('scroll', scrollVisible);
+			main.addEventListener('scroll', scrollSubmit);
+			main.addEventListener('scroll', scrollAnimate);
+		}
+	}
+
+	function getWidth(element){
+        var style = getComputedStyle(element);
+        var width = style.getPropertyValue("width");
+        width = parseInt(width.split("px")[0]);
+        return width;
+	}
+
+	function validateInput(){
+		var valid = true;
+		var code = document.getElementById('id_party_code');
+		var codeInfo = document.getElementById('code_validator');
+		var codeText = document.getElementById('code_text');
+		if(code.value == ""){
+			codeText.style.display = 'block';
+			codeInfo.style.display = 'none';
+			valid = false;
+		}
+		else if (validateCode(code.value) == 'False'){
+			codeInfo.style.display = 'block';
+			codeText.style.display = 'none';
+			valid = false;
+		}
+		else{
+			codeInfo.style.display = 'none';
+			codeText.style.display = 'none';
+		}
+		var name = document.getElementById('id_user_name');
+		var nameInfo = document.getElementById('name_validator');
+		if (name.value == ""){
+			nameInfo.style.display = 'block';
+			valid = false;
+		}
+		else{
+			nameInfo.style.display = 'none';
+		}
+		console.log(valid);
+		return valid;
+	}
+
+	function validateCode(code){
+		$.ajax({
+			url: '/party/validate_code',
+			data: {
+				'code': code,
+			},
+			dataType: 'json',
+			success: function (data) {
+				return data.valid
+			},
+			error: function(data){
+				return false;
+			}
+		});
+	}
+</script>
+
+
+<style>
+	@keyframes tonext {
+	  75% {
+		left: 0;
+	  }
+	  95% {
+		left: 100%;
+	  }
+	  98% {
+		left: 100%;
+	  }
+	  99% {
+		left: 0;
+	  }
+	}
+	
+	@keyframes tostart {
+	  75% {
+		left: 0;
+	  }
+	  95% {
+		left: -300%;
+	  }
+	  98% {
+		left: -300%;
+	  }
+	  99% {
+		left: 0;
+	  }
+	}
+	
+	@keyframes snap {
+	  96% {
+		scroll-snap-align: center;
+	  }
+	  97% {
+		scroll-snap-align: none;
+	  }
+	  99% {
+		scroll-snap-align: none;
+	  }
+	  100% {
+		scroll-snap-align: center;
+	  }
+	}
+	
+	body {
+	  max-width: 37.5rem;
+	  margin: 0 auto;
+	  padding: 0 1.25rem;
+	  font-family: 'Lato', sans-serif;
+	}
+	
+	* {
+	  box-sizing: border-box;
+	  scrollbar-color: transparent transparent; /* thumb and track color */
+	  scrollbar-width: 0px;
+	}
+	
+	*::-webkit-scrollbar {
+	  width: 0;
+	}
+	
+	*::-webkit-scrollbar-track {
+	  background: transparent;
+	}
+	
+	*::-webkit-scrollbar-thumb {
+	  background: transparent;
+	  border: none;
+	}
+	
+	* {
+	  -ms-overflow-style: none;
+	}
+	
+	ol, li {
+	  list-style: none;
+	  margin: 0;
+	  padding: 0;
+	}
+
+	.scroll-snap-prox{
+		scroll-snap-type: x proximity;
+	}
+
+	.scroll-snap-man{
+		scroll-snap-type: x mandatory;
+	}
+	
+	.carousel {
+	  position: relative;
+	  padding-top: 75%;
+	  filter: drop-shadow(0 0 10px #0003);
+	  perspective: 100px;
+	}
+	
+	.carousel__viewport {
+	  position: absolute;
+	  top: 0;
+	  right: 0;
+	  bottom: 0;
+	  left: 0;
+	  display: flex;
+	  overflow-x: scroll;
+	  overflow-y: hidden;
+	  counter-reset: item;
+	  scroll-behavior: smooth;
+	  height: 4em;
+	}
+	
+	.carousel__slide {
+	  position: relative;
+	  flex: 0 0 100%;
+	  width: 100%;
+	  background-color: transparent;
+	  counter-increment: item;
+	}
+		
+	.carousel__slide:before {
+	  position: absolute;
+	  top: 50%;
+	  left: 50%;
+	  transform: translate3d(-50%,-40%,70px);
+	  color: #fff;
+	  font-size: 2em;
+	}
+	
+	.carousel__snapper {
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  width: 100%;
+	  height: 100%;
+	  scroll-snap-align: center;
+	}
+	
+	@media (hover: hover) {
+	  .carousel__snapper {
+		animation-name: none;
+		animation-timing-function: ease;
+		animation-duration: 4s;
+		animation-iteration-count: infinite;
+	  }
+	
+	  .carousel__slide:last-child .carousel__snapper {
+		animation-name: none;
+	  }
+	}
+	
+	@media (prefers-reduced-motion: reduce) {
+	  .carousel__snapper {
+		animation-name: none;
+	  }
+	}
+	
+	.carousel:hover .carousel__snapper,
+	.carousel:focus-within .carousel__snapper {
+	  animation-name: none;
+	}
+	
+	.carousel__navigation {
+	  position: absolute;
+	  right: 0;
+	  bottom: 0;
+	  left: 0;
+	  text-align: center;
+	}
+	
+	.carousel__navigation-list,
+	.carousel__navigation-item {
+	  display: inline-block;
+	}
+	
+	.carousel__navigation-button {
+	  display: inline-block;
+	  width: 1.5rem;
+	  height: 1.5rem;
+	  background-color: #333;
+	  background-clip: content-box;
+	  border: 0.25rem solid transparent;
+	  border-radius: 50%;
+	  font-size: 0;
+	  transition: transform 0.1s;
+	}
+	
+	.carousel__prev,
+	.carousel__next {
+	  position: absolute;
+	  top: 0;
+	  margin-top: 37.5%;
+	  width: 4rem;
+	  height: 4rem;
+	  transform: translateY(-50%);
+	  border-radius: 50%;
+	  font-size: 0;
+	  outline: 0;
+	}
+	
+	.carousel::before,
+	.carousel__prev {
+	  left: -1rem;
+	}
+	
+	.carousel::after,
+	.carousel__next {
+	  right: -1rem;
+	}
+	
+	.carousel::before,
+	.carousel::after {
+	  z-index: 1;
+	  background-color: #333;
+	  background-size: 1.5rem 1.5rem;
+	  background-repeat: no-repeat;
+	  background-position: center center;
+	  color: #fff;
+	  font-size: 2.5rem;
+	  line-height: 4rem;
+	  text-align: center;
+	  pointer-events: none;
+	}
+
+	.validator{
+		color: red;
+		display: none;
+	}
+
+	.swipe-content{
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		margin: auto;
+	}
+
+	.swipe-icon{
+		width: 2.5em; 
+		height: 2.5em; 
+		line-height:20px;
+		position: absolute;
+		padding: 5px 10px;
+		border-radius: 50%;
+		background: white;
+		color: lightgray;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size:1em;
+		top: 0;
+  		bottom: 0;
+  		margin: auto 0;
+	}
+</style>
+
+	
+<div class="container form-width">
+	<form name="joinParty" action="" method="post">
+		{% csrf_token %}
+		{% if not party_name %}
+		<h5>{{ form.party_code.label }}</h5>
+		{{ form.party_code }}
+		{% else %}
+		<div class="d-none">{{ form.party_code }}</div>
+		<h6>Join {{host}}'s Sesh</h6>
+		<div class="text-center">
+			<strong>{{ party_name | safe }}</strong>
+		</div>
+		{% endif %}
+		<div id="code_text" class="ps-3 validator">
+			<em>empty...need not empty</em>
+		</div>
+		<div id="code_validator" class="ps-3 validator">
+			<em>we couldn't find a party with that code</em>
+		</div>
+
+		<div class="pt-2">
+			<h5>{{ form.user_name.label }}</h5>
+			{{ form.user_name }}
+		</div>
+		<div id="name_validator" class="ps-3 validator">
+			<em>need some text here...could be anything</em>
+		</div>
+
+		<div id="button" class="pt-2 text-end">
+			<input type="submit" class="btn btn-outline-light btn-lg block"
+				style="border:3px solid black; border-radius:16px; color:black; display:block;" value="Submit">
+		</div>
+		<div id="swipe" style="position:relative">
+			<section id="carousel" class="carousel" style="margin-top:1em;">
+				<ol id="main" class="carousel__viewport scroll-snap-man" style="visibility:hidden;">
+					<li id="carousel__slide1" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
+						<div class="carousel__snapper"></div>
+					</li>
+					<li id="carousel__slide2" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
+						<div class="carousel__snapper" style="text-align:left; color:lightgray ">
+							<div class="swipe-icon">
+								<i class="fa-solid fa-chevron-right"></i>
+							</div>
+						</div>
+					</li>
+					<li id="carousel__slide3" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
+						<div class="carousel__snapper"></div>
+					</li>
+				</ol>
+			</section>
+			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-1;">
+				<ol id="placeholder" class="carousel__viewport scroll-snap-man">
+					<li id="direction" tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
+						<div class="carousel__snapper" style="display:flex;">
+							<div class="swipe-content">
+								SLIDE TO CONTINUE
+							</div>
+						</div>
+					</li>
+				</ol>
+			</section>
+		</div>
+	</form>
+</div>
 {% endblock %}
