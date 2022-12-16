@@ -58,14 +58,12 @@
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
-		var debug = document.getElementById('debug');
 		var swipe_icon = document.getElementById('swipe_icon');
-		debug.innerHTML = width + " : " + main.scrollLeft;
 		if(width == main.scrollLeft){
 			swipe_icon.style.visibility = 'visible';
-			//main.removeEventListener('scroll', scrollVisible);
-			//main.addEventListener('scroll', scrollSubmit);
-			//main.addEventListener('scroll', scrollAnimate);
+			main.removeEventListener('scroll', scrollVisible);
+			main.addEventListener('scroll', scrollSubmit);
+			main.addEventListener('scroll', scrollAnimate);
 		}
 	}
 
@@ -364,8 +362,8 @@
 	}
 
 	.swipe-icon{
-		width: 2.5em; 
-		height: 2.5em; 
+		width: 3.5em; 
+		height: 3.5em; 
 		line-height:20px;
 		position: absolute;
 		padding: 5px 10px;
@@ -379,6 +377,7 @@
 		top: 0;
   		bottom: 0;
   		margin: auto 0;
+		margin-left: .25em;
 	}
 </style>
 
@@ -410,25 +409,24 @@
 		<div id="name_validator" class="ps-3 validator">
 			<em>need some text here...could be anything</em>
 		</div>
-		<p id="debug"></p>
 		<div id="button" class="pt-2 text-end">
 			<input type="submit" class="btn btn-outline-light btn-lg block"
 				style="border:3px solid black; border-radius:16px; color:black; display:block;" value="Submit">
 		</div>
 		<div id="swipe" style="position:relative">
 			<section id="carousel" class="carousel" style="margin-top:1em;">
-				<ol id="main" class="carousel__viewport scroll-snap-man">
-					<li id="carousel__slide1" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
+				<ol id="main" class="carousel__viewport scroll-snap-man" style="border-radius: 500px;">
+					<li id="carousel__slide1" tabindex="0" class="carousel__slide">
 						<div class="carousel__snapper"></div>
 					</li>
-					<li id="carousel__slide2" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
+					<li id="carousel__slide2" tabindex="0" class="carousel__slide">
 						<div class="carousel__snapper" style="text-align:left; color:lightgray ">
 							<div id ="swipe_icon" class="swipe-icon" style="visibility: hidden;">
 								<i class="fa-solid fa-chevron-right"></i>
 							</div>
 						</div>
 					</li>
-					<li id="carousel__slide3" tabindex="0" class="carousel__slide" style="border-radius: 500px;">
+					<li id="carousel__slide3" tabindex="0" class="carousel__slide">
 						<div class="carousel__snapper"></div>
 					</li>
 				</ol>
