@@ -50,7 +50,7 @@
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
-		var text = document.getElementById('placeholder');
+		var text = document.getElementById('swipe_content');
 		text.style.opacity = (main.scrollLeft / width) * 100 + '%';
 	}
 
@@ -433,9 +433,9 @@
 			</section>
 			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-1;">
 				<ol id="placeholder" class="carousel__viewport scroll-snap-man">
-					<li id="direction" tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
+					<li tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
 						<div class="carousel__snapper" style="display:flex;">
-							<div class="swipe-content">
+							<div id="swipe_content" class="swipe-content">
 								SLIDE TO CONTINUE
 							</div>
 						</div>
