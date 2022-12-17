@@ -44,18 +44,18 @@
 			main.removeEventListener('scroll', scrollSubmit);
 			await delay(setSwipeIconMargin, 'auto', 1000);
 			var loader = document.getElementById('loader');
-			loader.style.display = 'block';
+			loader.style.visibility = 'visible';
 			await delay(setSwipeIconMargin, 'auto', 2500);
 			if (validateInput()) {
 				document.joinParty.submit();
 			}
 			else {
-				loader.style.display = 'none';
+				loader.style.visibility = 'hidden';
 				swipe.style.width = sWidth + 'px';
 				main.classList.add('scroll-snap-man');
 				main.style.overflow = "";
 				initPos(main);
-				setSwipeIconMargin('auto 0 auto .25em');
+				setSwipeIconMargin('auto 0 auto .15em');
 				swipe_content.style.display = 'block';
 				main.addEventListener('scroll', scrollSubmit);
 			}
@@ -271,7 +271,7 @@
 	  overflow-y: hidden;
 	  counter-reset: item;
 	  scroll-behavior: smooth;
-	  height: 4em;
+	  height: 3.75em;
 	}
 	
 	.carousel__slide {
@@ -427,8 +427,7 @@
 		align-items: center;
 		font-size:1em;
 		inset: 0;
-  		margin: auto 0;
-		margin-left: .25em;
+  		margin: auto 0 auto .15em;
 	}
 
 	.fade-in {
@@ -443,15 +442,13 @@
 
 
 	.loader {
-		position: absolute;
-		border: 20px solid lightgray;
-		border-top: 20px solid blue;
-		border-radius: 50%;
-		width: 60px;
-		height: 60px;
+		border: 18px solid lightgray;
+		border-top: 18px solid blue;
 		animation: load 2s linear infinite;
 		z-index: -1;
-		margin-left: .1em;
+		width: 3.8em; 
+		height: 3.8em; 
+		margin-left: .05em
 	}
 
 	@keyframes load {
@@ -504,7 +501,8 @@
 							<div id ="swipe_icon" class="swipe-icon" style="visibility: hidden;">
 								<em id="chevron" class="fa-solid fa-chevron-right"></em>
 							</div>
-							<div id="loader" class = "loader swipe-icon" style="display:none;"></div>
+							<div id="loader" class = "loader swipe-icon" style="visibility:hidden;">
+							</div>
 						</div>
 					</li>
 				</ol>
