@@ -35,7 +35,7 @@
 		var loader = document.getElementById('loader');
 		var iWidth = getWidth(loader);
 		var sWidth = getWidth(swipe);
-		iWidth += getMarginLeft(loader) + 5;
+		iWidth += getMarginLeft(loader);
 		if(main.scrollLeft < iWidth){
 			main.classList.remove('scroll-snap-man');
 			main.style.overflow = "hidden";
