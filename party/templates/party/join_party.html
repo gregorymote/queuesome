@@ -43,6 +43,10 @@
 			main.scrollLeft = iWidth;
 			main.removeEventListener('scroll', scrollSubmit);
 			await delay(setSwipeIconMargin, 'auto', 1000);
+			//console.log('here1');
+			//var loader = document.getElementById('loader');
+			//loader.style.display = 'block';
+			//await delay(setSwipeIconMargin, 'auto', 3000);
 			if (validateInput()) {
 				document.joinParty.submit();
 			}
@@ -101,6 +105,7 @@
 	}
 
 	function setSwipeIconMargin(margin){
+		console.log('here2');
 		icon = document.getElementById('swipe_icon').style.margin = margin;
 	}
 
@@ -440,12 +445,14 @@
 
 	.loader {
 		position: absolute;
-		border: 10px solid lightgray;
-		border-top: 10px solid gray;
+		border: 20px solid lightgray;
+		border-top: 20px solid blue;
 		border-radius: 50%;
-		width: 50px;
-		height: 50px;
+		width: 60px;
+		height: 60px;
 		animation: load 2s linear infinite;
+		z-index: -1;
+		margin-left: .1em;
 	}
 
 	@keyframes load {
@@ -498,6 +505,7 @@
 							<div id ="swipe_icon" class="swipe-icon" style="visibility: hidden;">
 								<em id="chevron" class="fa-solid fa-chevron-right"></em>
 							</div>
+							<div id="loader" class = "loader swipe-icon" style="display:none;"></div>
 						</div>
 					</li>
 				</ol>
