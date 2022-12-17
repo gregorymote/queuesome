@@ -39,7 +39,7 @@
 		if(main.scrollLeft < iWidth){
 			main.classList.remove('scroll-snap-man');
 			main.style.overflow = "hidden";
-			swipe.style.width = getHeight(swipe) + 'px';
+			swipe.style.width = getHeight(main) + 'px';
 			swipe_content.style.display = 'none';
 			main.scrollLeft = iWidth;
 			main.removeEventListener('scroll', scrollSubmit);
