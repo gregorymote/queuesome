@@ -32,9 +32,10 @@
 		var main = document.getElementById('main');
 		var swipe_icon = document.getElementById('swipe_icon');
 		var swipe_content = document.getElementById('swipe_content');
-		var iWidth = getWidth(swipe_icon);
+		var loader = document.getElementById('loader');
+		var iWidth = getWidth(loader);
 		var sWidth = getWidth(swipe);
-		iWidth += getMarginLeft(swipe_icon);
+		iWidth += getMarginLeft(loader);
 		if(main.scrollLeft < iWidth){
 			main.classList.remove('scroll-snap-man');
 			main.style.overflow = "hidden";
@@ -43,7 +44,7 @@
 			main.scrollLeft = iWidth;
 			main.removeEventListener('scroll', scrollSubmit);
 			await delay(setSwipeIconMargin, 'auto', 1000);
-			var loader = document.getElementById('loader');
+			
 			loader.style.visibility = 'visible';
 			document.getElementById("debug").innerHTML = getWidth(loader) + " : " + getWidth(swipe) + " : " + iWidth;
 			/*await delay(setSwipeIconMargin, 'auto', 2000);
