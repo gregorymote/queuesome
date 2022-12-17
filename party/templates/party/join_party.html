@@ -94,14 +94,14 @@
 	function getWidth(element){
         var style = getComputedStyle(element);
         var width = style.getPropertyValue("width");
-        width = parseInt(width.split("px")[0]);
+        width = parseFloat(width);
         return width;
 	}
 
 	function getMarginLeft(element){
 		var style = getComputedStyle(element);
 		var marginLeft = style.marginLeft;
-		return parseInt(marginLeft);
+		return parseFloat(marginLeft);
 	}
 
 	function setSwipeIconMargin(margin){
@@ -278,7 +278,7 @@
 	  overflow-y: hidden;
 	  counter-reset: item;
 	  scroll-behavior: smooth;
-	  height: 3.65em;
+	  height: 3.8em;
 	}
 	
 	.carousel__slide {
@@ -449,7 +449,7 @@
 
 
 	.loader {
-		border: 18px solid blue;
+		border: 18px solid lightgray;
 		border-top: 18px solid blue;
 		animation: load 2s linear infinite;
 		z-index: -1;
@@ -514,7 +514,7 @@
 					</li>
 				</ol>
 			</section>
-			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-100; display:none;">
+			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-100;">
 				<ol id="placeholder" class="carousel__viewport scroll-snap-man">
 					<li tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
 						<div class="carousel__snapper" style="display:flex;">
