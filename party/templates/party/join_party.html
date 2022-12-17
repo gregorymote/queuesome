@@ -45,19 +45,19 @@
 			await delay(setSwipeIconMargin, 'auto', 1000);
 			var loader = document.getElementById('loader');
 			loader.style.visibility = 'visible';
-			await delay(setSwipeIconMargin, 'auto', 2500);
-			if (validateInput()) {
+			await delay(setSwipeIconMargin, 'auto', 2000);
+			if (await delay(validateInput, '', 0)){
 				document.joinParty.submit();
 			}
 			else {
+				initPos(main);
 				loader.style.visibility = 'hidden';
 				swipe.style.width = sWidth + 'px';
 				main.classList.add('scroll-snap-man');
-				main.style.overflow = "";
-				initPos(main);
 				setSwipeIconMargin('auto 0 auto .15em');
 				swipe_content.style.display = 'block';
 				main.addEventListener('scroll', scrollSubmit);
+				main.style.overflow = "";
 			}
 		}
 	}
@@ -103,28 +103,31 @@
 	}
 
 	function setSwipeIconMargin(margin){
-		icon = document.getElementById('swipe_icon').style.margin = margin;
+		document.getElementById('swipe_icon').style.margin = margin;
+		document.getElementById('loader').style.margin = margin;
 	}
 
 	function delay(funct, param, ms){
-		return new Promise((resolve, reject) => {
-  			setTimeout(function(){funct(param); resolve();}, ms);
+		var x = new Promise((resolve, reject) => {
+  			setTimeout(function(){resolve(funct(param));}, ms);
 			}
 		);
+		return x;
 	}
 
-	function validateInput(){
+	async function validateInput(){
 		var main = document.getElementById('main');
 		var valid = true;
 		var code = document.getElementById('id_party_code');
 		var codeInfo = document.getElementById('code_validator');
 		var codeText = document.getElementById('code_text');
+		var validate = await validateCode(code.value);
 		if(code.value == ""){
 			codeText.style.display = 'block';
 			codeInfo.style.display = 'none';
 			valid = false;
 		}
-		else if (validateCode(code.value) == 'False'){
+		else if (!validate){
 			codeInfo.style.display = 'block';
 			codeText.style.display = 'none';
 			valid = false;
@@ -145,19 +148,21 @@
 	}
 
 	function validateCode(code){
-		$.ajax({
-			url: '/party/validate_code',
-			data: {
-				'code': code,
-			},
-			dataType: 'json',
-			success: function (data) {
-				return data.valid
-			},
-			error: function(data){
-				return false;
-			}
-		});
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				url: '/party/validate_code',
+				data: {
+					'code': code,
+				},
+				dataType: 'json',
+				success: function (data) {
+					resolve(data.valid);
+				},
+				error: function(data){
+					resolve(false);
+				}
+			});
+		});	
 	}
 </script>
 
@@ -271,7 +276,7 @@
 	  overflow-y: hidden;
 	  counter-reset: item;
 	  scroll-behavior: smooth;
-	  height: 3.75em;
+	  height: 3.65em;
 	}
 	
 	.carousel__slide {
@@ -486,7 +491,7 @@
 		<div id="name_validator" class="ps-3 validator">
 			<em>need some text here...could be anything</em>
 		</div>
-		<div id="button" class="pt-2 text-end">
+		<div id="button" style="display:none;" class="pt-2 text-end">
 			<input type="submit" class="btn btn-outline-light btn-lg block"
 				style="border:3px solid black; border-radius:16px; color:black; display:block;" value="Submit">
 		</div>
