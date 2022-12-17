@@ -39,7 +39,7 @@
 		if(main.scrollLeft < iWidth){
 			main.classList.remove('scroll-snap-man');
 			main.style.overflow = "hidden";
-			swipe.style.width = iWidth + 'px';
+			swipe.style.width = getHeight(swipe) + 'px';
 			swipe_content.style.display = 'none';
 			main.scrollLeft = iWidth;
 			main.removeEventListener('scroll', scrollSubmit);
@@ -96,6 +96,13 @@
         var width = style.getPropertyValue("width");
         width = parseFloat(width);
         return width;
+	}
+
+	function getHeight(element){
+        var style = getComputedStyle(element);
+        var height = style.getPropertyValue("height");
+        height = parseFloat(height);
+        return height;
 	}
 
 	function getMarginLeft(element){
