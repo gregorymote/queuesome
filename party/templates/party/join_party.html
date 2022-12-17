@@ -25,14 +25,7 @@
 		main.addEventListener('scroll', scrollVisible);
 	});
 
-	function initPos(main){
-		var slide = document.getElementById('carousel__slide1');
-		var width = getWidth(slide);
-		console.log(width);
-		main.scroll(width, 0);
-	}
-
-	const scrollSubmit = () => {
+	async function scrollSubmit(){
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
 		var swipe = document.getElementById('swipe');
@@ -48,7 +41,8 @@
 			swipe.style.width = iWidth + 'px';
 			swipe_content.style.display = 'none';
 			main.scrollLeft = iWidth;
-			setTimeout(function(){setSwipeIconMargin('auto')}, 1000)
+			main.removeEventListener('scroll', scrollSubmit);
+			await delay(setSwipeIconMargin, 'auto', 1000);
 			if (validateInput()) {
 				document.joinParty.submit();
 			}
@@ -60,12 +54,13 @@
 					initPos(main);
 					setSwipeIconMargin('auto 0 auto .25em');
 					swipe_content.style.display = 'block';
-				}, 1000);
+					main.addEventListener('scroll', scrollSubmit);
+				}, 1500);
 			}
 		}
 	}
 
-	const scrollAnimate = () => {
+	function scrollAnimate(){
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
@@ -73,7 +68,7 @@
 		text.style.opacity = (((main.scrollLeft / width) * 100) / 2) + '%';
 	}
 
-	const scrollVisible = () => {
+	function scrollVisible(){
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
 		var main = document.getElementById('main');
@@ -84,6 +79,12 @@
 			main.addEventListener('scroll', scrollSubmit);
 			main.addEventListener('scroll', scrollAnimate);
 		}
+	}
+
+	function initPos(viewport){
+		var slide = document.getElementById('carousel__slide1');
+		var width = getWidth(slide);
+		viewport.scroll(width, 0);
 	}
 
 	function getWidth(element){
@@ -101,6 +102,11 @@
 
 	function setSwipeIconMargin(margin){
 		icon = document.getElementById('swipe_icon').style.margin = margin;
+	}
+
+
+	function delay(funct, param, ms){
+  		setTimeout(function(){funct(param)}, ms);
 	}
 
 	function validateInput(){
@@ -377,7 +383,7 @@
 	}
 
 	.validator{
-		color: red;
+		color: gray;
 		display: none;
 	}
 
@@ -400,6 +406,7 @@
 		top: 0;
 		bottom: 0;
 		margin: auto;
+		opacity: 50%; 
 	}
 
 	.swipe-icon{
@@ -421,12 +428,29 @@
 	}
 
 	.fade-in {
-		animation: fadeIn 4s;
+		animation: fadeIn 2s;
 	}
 
 	@keyframes fadeIn {
 		0% { opacity: 0; }
-		100% { opacity: 1; }
+		50% {opacity: 0;}
+		100% { opacity: .5; }
+	}
+
+
+	.loader {
+		position: absolute;
+		border: 10px solid lightgray;
+		border-top: 10px solid gray;
+		border-radius: 50%;
+		width: 50px;
+		height: 50px;
+		animation: load 2s linear infinite;
+	}
+
+	@keyframes load {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
 	}
 
 </style>
@@ -472,12 +496,9 @@
 					<li id="carousel__slide2" tabindex="0" class="carousel__slide">
 						<div class="carousel__snapper" style="text-align:left; color:lightgray ">
 							<div id ="swipe_icon" class="swipe-icon" style="visibility: hidden;">
-								<i class="fa-solid fa-chevron-right"></i>
+								<em id="chevron" class="fa-solid fa-chevron-right"></em>
 							</div>
 						</div>
-					</li>
-					<li id="carousel__slide3" tabindex="0" class="carousel__slide">
-						<div class="carousel__snapper"></div>
 					</li>
 				</ol>
 			</section>
