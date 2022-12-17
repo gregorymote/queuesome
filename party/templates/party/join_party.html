@@ -50,14 +50,15 @@
 				document.joinParty.submit();
 			}
 			else {
-				initPos(main);
 				loader.style.visibility = 'hidden';
-				swipe.style.width = sWidth + 'px';
 				main.classList.add('scroll-snap-man');
+				initPos(main);
+				swipe.style.width = sWidth + 'px';
 				setSwipeIconMargin('auto 0 auto .15em');
+				await delay(getWidth, main, 1000);
+				main.style.overflow = "";
 				swipe_content.style.display = 'block';
 				main.addEventListener('scroll', scrollSubmit);
-				main.style.overflow = "";
 			}
 		}
 	}
