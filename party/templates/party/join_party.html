@@ -44,9 +44,7 @@
 			main.scrollLeft = iWidth;
 			main.removeEventListener('scroll', scrollSubmit);
 			await delay(setSwipeIconMargin, 'auto', 1000);
-			
 			loader.style.visibility = 'visible';
-			document.getElementById("debug").innerHTML = getWidth(loader) + " : " + getWidth(swipe) + " : " + iWidth;
 			/*await delay(setSwipeIconMargin, 'auto', 2000);
 			if (await delay(validateInput, '', 0)){
 				document.joinParty.submit();
@@ -521,7 +519,7 @@
 					</li>
 				</ol>
 			</section>
-			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-100;">
+			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-1;">
 				<ol id="placeholder" class="carousel__viewport scroll-snap-man">
 					<li tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
 						<div class="carousel__snapper" style="display:flex;">
@@ -533,7 +531,6 @@
 				</ol>
 			</section>
 		</div>
-		<p id="debug"></p>
 	</form>
 </div>
 {% endblock %}
