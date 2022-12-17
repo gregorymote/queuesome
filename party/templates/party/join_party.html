@@ -28,20 +28,39 @@
 	function initPos(main){
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
+		console.log(width);
 		main.scroll(width, 0);
 	}
 
 	const scrollSubmit = () => {
 		var slide = document.getElementById('carousel__slide1');
 		var width = getWidth(slide);
+		var swipe = document.getElementById('swipe');
 		var main = document.getElementById('main');
-		if(main.scrollLeft ==  0){
-			var valid = validateInput();
-			if(valid){
+		var swipe_icon = document.getElementById('swipe_icon');
+		var swipe_content = document.getElementById('swipe_content');
+		var iWidth = getWidth(swipe_icon);
+		var sWidth = getWidth(swipe);
+		iWidth += getMarginLeft(swipe_icon);
+		if(main.scrollLeft < iWidth){
+			main.classList.remove('scroll-snap-man');
+			main.style.overflow = "hidden";
+			swipe.style.width = iWidth + 'px';
+			swipe_content.style.display = 'none';
+			main.scrollLeft = iWidth;
+			setTimeout(function(){setSwipeIconMargin('auto')}, 1000)
+			if (validateInput()) {
 				document.joinParty.submit();
 			}
-			else{
-				initPos(main);
+			else {
+				setTimeout(function(){
+					swipe.style.width = sWidth + 'px';
+					main.classList.add('scroll-snap-man');
+					main.style.overflow = "";
+					initPos(main);
+					setSwipeIconMargin('auto 0 auto .25em');
+					swipe_content.style.display = 'block';
+				}, 1000);
 			}
 		}
 	}
@@ -74,7 +93,18 @@
         return width;
 	}
 
+	function getMarginLeft(element){
+		var style = getComputedStyle(element);
+		var marginLeft = style.marginLeft;
+		return parseInt(marginLeft)
+	}
+
+	function setSwipeIconMargin(margin){
+		icon = document.getElementById('swipe_icon').style.margin = margin;
+	}
+
 	function validateInput(){
+		var main = document.getElementById('main');
 		var valid = true;
 		var code = document.getElementById('id_party_code');
 		var codeInfo = document.getElementById('code_validator');
@@ -102,8 +132,6 @@
 		else{
 			nameInfo.style.display = 'none';
 		}
-		console.log(valid);
-		return valid;
 	}
 
 	function validateCode(code){
@@ -207,8 +235,8 @@
 	  padding: 0;
 	}
 
-	.scroll-snap-prox{
-		scroll-snap-type: x proximity;
+	.scroll-snap-none{
+		scroll-snap-type: x none;
 	}
 
 	.scroll-snap-man{
@@ -353,6 +381,19 @@
 		display: none;
 	}
 
+	.swipe-container{
+		position: relative;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.swipe-container{
+		-webkit-transition: width 1s ease-in-out;
+		-moz-transition: width 1s ease-in-out;
+		-o-transition: width 1s ease-in-out;
+		transition: width 1s ease-in-out;
+	}
+
 	.swipe-content{
 		left: 0;
 		right: 0;
@@ -374,11 +415,20 @@
 		justify-content: center;
 		align-items: center;
 		font-size:1em;
-		top: 0;
-  		bottom: 0;
+		inset: 0;
   		margin: auto 0;
 		margin-left: .25em;
 	}
+
+	.fade-in {
+		animation: fadeIn 4s;
+	}
+
+	@keyframes fadeIn {
+		0% { opacity: 0; }
+		100% { opacity: 1; }
+	}
+
 </style>
 
 	
@@ -413,7 +463,7 @@
 			<input type="submit" class="btn btn-outline-light btn-lg block"
 				style="border:3px solid black; border-radius:16px; color:black; display:block;" value="Submit">
 		</div>
-		<div id="swipe" style="position:relative">
+		<div id="swipe" class="swipe-container">
 			<section id="carousel" class="carousel" style="margin-top:1em;">
 				<ol id="main" class="carousel__viewport scroll-snap-man" style="border-radius: 500px;">
 					<li id="carousel__slide1" tabindex="0" class="carousel__slide">
@@ -435,7 +485,7 @@
 				<ol id="placeholder" class="carousel__viewport scroll-snap-man">
 					<li tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
 						<div class="carousel__snapper" style="display:flex;">
-							<div id="swipe_content" class="swipe-content">
+							<div id="swipe_content" class="swipe-content fade-in">
 								SLIDE TO CONTINUE
 							</div>
 						</div>
