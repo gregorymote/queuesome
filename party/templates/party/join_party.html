@@ -43,23 +43,21 @@
 			main.scrollLeft = iWidth;
 			main.removeEventListener('scroll', scrollSubmit);
 			await delay(setSwipeIconMargin, 'auto', 1000);
-			//console.log('here1');
-			//var loader = document.getElementById('loader');
-			//loader.style.display = 'block';
-			//await delay(setSwipeIconMargin, 'auto', 3000);
+			var loader = document.getElementById('loader');
+			loader.style.display = 'block';
+			await delay(setSwipeIconMargin, 'auto', 2500);
 			if (validateInput()) {
 				document.joinParty.submit();
 			}
 			else {
-				setTimeout(function(){
-					swipe.style.width = sWidth + 'px';
-					main.classList.add('scroll-snap-man');
-					main.style.overflow = "";
-					initPos(main);
-					setSwipeIconMargin('auto 0 auto .25em');
-					swipe_content.style.display = 'block';
-					main.addEventListener('scroll', scrollSubmit);
-				}, 1500);
+				loader.style.display = 'none';
+				swipe.style.width = sWidth + 'px';
+				main.classList.add('scroll-snap-man');
+				main.style.overflow = "";
+				initPos(main);
+				setSwipeIconMargin('auto 0 auto .25em');
+				swipe_content.style.display = 'block';
+				main.addEventListener('scroll', scrollSubmit);
 			}
 		}
 	}
@@ -101,17 +99,18 @@
 	function getMarginLeft(element){
 		var style = getComputedStyle(element);
 		var marginLeft = style.marginLeft;
-		return parseInt(marginLeft)
+		return parseInt(marginLeft);
 	}
 
 	function setSwipeIconMargin(margin){
-		console.log('here2');
 		icon = document.getElementById('swipe_icon').style.margin = margin;
 	}
 
-
 	function delay(funct, param, ms){
-  		setTimeout(function(){funct(param)}, ms);
+		return new Promise((resolve, reject) => {
+  			setTimeout(function(){funct(param); resolve();}, ms);
+			}
+		);
 	}
 
 	function validateInput(){
