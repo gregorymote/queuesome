@@ -200,8 +200,8 @@
 		<div id="results" class="results"></div>
 		<div style="display:none;">{{ form.result }}</div>
 		<div id="buttons" class = "text-end pb-2">
-			<a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black">Back</a>
-			<input type="submit" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" id="add to queue" value="Add to Queue" style="display:none;">
+			<input type="submit" class="btn btn-lg button-black" id="add to queue" value="Add to Queue" style="display:none; margin-bottom:.25em">
+			<a href="{% url 'play' pid=party.pk %}" class="btn btn-lg button-white">Back</a>
 		</div>			
 		{% if invalid %}
 		<div class="alert alert-info">

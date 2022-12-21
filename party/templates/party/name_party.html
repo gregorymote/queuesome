@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 {% extends "base.html" %}
 {% block settings %}
-<style>
-	.enjoyhint_close_btn,
-	.enjoyhint_skip_btn,
-	.enjoyhint_next_btn,
-	.enjoyhint_prev_btn{
-		display:none;
-	}
-	.enjoyhint_disable_events{
-		pointer-events: none;
-	}
-</style>
 <script>
 
 	$(document).ready(function() {
@@ -45,6 +34,44 @@
 
 
 {% block page_content %}
+
+<style>
+	.enjoyhint_close_btn,
+	.enjoyhint_skip_btn,
+	.enjoyhint_next_btn,
+	.enjoyhint_prev_btn{
+		display:none;
+	}
+	.enjoyhint_disable_events{
+		pointer-events: none;
+	}
+</style>
+
+<script>
+    //initialize instance
+    var enjoyhint_instance = new EnjoyHint({});
+    //simple config.
+    var enjoyhint_script_steps = [
+        {
+          'next .device' : 'psst, settings are right here if you ever need em',
+		  shape : 'circle'
+        }
+    ];
+    //set script config
+    enjoyhint_instance.set(enjoyhint_script_steps);
+    //run Enjoyhint script on first page load
+    window.onload = function () {
+		if (!('hasCodeRunBefore' in localStorage)) {
+			enjoyhint_instance.run();
+			localStorage.setItem("hasCodeRunBefore", true);
+			document.addEventListener('click', stopTour);	
+		}	
+	}
+	function stopTour(e){
+		enjoyhint_instance.stop();
+	}
+  </script>
+
 	<div class = "container form-width">
 		<form action="" method="post">
 			{% csrf_token %}
@@ -55,39 +82,10 @@
 				{{ form.user_name }}
 			</div>
 			<div class = "pt-2 text-end">
-				<input type="submit" class="btn btn-dark btn-lg block text-primary button-black" value="Submit">
+				<input type="submit" class="btn btn-lg button-black" value="Submit">
 			</div>
 		</form>	
 	</div>
-  <script>
+  
 
-    //initialize instance
-    var enjoyhint_instance = new EnjoyHint({});
-    
-    //simple config.
-
-    var enjoyhint_script_steps = [
-        {
-          'next .device' : 'psst, settings are right here if you ever need em',
-		  shape : 'circle'
-        }
-
-    ];
-    
-    //set script config
-    enjoyhint_instance.set(enjoyhint_script_steps);
-    
-    //run Enjoyhint script on first page load
-    window.onload = function () {
-		if (!('hasCodeRunBefore' in localStorage)) {
-			enjoyhint_instance.run();
-			localStorage.setItem("hasCodeRunBefore", true);
-			document.addEventListener('click', stopTour);	
-		}	
-	}
-
-	function stopTour(e){
-		enjoyhint_instance.stop();
-	}
-  </script>
 {% endblock %}

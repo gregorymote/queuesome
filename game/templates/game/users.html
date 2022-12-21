@@ -45,10 +45,7 @@
         </table>
 
 		<div class="text-right pt-3">
-            <a href="{% url 'play' pid=party.pk %}" id="play" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black">Back</a>
-            {% if isHost %}
-			<input type="submit" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" name="skip" value="Skip to Next Round"></input>
-            {% endif %}
+            <a href="{% url 'play' pid=party.pk %}" class="btn btn-lg button-white">Back</a>
         </div>
 
 		

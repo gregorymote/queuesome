@@ -85,37 +85,21 @@
 				name_list.appendChild(header);
 			}
 		}
-		
-		function encodeText(str){
-			var p = document.createElement('p');
-			p.innerHTML = str;
-			return p.innerHTML;
-		}
 	</script>
 	
 	<div class = "container form-width">	
-		<h5 id = "party_name">{{party.name | safe}}</h5>
-		
+		<h5 id = "party_name">{{party.name | safe}}</h5>	
 		<div class = "row">
 			<div class = "col" id="name_list"></div>
 		</div>	
-		
-
 		<div class = "row-12 text-end">
 			<form action="" method="post">
-				<a class="btn btn-dark btn-black btn-lg block" data-bs-toggle="modal" data-bs-target="#qrModal" style= "border:3px solid black; border-radius:16px; color: white">QR <em class="fa fa-qrcode" style= "color:rgb(255, 255, 255)"></em></a>
 				{% csrf_token %}
 				{% if access %}
-					<input type="submit" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" value="Let's Go">
+					<input type="submit" class="btn btn-lg button-black" value="Let's Go">
 				{% endif %}
+				<a class="btn btn-lg button-white" style="margin-top:.25em;" data-bs-toggle="modal" data-bs-target="#qrModal">{{party.joinCode}} <em class="fa fa-qrcode" style= "color:black;"></em></a>
 			</form>
-		</div>
-	
-		<div class = "row">
-			<div class = "col text-center">
-				<h1 class="display-3"><span class="badge bg-secondary">{{party.joinCode}}</span></h1>
-				<h6>This is Your Room Code</h6>
-			</div>		
 		</div>
 	</div>
 

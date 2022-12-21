@@ -153,6 +153,7 @@
 		else{
 			nameInfo.style.display = 'none';
 		}
+		return valid;
 	}
 
 	function validateCode(code){
@@ -285,13 +286,13 @@
 	  counter-reset: item;
 	  scroll-behavior: smooth;
 	  height: 3.8em;
+	  border-radius: 500px;
 	}
 	
 	.carousel__slide {
 	  position: relative;
 	  flex: 0 0 100%;
 	  width: 100%;
-	  background-color: transparent;
 	  counter-increment: item;
 	}
 		
@@ -500,12 +501,12 @@
 			<em>need some text here...could be anything</em>
 		</div>
 		<div id="button" style="display:none;" class="pt-2 text-end">
-			<input type="submit" class="btn btn-outline-light btn-lg block"
-				style="border:3px solid black; border-radius:16px; color:black; display:block;" value="Submit">
+			<input type="submit" class="btn btn-lg button-black"
+				style="display:block;" value="Submit">
 		</div>
 		<div id="swipe" class="swipe-container">
 			<section id="carousel" class="carousel" style="margin-top:1em;">
-				<ol id="main" class="carousel__viewport scroll-snap-man" style="border-radius: 500px;">
+				<ol id="main" class="carousel__viewport scroll-snap-man">
 					<li id="carousel__slide1" tabindex="0" class="carousel__slide">
 						<div class="carousel__snapper"></div>
 					</li>
@@ -522,7 +523,7 @@
 			</section>
 			<section id="carousel2" class="carousel" style="position: absolute; top:0; width:100%; z-index:-1;">
 				<ol id="placeholder" class="carousel__viewport scroll-snap-man">
-					<li tabindex="0" class="carousel__slide" style="background-color: lightgray; border-radius: 500px;">
+					<li tabindex="0" class="carousel__slide" style="background-color: lightgray;">
 						<div class="carousel__snapper" style="display:flex;">
 							<div id="swipe_content" class="swipe-content fade-in">
 								SLIDE TO CONTINUE

@@ -36,7 +36,7 @@
 	setTimeout(getDeviceData, 1000);
 </script>
 
-<div class="container" style="width:90%">
+<div class="container form-width">
 	<div class="text-center">
 		<h5>Settings</h5>
 	</div>
@@ -66,8 +66,8 @@
 		</div>
 
 		<div class="text-end pt-3">
-			<a href="{% url 'start_party' pid=party.pk %}" id="play" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black">Back</a>
-			<input type="submit" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" name="submit" value="Submit"></input>
+			<input type="submit" class="btn btn-lg button-black" name="submit" value="Submit"></input>
+			<a href="{% url 'start_party' pid=party.pk %}" id="play" class="btn btn-lg button-white" style="margin-top:.25em;">Back</a>
 		</div>
 
 		<!-- Button to Open the Modal -->
