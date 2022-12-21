@@ -95,10 +95,10 @@
 		<div class = "row-12 text-end">
 			<form action="" method="post">
 				{% csrf_token %}
+				<a class="btn btn-lg button-white" data-bs-toggle="modal" data-bs-target="#qrModal">{{party.joinCode}} <em class="fa fa-qrcode" style= "color:black;"></em></a>
 				{% if access %}
-					<input type="submit" class="btn btn-lg button-black" value="Let's Go">
+				<input type="submit" class="btn btn-lg button-black" style="margin-top:.25em;" value="Let's Go">
 				{% endif %}
-				<a class="btn btn-lg button-white" style="margin-top:.25em;" data-bs-toggle="modal" data-bs-target="#qrModal">{{party.joinCode}} <em class="fa fa-qrcode" style= "color:black;"></em></a>
 			</form>
 		</div>
 	</div>
