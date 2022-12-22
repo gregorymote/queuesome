@@ -1,0 +1,33 @@
+<div id="button" style="display:none;" class="pt-2 text-end">
+    <input id="button_submit" type="submit" class="btn btn-lg button-black"
+        style="display:block;" value="{{button_text}}">
+</div>
+<div id="swipe" class="swipe-container">
+    <section id="carousel" class="swipe-carousel" style="margin-top:1em;">
+        <ol id="main_viewport" class="swipe-carousel__viewport scroll-snap-man" style="border-radius: 500px">
+            <li id="carousel__slide1" tabindex="0" class="swipe-carousel__slide">
+                <div class="swipe-carousel__snapper"></div>
+            </li>
+            <li id="carousel__slide2" tabindex="0" class="swipe-carousel__slide">
+                <div class="swipe-carousel__snapper" style="text-align:left; color:lightgray ">
+                    <div id ="swipe_icon" class="swipe-icon" style="visibility: hidden;">
+                        <em id="chevron" class="fa-solid fa-chevron-right"></em>
+                    </div>
+                    <div id="loader" class = "swipe-loader swipe-icon" style="display:none; visibility: hidden;">
+                    </div>
+                </div>
+            </li>
+        </ol>
+    </section>
+    <section id="carousel2" class="swipe-carousel" style="position: absolute; top:0; width:100%; z-index:-1;">
+        <ol id="placeholder" class="swipe-carousel__viewport scroll-snap-man">
+            <li tabindex="0" class="swipe-carousel__slide" style="background-color: lightgray; border-radius: 500px">
+                <div class="swipe-carousel__snapper" style="display:flex;">
+                    <div id="swipe_content" class="swipe-content swipe-fade-in">
+                        {{ swipe_text }}
+                    </div>
+                </div>
+            </li>
+        </ol>
+    </section>
+</div>

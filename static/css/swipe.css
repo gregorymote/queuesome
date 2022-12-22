@@ -1,0 +1,304 @@
+@keyframes tonext {
+    75% {
+        left: 0;
+    }
+
+    95% {
+        left: 100%;
+    }
+
+    98% {
+        left: 100%;
+    }
+
+    99% {
+        left: 0;
+    }
+}
+
+@keyframes tostart {
+    75% {
+        left: 0;
+    }
+
+    95% {
+        left: -300%;
+    }
+
+    98% {
+        left: -300%;
+    }
+
+    99% {
+        left: 0;
+    }
+}
+
+@keyframes snap {
+    96% {
+        scroll-snap-align: center;
+    }
+
+    97% {
+        scroll-snap-align: none;
+    }
+
+    99% {
+        scroll-snap-align: none;
+    }
+
+    100% {
+        scroll-snap-align: center;
+    }
+}
+
+
+* {
+    box-sizing: border-box;
+    scrollbar-color: transparent transparent;
+    /* thumb and track color */
+    scrollbar-width: 0px;
+}
+
+*::-webkit-scrollbar {
+    width: 0;
+    display: none;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: transparent;
+    border: none;
+}
+
+* {
+    -ms-overflow-style: none;
+}
+
+ol,
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.scroll-snap-none {
+    scroll-snap-type: x none;
+}
+
+.scroll-snap-man {
+    scroll-snap-type: x mandatory;
+}
+
+.swipe-carousel {
+    position: relative;
+    padding-top: 75%;
+    filter: drop-shadow(0 0 10px #0003);
+    perspective: 100px;
+}
+
+.swipe-carousel__viewport {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    counter-reset: item;
+    scroll-behavior: smooth;
+    height: 3.8em;
+}
+
+.swipe-carousel__slide {
+    position: relative;
+    flex: 0 0 100%;
+    width: 100%;
+    counter-increment: item;
+}
+
+.swipe-carousel__slide:before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -40%, 70px);
+    color: #fff;
+    font-size: 2em;
+}
+
+.swipe-carousel__snapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: center;
+}
+
+@media (hover: hover) {
+    .swipe-carousel__snapper {
+        animation-name: none;
+        animation-timing-function: ease;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+    }
+
+    .swipe-carousel__slide:last-child .swipe-carousel__snapper {
+        animation-name: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .swipe-carousel__snapper {
+        animation-name: none;
+    }
+}
+
+.swipe-carousel:hover .swipe-carousel__snapper,
+.swipe-carousel:focus-within .swipe-carousel__snapper {
+    animation-name: none;
+}
+
+.swipe-carousel__navigation {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
+
+.swipe-carousel__navigation-list,
+.swipe-carousel__navigation-item {
+    display: inline-block;
+}
+
+.swipe-carousel__navigation-button {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: #333;
+    background-clip: content-box;
+    border: 0.25rem solid transparent;
+    border-radius: 50%;
+    font-size: 0;
+    transition: transform 0.1s;
+}
+
+.swipe-carousel__prev,
+.swipe-carousel__next {
+    position: absolute;
+    top: 0;
+    margin-top: 37.5%;
+    width: 4rem;
+    height: 4rem;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    font-size: 0;
+    outline: 0;
+}
+
+.swipe-carousel::before,
+.swipe-carousel__prev {
+    left: -1rem;
+}
+
+.swipe-carousel::after,
+.swipe-carousel__next {
+    right: -1rem;
+}
+
+.swipe-carousel::before,
+.swipe-carousel::after {
+    z-index: 1;
+    background-color: #333;
+    background-size: 1.5rem 1.5rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+    color: #fff;
+    font-size: 2.5rem;
+    line-height: 4rem;
+    text-align: center;
+    pointer-events: none;
+}
+
+.swipe-container {
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.swipe-container {
+    -webkit-transition: width 1s ease-in-out;
+    -moz-transition: width 1s ease-in-out;
+    -o-transition: width 1s ease-in-out;
+    transition: width 1s ease-in-out;
+}
+
+.swipe-content {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    opacity: 50%;
+}
+
+.swipe-icon {
+    width: 3.5em;
+    height: 3.5em;
+    line-height: 20px;
+    position: absolute;
+    padding: 5px 10px;
+    border-radius: 50%;
+    background: white;
+    color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    inset: 0;
+    margin: auto 0 auto .15em;
+}
+
+.swipe-fade-in {
+    animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: .5;
+    }
+}
+
+
+.swipe-loader {
+    border: 18px solid lightgray;
+    border-top: 18px solid blue;
+    animation: load 2s linear infinite;
+    z-index: -1;
+    width: 3.8em;
+    height: 3.8em;
+    margin-left: .05em
+}
+
+@keyframes load {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

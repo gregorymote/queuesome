@@ -1,5 +1,5 @@
 function setActiveProperties(active, type, name){
-    var device_continue = document.getElementById("device_continue");
+    var device_continue = document.getElementById("button_submit");
     var device_name = document.getElementById("name");
     var message = document.getElementById('message');
     var icon = document.getElementById('device');
@@ -9,13 +9,11 @@ function setActiveProperties(active, type, name){
     if(active){
         icon.style.color = '#1ed760';
         device_continue.disabled = false;
-        device_continue.style.display = 'block';
         message.style.display = 'none';
     }
     else{
         icon.style.color = 'gray';
         device_continue.disabled = true;
-        device_continue.style.display = 'none';
         message.style.display = 'block';
     }
     device_name.innerHTML = name;

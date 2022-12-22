@@ -4,8 +4,12 @@
 {% block page_content %}
 
 <script>
+	var active = '{{device.active}}' == 'True';
 	$(document).ready(function () {
-		setActiveProperties('{{device.active}}' == 'True', '{{device.type}}', '{{device.name}}');
+		setActiveProperties(active, '{{device.type}}', '{{device.name}}');
+		var button = document.getElementById('button');
+		var carousel = document.getElementById('swipe');
+		initSwipeButton(button, carousel);
 	});
 
 	var inactivity = false;
@@ -19,7 +23,8 @@
 				},
 				dataType: 'json',
 				success: function (data) {
-					setActiveProperties(data.device.active, data.device.type, data.device.name)
+					active = data.device.active
+					setActiveProperties(active, data.device.type, data.device.name)
 					inactivity = data.stop;
 				},
 				complete: function(data){
@@ -32,10 +37,27 @@
 		}	
 	}
 	setTimeout(getDeviceData, 1000);
+
+	function swipeSubmit(){
+		document.setDevice.submit();
+	}
+
+	async function validateInput(){
+		var valid = active;
+		var device_validator = document.getElementById('device_validator');
+		if(!valid){
+			device_validator.style.display = 'block';
+		}
+		else{
+			device_validator.style.display = 'none';
+		}
+		return valid;
+	}
+
 </script>
 
 <div class="container form-width">
-	<form action="" method="post">
+	<form name="setDevice" action="" method="post">
 		{% csrf_token %}
 		<div class="pt-2">
 			<div class="pb-3">
@@ -56,10 +78,10 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="text-end pt-2">
-				<input id="device_continue" type="submit" class="btn btn-lg button-black" value="Continue" disabled>
+			<div id="device_validator" class="ps-3 validator">
+				<em>need an active device to continue</em>
 			</div>
+			{% include "swipe.html" with swipe_text="SLIDE TO CONTINUE"  button_text="Submit" %}
 		</div>
 	</form>
 </div>

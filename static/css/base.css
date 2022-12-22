@@ -582,3 +582,8 @@ input{
     font-family: 'Righteous', cursive;
 
 }
+
+.validator{
+    color: gray;
+    display: none;
+}

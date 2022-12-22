@@ -72,18 +72,61 @@
 	}
   </script>
 
+  <script>
+
+	$(document).ready(function () {
+			var button = document.getElementById('button');
+			var carousel = document.getElementById('swipe');
+			initSwipeButton(button, carousel);
+	});
+
+	function swipeSubmit(){
+		document.nameParty.submit();
+	}
+
+
+	async function validateInput(){
+		var valid = true;
+		var party_name = document.getElementById('id_party_name');
+		var party_info = document.getElementById('party_info');
+		if(party_name.value == ""){
+			party_info.style.display = 'block';
+			valid = false;
+		}
+		else{
+			party_info.style.display = 'none';
+		}
+		var user_name = document.getElementById('id_user_name');
+		var user_info = document.getElementById('user_info');
+		if (user_name.value == ""){
+			user_info.style.display = 'block';
+			valid = false;
+		}
+		else{
+			user_info.style.display = 'none';
+		}
+		return valid;
+	}
+
+
+  </script>
+
 	<div class = "container form-width">
-		<form action="" method="post">
+		<form name="nameParty" action="" method="post">
 			{% csrf_token %}
 			<h5>{{ form.party_name.label }}</h5>
 			{{ form.party_name }}
+			<div id="party_info" class="ps-3 validator">
+				<em>empty...need not empty</em>
+			</div>
 			<div class = "pt-2">
 				<h5>{{ form.user_name.label }}</h5>
 				{{ form.user_name }}
+				<div id="user_info" class="ps-3 validator">
+					<em>need some text here...could be anything</em>
+				</div>
 			</div>
-			<div class = "pt-2 text-end">
-				<input type="submit" class="btn btn-lg button-black" value="Submit">
-			</div>
+			{% include "swipe.html" with swipe_text="SLIDE TO CONTINUE"  button_text="Submit" %}
 		</form>	
 	</div>
   
