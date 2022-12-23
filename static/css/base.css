@@ -365,20 +365,20 @@ input{
 
 @-moz-keyframes spin {
     100% {
-        -moz-transform: rotate(720deg);
+        -moz-transform: rotate(1440deg);
     }
 }
 
 @-webkit-keyframes spin {
     100% {
-        -webkit-transform: rotate(720deg);
+        -webkit-transform: rotate(1440deg);
     }
 }
 
 @keyframes spin {
     100% {
-        -webkit-transform: rotate(720deg);
-        transform: rotate(720deg);
+        -webkit-transform: rotate(1440deg);
+        transform: rotate(1440deg);
     }
 }
 
@@ -569,9 +569,9 @@ input{
 }
 
 .spin {
-    -webkit-animation: spin 2.5s linear;
-    -moz-animation: spin 2.5s linear;
-    animation: spin 2.5s linear;
+    -webkit-animation: spin 5s linear;
+    -moz-animation: spin 5s linear;
+    animation: spin 5s linear;
 }
 
 
