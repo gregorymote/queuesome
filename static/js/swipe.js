@@ -72,7 +72,7 @@ function scrollVisible(){
     var swipe_icon = document.getElementById('swipe_icon');
     var debug = document.getElementById("debug");
     debug.innerHTML = main_viewport.scrollLeft + " : " + width;
-    if(width == main_viewport.scrollLeft){
+    if(Math.round(width) == Math.round(main_viewport.scrollLeft)){
         swipe_icon.style.visibility = 'visible';
         main_viewport.removeEventListener('scroll', scrollVisible);
         main_viewport.addEventListener('scroll', scrollSubmit);
@@ -84,7 +84,6 @@ function initPos(viewport){
     var slide = document.getElementById('carousel__slide1');
     var width = getWidth(slide);
     var debug = document.getElementById("debug");
-    debug.innerHTML = "INIT POSITION Width: " + width;
     viewport.scroll(width, 0);
 }
 
