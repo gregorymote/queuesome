@@ -112,6 +112,7 @@ input{
     border:1px solid black;
     border-radius:500px;
     border-color:gray;
+    background-color: white; 
     font-weight:600;
 }
 
