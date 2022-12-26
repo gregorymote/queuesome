@@ -44,6 +44,10 @@
 {% block page_content %}
 
 	<script>
+		var colors = [
+		'#fffff'
+		]
+		
 		var names = {{ names|safe }};
 		var size = {{ names|safe }}.length;
 		window.onload = function() {
@@ -77,28 +81,46 @@
 	
 			name_list.innerHTML = '';
 			for(var i=0; i<names.length; i++){
-				var header = document.createElement('h5');
 				var span = document.createElement('span');
-				span.classList.add("badge","rounded-pill","bg-secondary");
-				span.innerHTML=names[i];
-				header.appendChild(span);
-				name_list.appendChild(header);
+				span.classList.add("lobby-user", "card");
+				span.style.backgroundColor = colors[i % colors.length]
+				span.innerHTML= names[i];
+				name_list.appendChild(span);
 			}
 		}
 	</script>
+
+	<style>
+		.lobby-content{
+			min-height:6em;
+			display: inline-flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			margin-top: .25em;
+		}
+
+		.lobby-user{
+			margin-left: .25em;
+			border-radius: 500px;
+			height: fit-content;
+			padding: .4em .75em;
+			font-size: 1.5rem;
+			margin-bottom: .25em;
+			text-align:center;
+		}
+	</style>
 	
 	<div class = "container form-width">	
 		<h5 id = "party_name">{{party.name | safe}}</h5>	
-		<div class = "row">
-			<div class = "col" id="name_list"></div>
+		<div class = "lobby-content" id="name_list">
 		</div>	
-		<div class = "row-12 text-end">
+		<div class = "text-end">
 			<form action="" method="post">
 				{% csrf_token %}
-				<a class="btn btn-lg button-white" data-bs-toggle="modal" data-bs-target="#qrModal">{{party.joinCode}} <em class="fa fa-qrcode" style= "color:black;"></em></a>
 				{% if access %}
 				<input type="submit" class="btn btn-lg button-black" style="margin-top:.25em;" value="Let's Go">
 				{% endif %}
+				<a class="btn btn-lg button-white" style="margin-top:.25em;" data-bs-toggle="modal" data-bs-target="#qrModal">{{party.joinCode}} <em class="fa fa-qrcode" style= "color:black;"></em></a>
 			</form>
 		</div>
 	</div>

@@ -56,7 +56,7 @@ def lobby(request, pid):
     users = Users.objects.filter(party=pid, active=True).all()
     names=[]
     for user in users:
-        names.append(user.name)
+        names.append(user.icon + ' ' + user.name)
     current_user = get_user(request, pid)
     if current_user.isHost:
         device = get_active_device(party)
@@ -89,7 +89,7 @@ def update_lobby(request):
     users = Users.objects.filter(party=pid, active=True).all()
     names=[]
     for user in users:
-        names.append(user.name)
+        names.append(user.icon + ' ' + user.name)
     data = {
         'size': users.count(),
         'started': party.started,

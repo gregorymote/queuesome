@@ -53,6 +53,7 @@ class Users(models.Model):
     turn = models.CharField(max_length=20, default='not_picked')
     active = models.BooleanField(default = True)
     refreshRate = models.IntegerField(default=5, null=True)
+    icon = models.CharField(max_length=16, null=True)
     created = models.DateTimeField(auto_now_add=True, blank=True)
     def __str__(self):
         return self.name or ''

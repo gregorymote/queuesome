@@ -25,8 +25,6 @@ async function scrollSubmit(){
     var iWidth = getWidth(loader);
     var sWidth = getWidth(swipe);
     iWidth += getMarginLeft(loader);
-    var debug = document.getElementById("debug");
-    debug.innerHTML = main_viewport.scrollLeft + " : " + iWidth;
     if(main_viewport.scrollLeft < iWidth){
         main_viewport.classList.remove('scroll-snap-man');
         main_viewport.style.overflow = "hidden";
@@ -36,7 +34,7 @@ async function scrollSubmit(){
         main_viewport.removeEventListener('scroll', scrollSubmit);
         await delay(setSwipeIconMargin, 'auto', 1000);
         loader.style.visibility = 'visible';
-        await delay(setSwipeIconMargin, 'auto', 2000);
+        await delay(setSwipeIconMargin, 'auto', 500);
         if (await delay(validateInput, '', 0)){
             swipeSubmit();
         }
@@ -70,8 +68,6 @@ function scrollVisible(){
     var width = getWidth(slide);
     var main_viewport = document.getElementById('main_viewport');
     var swipe_icon = document.getElementById('swipe_icon');
-    var debug = document.getElementById("debug");
-    debug.innerHTML = main_viewport.scrollLeft + " : " + width;
     if(Math.round(width) == Math.round(main_viewport.scrollLeft)){
         swipe_icon.style.visibility = 'visible';
         main_viewport.removeEventListener('scroll', scrollVisible);
@@ -83,7 +79,6 @@ function scrollVisible(){
 function initPos(viewport){
     var slide = document.getElementById('carousel__slide1');
     var width = getWidth(slide);
-    var debug = document.getElementById("debug");
     viewport.scroll(width, 0);
 }
 

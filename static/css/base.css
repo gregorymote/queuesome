@@ -107,6 +107,15 @@ input{
     font-weight:600;
 }
 
+.button-white:hover{
+    width: 100%;
+    border:1px solid black;
+    border-radius:500px;
+    border-color:gray;
+    background-color: white; 
+    font-weight:600;
+}
+
 .button-white{
     width: 100%;
     border:1px solid black;
