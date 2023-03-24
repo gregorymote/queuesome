@@ -1,15 +1,28 @@
 {% extends "base.html" %}
 {% block meta%}
-  <title>{{object.title}}}</title>
+  <title>{{object.blogger}} 's blogger profile</title>
 	<meta name="description" content={{object.preview}}/>
 {% endblock %}
 
 {% block right_header %}<em><a href = "/blog" style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px; text-decoration: none">the blog</a></em>{% endblock %}
 
 {% block page_content %}
+
 <style>
-  a { color: inherit; }
+.profile_pic {
+  display: inline-block;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+a { color: inherit; }
 </style>
+
+
 <div class="container">
   <div class="row">
     <div class="col-md-8 card mb-4 mt-3 pb-4 left top">
@@ -17,9 +30,13 @@
         <div class="text-end">
           <a href="{% url 'home'  %}">&larr; Back</a>
         </div>
-        <h1>{% block title %} {{ object.title }} {% endblock title %}</h1>
-        <p class=" text-muted"><a href="/blog/profile/{{post.author.id}}">{{ post.author }}</a> | {{ post.created_on }}</p>
-        <p class="card-text ">{{ object.content | safe }}</p>
+        <div class="text-center">
+            <img class = "profile_pic" src="{{object.picture}}">
+        </div>
+        
+        <h1>{{ object.blogger }}</h1>
+        <p class=" text-muted"></p>
+        <p class="card-text ">{{ object.about | safe }}</p>
       </div>
       <a href="{% url 'home'  %}" class="btn btn-lg button-white">&larr; Back</a>
     </div>

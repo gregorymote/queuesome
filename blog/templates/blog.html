@@ -4,11 +4,11 @@
 {% block page_content %}
 
 <style>
- 
-    
     .card {
         box-shadow: 0 16px 48px #E3E7EB;
     }
+
+    a { color: inherit; }
 </style>
 
 <div class="container">
@@ -19,13 +19,13 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h2 class="card-title">{{ post.title }}</h2>
-                    <p class="card-text text-muted h6">{{ post.author }} | {{ post.created_on}} </p>
+                    <p class="card-text text-muted h6"><a href="/blog/profile/{{post.author.id}}">{{ post.author }}</a> | {{ post.created_on}} </p>
                     {% if post.preview != "" %}
                     <p class="card-text">{{post.preview}}</p>
                     {% else %}
                     <p class="card-text">{{post.content|slice:":200" }}</p>
                     {% endif %}
-                    <a href="{% url 'post_detail' post.slug  %}" class="btn btn-outline-light btn-lg block" style= "border:3px solid black; border-radius:16px; color:black" >Read More &rarr;</a>
+                    <a href="{% url 'post_detail' post.slug  %}" class="btn btn-lg button-white">Read More &rarr;</a>
                 </div>
             </div>
             {% endfor %}

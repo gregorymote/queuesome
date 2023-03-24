@@ -22,3 +22,14 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class Profile(models.Model):
+    about = models.TextField()
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    preview = models.TextField(max_length=200, default="", blank=True)
+    picture = models.URLField(default="")
+    blogger = models.ForeignKey(User, on_delete= models.CASCADE,related_name='profile')
+    
+    def __str__(self):
+        return self.blogger.username
