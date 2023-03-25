@@ -143,6 +143,7 @@ def set_user_points(party, round_number):
         user = song.user
         user.points = user.points + song.likes
         user.save()
+    print(QDEBUG,'Reset Users Likes:')
 
 
 def reset_user_likes(party):

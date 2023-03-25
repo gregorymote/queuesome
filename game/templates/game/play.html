@@ -242,10 +242,10 @@
 		}
 
 		if(onLoad || redraw){
-			var like = document.getElementById('like');
-			var dislike = document.getElementById('dislike');
-			var hasLiked = decodeBool(user.hasLiked)
-			var hasDislike = decodeBool(user.hasDislike)
+			var like = document.getElementById('like_icon');
+			var dislike = document.getElementById('dislike_icon');
+			var hasLiked = decodeBool(user.hasLiked);
+			var hasDislike = decodeBool(user.hasDislike);
 			if (song.art != "lull" && song.user != user.user){
 				like.style.display = 'initial';
 				if(hasLiked){
@@ -258,12 +258,12 @@
 				}
 				dislike.style.display = 'initial';
 				if(hasDislike){
-					like.classList.remove('fa-regular');
-					like.classList.add('fa-solid');
+					dislike.classList.remove('fa-regular');
+					dislike.classList.add('fa-solid');
 				}
 				else{
-					like.classList.remove('fa-solid');
-					like.classList.add('fa-regular');
+					dislike.classList.remove('fa-solid');
+					dislike.classList.add('fa-regular');
 				}
 			}
 			else{

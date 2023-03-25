@@ -257,8 +257,7 @@ def update_like(request):
     pid = request.GET.get('pid', None)
     like = request.GET.get('like', None)
     action = request.GET.get('action', None)
-    user = get_user(request, pid)   
-    print(action, like)
+    user = get_user(request, pid)
     if like == 'true':
         if action == 'like_icon': 
             user.hasLiked = True
