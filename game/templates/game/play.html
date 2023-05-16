@@ -52,7 +52,7 @@
 	var wait = true;
 	var party = {
 		"device_error" : "{{party.device_error}}",
-		"name" : "{{party.name}}",
+		"name" : "{{party.name | safe}}",
 		"state": "{{party.state}}",
 		"joinCode" : "{{party.joinCode}}",
 	}
@@ -63,18 +63,18 @@
 		"hasLiked": "{{user.hasLiked}}",
 		"hasDislike": "{{user.hasSkip}}",
 		"user": "{{user.pk}}",
-		"name": "{{user.name}}"
+		"name": "{{user.name | safe}}"
 	}
 	var category = {
-		"name": "{{category.name}}",
-		"leader": "{{category.leader.name}}",
+		"name": "{{category.name | safe}}",
+		"leader": "{{category.leader.name | safe}}",
 		"full": "{{ full }}",
 	}
 	var song = {
-		"name": "{{song.name}}",
-		"title": "{{song.title}}",
-		"artist": "{{song.artist}}",
-		"link": "{{song.link}}",
+		"name": "{{song.name | safe}}",
+		"title": "{{song.title | safe}}",
+		"artist": "{{song.artist | safe}}",
+		"link": "{{song.link | safe}}",
 		"user": "{{song.user.pk}}",
 		"art": "{{song.art}}",
 		"color": "{{song.color}}"
