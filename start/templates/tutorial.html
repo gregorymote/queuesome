@@ -1,0 +1,696 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+	<style>
+		.lobby-content{
+			min-height:6em;
+			display: inline-flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			margin-top: .25em;
+		}
+
+		.lobby-user{
+			margin-left: .25em;
+			border-radius: 500px;
+			height: fit-content;
+			padding: .4em .75em;
+			font-size: 1.5rem;
+			margin-bottom: .25em;
+			text-align:center;
+		}
+        h6{
+            display: inline-block;
+            line-height: normal;
+        }
+        h5 {
+                transition-duration: 5s;
+        }
+
+        .song-link{
+            text-decoration:none;
+        }
+    
+        .category-name {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            width: 90%;
+            margin:auto;
+        }
+    
+        .play-bar{
+            border-color: lightgray;
+            border-width: 2px;
+            border-style: solid;
+            border-radius: 12px;
+            height: auto;
+            border-bottom:none;
+            border-left: none;
+            border-right: none;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            max-width:800px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+        }
+    
+        .action:hover{
+            width: 90%; 
+            border-radius:500px; 
+            color:white !important;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            text-decoration: none;
+        }
+    
+        .action{
+            width: 90%; 
+            border-radius:500px; 
+            color:white !important;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            text-decoration: none;
+        }
+    
+        .like{
+            display:inline-block;
+            font-size: 2em;
+            position: relative;
+        }
+        .song-color{
+            color: rgb(130, 128, 131);
+        }
+        .right-align{
+            text-align: right;
+        }
+
+        .header{
+			background-color: white;
+			height: 6em;
+			z-index: 0;
+		}
+
+		.title{
+			position: absolute;
+			bottom: 0px;
+			width:100%;
+		}
+
+		.separator{
+			border-bottom: solid;
+			border-color: lightgray;
+			border-width: 1px;
+		}
+
+		.categories{
+			display: inline-flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			margin-top: 5em;
+		}
+		
+		/* CARDS */
+
+		.cards {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+		}
+
+		.card1 {
+			margin-right: 1em;
+			margin-top: 1em;
+			margin-bottom: 1em;
+			padding: .25em;
+			width: auto;
+			height: auto;
+			display: grid;
+			transition: all 0.2s;
+			box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+			border-radius: 5px;
+		}
+
+		.card1:hover {
+			box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+			transform: scale(1.01);
+		}
+
+		.card1__title {
+			font-weight: 400;
+			color: black;
+			margin: .25em;
+		}
+        p {
+		text-overflow: ellipsis;
+		max-width: 220px;
+		white-space: nowrap;
+		overflow: hidden;
+		margin-bottom: -.4em !important;
+	}
+        h5 {
+            transition-duration: 5s;
+        }
+        .category-name {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            width: 90%;
+            margin:auto;
+        }
+        .enjoyhint_close_btn,
+	    .enjoyhint_skip_btn,
+	    .enjoyhint_prev_btn{
+		    display:none;
+	    }
+	    .enjoyhint_disable_events{
+		    pointer-events: none;
+	    }
+
+	</style>
+	
+
+
+	<div id="lobby" class="container form-width">	
+		<h5 id="party_name">Welcome to queusome!</h5>	
+		<div class="lobby-content" id="name_list">
+            <span class="lobby-user card">🪗 John Queue</span>
+            <span class="lobby-user card">🎤 Queue-Tip</span>
+            <span class="lobby-user card">🎷 Queuey Lewis</span>
+        </div>	
+		<div class="text-end">
+			<form action="" method="post">			
+				<a id='lets_go' class="btn btn-lg button-black" style="margin-top:.25em;">Let's Go</a>
+				
+				<a  id='join_code' class="btn btn-lg button-white" style="margin-top:.25em;" data-bs-toggle="modal" data-bs-target="#qrModal">ABCD <em class="fa fa-qrcode" style="color:black;" aria-hidden="true"></em></a>
+			</form>
+		</div>
+	</div>
+
+    <div id="parent" class="container text-center form-width" style="display:none;">
+        <div style="visibility:hidden">
+            <p style="margin-bottom:0; line-height:.5em;">Rendering</p>
+        </div>
+        <div style="position:relative">
+            <img id="blur" class="blurry artwork-square" alt="" src="/static/images/queue_it_to_it_brah.png">
+            <img id="artwork" class="clear artwork-square" alt="" src="/static/images/queue_it_to_it_brah.png">
+        </div>
+        <div class="pt-1">
+    
+            <img id="logo" style="display:none;" src="/static/images/Spotify_Icon_RGB_Green.png" width="21" height="21"
+                alt="...">
+        </div>
+        <div class="song-title">
+            <h5 id="song_title" style="position: absolute; width: 100%;">Someone Needs to Curate the Vibe</h5>
+            <h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+        </div>
+        <a id="song_link" style="visibility: hidden; position: relative; bottom: 0.5em;;"
+            class="song-link song-color">
+            <h6 id="song_artist"></h6>
+        </a>
+        <div class="pt-1">
+    
+            <img id="logo_placeholder" style="visibility:hidden;" src="/static/images/Spotify_Icon_RGB_Green.png" width="21"
+                height="21" alt="...">
+        </div>
+    </div>
+    
+    <div id='bottom' class="fixed-bottom" style="display:none;">
+        <div id="play_bar" class="play-bar">
+            <div class="row pb-2">
+                <div class="col-8 pt-2 text-left ">
+                    <div id="category_parent" class="category-name">
+                        <h5 id="category_name" style="position: absolute; margin-bottom: 0px; width: 100%;">New queue Coming
+                            Soon...</h5>
+                        <h5 id="category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of
+                            the Parent Div</h5>
+                        <h6 id="category_leader" class="category-leader song-color" style="color: rgb(130, 128, 131);">TEST
+                        </h6>
+                    </div>
+                </div>
+                <div id="like_buttons" class="col-4 pe-4 pt-2 right-align">
+                    <div id="like" class="like song-color pe-2" style="bottom: 0.2em; color: rgb(130, 128, 131);">
+                        <em id="like_icon" class="fa-regular fa-thumbs-up" style="display: none;"></em>
+                    </div>
+                    <div id="dislike" class="like song-color pe-2" style="top: 0.1em; color: rgb(130, 128, 131);">
+                        <em id="dislike_icon" class="fa-regular fa-thumbs-down" style="display: none;"></em>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <a id="action" class="btn btn-lg button-black action" style="" role="button"
+                    >Curate the Vibe</a>
+            </div>
+        </div>
+
+        <nav class="navbar navbar-light">
+            <a class="btn"> <em class="fa fa-users" aria-hidden="true"></em></a>
+            <div class=" ps-5 text-center">
+                <a class="btn" data-bs-toggle="modal" data-bs-target=""><strong id="party_code">ABCD</strong> <em
+                        class="fa fa-qrcode" aria-hidden="true"></em></a>
+            </div>
+            <a class="btn" data-bs-toggle="modal" data-bs-target=""><strong>Results</strong> <em
+                    class="fa fa-bar-chart" aria-hidden="true"></em></a>
+        </nav>
+    </div>
+
+
+<div id="vibe" style="display:none;">
+    <div id="header" class="header fixed-top" style="margin-bottom: 0px;">
+		<div  id ="vibe_title" class="title text-center">
+			<h5>Curate the Vibe</h5>
+			<div class="container form-width separator"></div>
+		</div>
+	</div>
+    <div id="categories" class="categories">
+        <div class="card1 text-center" id="2" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title" data-description="You got this">Create Your Own</h5>
+        </div>
+        <div class="card1 text-center" id="11" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title"
+                data-description="you don’t have to know the words to these ones cause everyone else does">Sing Along</h5>
+        </div>
+        <div class="card1 text-center" id="15" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title" data-description="What? Friends listen to “Endless Love” in the dark">Love Songs</h5>
+        </div>
+        <div class="card1 text-center" id="16" style="background-color: rgb(122, 252, 255);">
+            <h5 class="card1__title" data-description="Let’s put a smile on that face!">Happy Songs</h5>
+        </div>
+        <div class="card1 text-center" id="18" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title"
+                data-description="not to be confused with a bed hanger which can be used to conveniently store your belongings on the side of your bed in place of a night stand">
+                Head Bangers</h5>
+        </div>
+        <div class="card1 text-center" id="25" style="background-color: rgb(255, 126, 185);">
+            <h5 class="card1__title"
+                data-description="I think we can all agree that this is a valid gray area where we can separate the art from the artist and vibe to some real stone cold classics">
+                Problematic Artists</h5>
+        </div>
+        <div class="card1 text-center" id="27" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title" data-description="we’re human, we’re pudding…we’re human pudding">As Seen On TV</h5>
+        </div>
+        <div class="card1 text-center" id="53" style="background-color: rgb(122, 252, 255);">
+            <h5 class="card1__title" data-description="Hand up, I would always only play on medium">Songs from Guitar Hero
+            </h5>
+        </div>
+        <div class="card1 text-center" id="80" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title"
+                data-description="something about “That thing you do”…idk I’m getting tired of writing these">One Hit
+                Wonders</h5>
+        </div>
+        <div class="card1 text-center" id="97" style="background-color: rgb(122, 252, 255);">
+            <h5 class="card1__title"
+                data-description="this is kinda a fun one. pick this one. It’ll be fun. They’ll love it">Solo Artists
+                Formerly in a Group</h5>
+        </div>
+        <div class="card1 text-center" id="104" style="background-color: rgb(255, 126, 185);">
+            <h5 class="card1__title" data-description="Thousands died from drinking tainted liquor during Prohibition">Songs
+                about Alcohol</h5>
+        </div>
+        <div class="card1 text-center" id="149" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title" data-description="your show">Songs by this Artist</h5>
+        </div>
+        <div class="card1 text-center" id="150" style="background-color: rgb(255, 101, 163);">
+            <h5 class="card1__title" data-description="The first one after The Wheels on the Bus">First Song You Ever Liked
+            </h5>
+        </div>
+        <div class="card1 text-center" id="509" style="background-color: rgb(255, 247, 64);">
+            <h5 class="card1__title" data-description="">Driving at 3am on a Highway by Yourself</h5>
+        </div>
+    </div>
+    </div>
+    <div id = "pick_song" style="display:none">
+        <div id="parent" class="container form-width">
+            <div id="header" class="text-center text-muted" style="margin-bottom: 0px; display: none;">
+                <h6>...and the vibe is:</h6>
+            </div>
+            <div id="category_div" class="pt-1 text-center category-name" style="bottom: 0.25em; display: block;">
+                <h5 id="category_name" style="position: absolute; width: 100%;">Songs with a Woman’s Name in the Title</h5>
+                <h5 id="category_placeholder" style="visibility: hidden; position: relative;">Text to Set the Height of the
+                    Parent Div</h5>
+            </div>
+            <div id="artwork_div" class="text-center" style="display: none; position: relative;">
+                <img id="blur" class="blurry artwork-square" alt="" src="https://i.scdn.co/image/ab67616d0000b2730c3a1b46b6b846dfdfbc6a7d">
+                <img id="artwork" class="clear artwork-square" alt="" src="https://i.scdn.co/image/ab67616d0000b2730c3a1b46b6b846dfdfbc6a7d">
+            </div>
+            <div id="title_div" class="song-title text-center" style="display: none; top: 0.75em;">
+                <h5 id="song_title" style="position: absolute; width: auto; transition-duration: 2.97455s; transform: translateX(0px);">Mary Jane's Last Dance, Tom Petty and the Heartbreakers</h5>
+                <h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+            </div>
+            <span id="search icon" class="text-center pt-3 pb-2" style="display:none;"><em class="fa fa-search"
+                    aria-hidden="true"></em></span>
+            <form action="" method="post">
+                <input type="hidden" name="csrfmiddlewaretoken"
+                    value="3nPRyl7MYw1bTPOFUElQWv0TAfkJCGBEkf1awNrLIDYLZXIzkOVHJzOTQlzUCMEI">
+                <div class="buttonIn">
+                    <h6><input type="text" name="search" class="form-control" placeholder="Mary"
+                            id="id_search" autocomplete="off" style="display: block;"></h6>
+                    <span id="arrow" class="arrow" style="display: block; margin-top: 5px;"><em class="fa fa-arrow-left"
+                            aria-hidden="true"></em></span>
+                </div>
+                <div id="results" class="results">
+                    <div class="row option-padding" id="spotify:track:4p9iQNEmsIGkB6eG8Val8n">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273c85ca3b845a922baff3041c7" alt="Mary, Alex G"
+                                class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary</p><small class="text-muted">Alex G</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:32HqvjPjKJvR54xNplTZIB">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b27347b803d47dbbe406bd738de5"
+                                alt="Bloody Mary, Kate and Ashley, PUP" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Bloody Mary, Kate and Ashley</p><small class="text-muted">PUP</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:2HZLXBOnaSRhXStMLrq9fD">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273bef9b0a348ea8dd18a581025"
+                                alt="Mary On A Cross, Ghost" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary On A Cross</p><small class="text-muted">Ghost</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="mjld">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b2730c3a1b46b6b846dfdfbc6a7d"
+                                alt="Mary Jane's Last Dance, Tom Petty and the Heartbreakers" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary Jane's Last Dance</p><small class="text-muted">Tom Petty and the Heartbreakers</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:5hWLHFSmomXmeTXEE478My">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273a1509c9a483365e651ce223e"
+                                alt="Mary Jane, Rick James" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary Jane</p><small class="text-muted">Rick James</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:4wx5EtoH5mBXOKKmMOwnH9">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b2736d53f0ab7b9da9c0911dbdcc"
+                                alt="Mary, The Happy Fits" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary</p><small class="text-muted">The Happy Fits</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:2zwmugV2IbUwKq5JgOWEpv">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b2730b283be60e1ca4d3b43137c2"
+                                alt="Mary Jane (All Night Long), Mary J. Blige" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary Jane (All Night Long)</p><small class="text-muted">Mary J. Blige</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:6xWbpC8KpcItoGd8ZOKJlU">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273e9d7c42bfbd5f4197f01faf5"
+                                alt="Mary On A Cross - slowed + reverb, Ghost" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary On A Cross - slowed + reverb</p><small class="text-muted">Ghost</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:4OKTvXafub2xMaeVp9eJlw">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b2732f7fbda43e4146c186ec2ec7"
+                                alt="Mary Jane, The Copper Children" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary Jane</p><small class="text-muted">The Copper Children</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:2QrQCMel6v2JiLxqrg4p2O">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b2732f8c0fd72a80a93f8c53b96c"
+                                alt="Mary's Song (Oh My My My), Taylor Swift" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary's Song (Oh My My My)</p><small class="text-muted">Taylor Swift</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:7wdwIaXUuzlu1grzWMFRJm">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273f7dbc53976b1ed64fa5c172b"
+                                alt="Mary On A Cross, Ghost" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary On A Cross</p><small class="text-muted">Ghost</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:0eIOyH8ggzxLWYPnMz71bo">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273020d32ce643eca6532188a5c"
+                                alt="Mary - Guitar Version, noturgf" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary - Guitar Version</p><small class="text-muted">noturgf</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:7iZsXC0H1rnCPCaVVPMXUU">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b2731128f666493eedb8187c6ae9"
+                                alt="Mary On A Cross - Slowed+Reverb, Denial" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary On A Cross - Slowed+Reverb</p><small class="text-muted">Denial</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:5MFR2Gq7oBZvTjxdCp8WJc">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273f542a6caa471581a1b8cf143"
+                                alt="Mary Had A Little Lamb, Titus S." class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary Had A Little Lamb</p><small class="text-muted">Titus S.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row option-padding" id="spotify:track:2q9xrd99wsoIskmSRrWA2J">
+                        <div><img src="https://i.scdn.co/image/ab67616d0000b273d7f587b9253439c488a84127"
+                                alt="Mary Had a Little Lamb, Macey Clark" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>Mary Had a Little Lamb</p><small class="text-muted">Macey Clark</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;"><input type="text" name="result" value="-1" class="form-control" id="id_result">
+                </div>
+                <div id="buttons" class="text-end pb-2" style="display: none;">
+                    <input type="submit" class="btn btn-lg button-black" id="add_to_queue" value="Add to Queue"
+                        style="display:none; margin-bottom:.25em">
+                    <a class="btn btn-lg button-white">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="end_button" class="text-end pb-2 ps-2 pe-2" style="display: none;">
+    <a class="btn btn-lg button-black" href="/index">Get Somethin Goin</a>
+</div>
+    <!-- Results Modal -->
+    <div class="modal fade" id="resultsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="results_title" aria-current="page">Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-muted" id="total_title">Total</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="results_body" class="modal-body text-center">
+                    <h6 id="results_header">No Results Yet</h6>
+                    <div id="results_contents"></div>
+                </div>
+                <div id="total_body" class="modal-body text-center" style="display:none;">
+                    <table class="table">
+                        <caption></caption>
+                        <thead>
+                            <tr>
+                                <th id="total_name">Name</th>
+                                <th id="total_likes">Likes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="total_contents">
+                            <tr>
+                                <td>Everyone</td>
+                                <td>∞</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- QR Modal -->
+	<div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog center" role="dialog">
+			<div class="modal-content qr-square">
+				<div class="modal-body content">
+					
+						<img style="width:100%;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https://queuesome.com/tutorial" alt="">	
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+    <script>
+        //initialize instance
+        var enjoyhint_instance = new EnjoyHint({});
+        //simple config.
+        var enjoyhint_script_steps = [
+            {
+            'next #party_name' : 'this is the queuesome lobby. this is where everyone waits while the sesh is getting set up',
+            shape : 'rectangle'
+            },
+            {
+            'next #name_list' : 'as new people join their names will appear here',
+            shape: 'rectangle'
+            },
+            {
+            'next #join_code' : 'share the room code with others so they can join the sesh or have them scan the qr code',
+            shape: 'rectangle',
+
+            },
+            {
+            'next #lets_go' : 'once everyone is in you can get the sesh goin',
+            shape: 'rectangle',
+            onEnd: function(){
+                console.log('here');
+            }
+            },
+
+            {
+            'next #artwork': 'welcome to the main page...this is where the magic happens',
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#lobby').hide();
+                $('#parent').show();
+                $('#bottom').css("display", "contents");
+            }
+            },
+
+            {
+            'next #song_title': "if a song isn't playing, it'll tell you why here...someone needs to pick a vibe first before any songs can get queue'd up",
+            shape: 'rectangle',
+            },
+            {
+            'next #action': "each round, one person will get chosen to pick a vibe",
+            shape: 'rectangle',
+            },
+            {
+            'next #vibe_title': "this is where you'll go to set the vibe. ",
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#parent').hide();
+                $('#bottom').hide();
+                $('#vibe').show();
+            }
+            },
+            {
+            'next #53': "choose from the list of prepopulated vibes",
+            shape: 'rectangle',
+            },
+            {
+            'next #2': "or create your own",
+            shape: 'rectangle',
+            },
+            {
+            'next #action': "once a vibe is chosen everyone will get the chance to pick a song that goes with it",
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#parent').show();
+                $('#bottom').css("display", "contents");
+                $('#vibe').hide();
+                $('#action').text('Pick a Song')
+            }
+            },
+            {
+            'next #category_div': "the vibe for the round will be displayed at the top of the page",
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#parent').hide();
+                $('#bottom').hide();
+                $('#pick_song').show();
+            }
+            },
+            {
+            'next #id_search': "look up songs by typing in the search bar",
+            shape: 'rectangle',
+            },
+
+            {
+            'next #mjld' : 'and then select the one you want to pick',
+            shape: 'rectangle',
+            },
+            {
+            'next #add_to_queue': "if everything looks good hit add to queue to submit your pick",
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#results').hide();
+                $('#id_search').hide();
+                $('#arrow').hide();
+                $('#buttons').show();
+                $('#add_to_queue').show();
+                $('#search icon').show();
+                $('#title_div').show();
+                $('#artwork_div').show();
+
+            }
+            },
+            {
+            'next #parent': "once everyone picks their songs for the vibe, they all play",
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#parent').show();
+                $('#bottom').show();
+                $('#pick_song').hide();
+                $('#artwork').attr('src', 'https://i.scdn.co/image/ab67616d0000b2733b4cadd2c04316e5968dae33');
+                $('#blur').attr('src', 'https://i.scdn.co/image/ab67616d0000b2733b4cadd2c04316e5968dae33');
+                $('#song_link').css('visibility', 'visible');
+                $('#song_link').css('color', 'rgb(170, 45, 43)');
+                $('#song_artist').text('Steely Dan');
+                $('#song_title').text('Josie');
+                $('#category_name').text('Songs with a Woman’s Name in the Title');
+                $('#category_leader').text("Queue-Tip's Vibe" );
+                $('#category_leader').css('color', 'rgb(170, 45, 43)');
+                $('#action').hide();
+                $('#logo').show();
+                $('#like_icon').show();
+                $('#like_icon').css('color', 'rgb(170, 45, 43)');
+                $('#dislike_icon').show();
+                $('#dislike_icon').css('color', 'rgb(170, 45, 43)');
+            }
+            },
+            {
+            'next #like_buttons': "and don't forget to throw a song a thumbs up or thumbs down while you listen",
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#like_icon').addClass('fa-solid');
+            }
+            },
+            {
+            'next #artwork': "and that's it...wash, rinse, repeat until you get sick of it...",
+            shape: 'rectangle',
+            },
+            {
+            'next #end_button' : 'click here to get started',
+            shape: 'rectangle',
+            onBeforeStart:function(){
+                $('#end_button').show();
+                $('#parent').hide();
+                $('#bottom').hide();
+            }
+            }
+
+        ];
+        //set script config
+        enjoyhint_instance.set(enjoyhint_script_steps);
+        enjoyhint_instance.run();
+    </script>
+{% endblock %}

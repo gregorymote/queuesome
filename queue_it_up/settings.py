@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import dj_database_url
 
-STATE="PROD"
+STATE="STAGE"
 if STATE=="DEV":
     HEROKU = False
     STAGE = False
@@ -110,23 +110,23 @@ if HEROKU:
     DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 else:
     ##Local Postgresql
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.postgresql',
+    #         'NAME': 'queue_it_up',
+    #         'USER': 'admin',
+    #         'PASSWORD': 'admin',
+    #         'HOST': '127.0.0.1',
+    #         'PORT': '',
+    #     }
+    # }
+    ##Local SQL Lite
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'queue_it_up',
-            'USER': 'admin',
-            'PASSWORD': 'admin',
-            'HOST': '127.0.0.1',
-            'PORT': '',
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
-    ##Local SQL Lite
-    ##DATABASES = {
-    ##    'default': {
-    ##        'ENGINE': 'django.db.backends.sqlite3',
-    ##        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    ##    }
-    ##}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
