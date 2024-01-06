@@ -1,13 +1,13 @@
 asgiref==3.7.2
 async-timeout==4.0.2
 autopep8==1.5.5
-certifi==2022.12.7
+certifi==2023.11.17
 chardet==3.0.4
 charset-normalizer==3.2.0
 contourpy==1.0.5
 cycler==0.11.0
 dj-database-url==0.5.0
-Django==4.2.3
+Django==5.0.1
 django-background-tasks-updated==1.2.7
 django-compat==1.0.15
 django-mysql==4.7.1
@@ -19,7 +19,7 @@ kiwisolver==1.4.4
 matplotlib==3.6.0
 numpy==1.23.3
 packaging==21.3
-Pillow==9.3.0
+pillow==10.2.0
 psycopg2==2.9.5
 pycodestyle==2.6.0
 pyparsing==3.0.9
@@ -38,5 +38,5 @@ threadpoolctl==3.1.0
 toml==0.10.2
 typing_extensions==4.7.1
 tzdata==2022.2
-urllib3==1.26.5
+urllib3==2.1.0
 whitenoise==5.3.0
