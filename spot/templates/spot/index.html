@@ -10,8 +10,9 @@
     $(document).ready(function() {
     	var song_title = document.getElementById('song_title');
 		var parent = document.getElementById('parent');
+        var background = "{{ background }}";
 		pan(song_title, parent, 3000)
-        magnify("artwork", 3);
+        magnify("artwork", 3, '{% static background %}');
 	});
 </script>
 
@@ -48,9 +49,8 @@
 	</div>
     
 	<div style="position:relative">
-        <i class="fa-solid fa-mosquito"></i>
 		<img id = "blur" class="blurry artwork-square" src="{{artwork}}" alt=""/>
-		<img id = "artwork" class="clear artwork-square" src="{{artwork}}" alt=""/>
+		<img id = "artwork" class="clear artwork-square" src="{% static background %}" alt=""/>
 	</div>
 	<div class="pt-1">
 		{% load static %}
