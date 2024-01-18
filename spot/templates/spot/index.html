@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 {% extends "base.html" %}
+
 {% block local_js %}
 {% load static %}
 <script src="{% static 'js/magnify.js' %}"></script>
 {% endblock %}
+
 {% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+
 {% block page_content %}
 <script>
     $(document).ready(function() {
@@ -12,7 +15,7 @@
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
-        magnify("artwork", 3, '{% static background %}');
+        magnify("artwork", 3, '{% static background %}', {{x_mult}}, {{y_mult}});
 	});
 </script>
 
@@ -33,9 +36,6 @@
         border: 3px solid #000;
         border-radius: 50%;
         cursor: none;
-        /*Set the size of the magnifier glass:*/
-        width: 100px;
-        height: 100px;
         z-index:1000;
     }
     .artwork-square{
