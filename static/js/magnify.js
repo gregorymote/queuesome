@@ -1,5 +1,5 @@
 function magnify(imgID, zoom, background_image, x_mult, y_mult) {
-    var img, glass, w, h, bw, fly_x, fly_y;
+    var img, glass, w, h, bw, fly_x, fly_y, rad;
     img = document.getElementById(imgID);
   
     /* Create magnifier glass: */
@@ -18,13 +18,13 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
     glass.style.visibility = "hidden";
 
     bw = 3;
-    console.log(glass.offsetWidth);
     w = glass.offsetWidth / 2;
     h = glass.offsetHeight / 2;
     
     fly_x =  Math.ceil(x_mult * img.width);
     fly_y = Math.ceil(y_mult * img.height);
-
+    rad = (10 / 75) * (img.width * .25);
+    console.log(rad);
     /* Execute a function when someone moves the magnifier glass over the image: */
     glass.addEventListener("mousemove", moveMagnifier);
     img.addEventListener("mousemove", moveMagnifier);
@@ -33,6 +33,18 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
     glass.addEventListener("touchmove", moveMagnifier);
     img.addEventListener("touchmove", moveMagnifier);
     
+    var win = false;
+    
+    let hour = 0; 
+    let minute = 0; 
+    let second = 0; 
+    let count = 0;
+    let hrString = hour; 
+    let minString = minute; 
+    let secString = second; 
+    let countString = count; 
+
+    stopWatch();
     function moveMagnifier(e) {
       glass.style.visibility = "initial";
       var pos, x, y;
@@ -42,9 +54,13 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
       pos = getCursorPos(e);
       x = pos.x;
       y = pos.y;
-      //console.log(Math.ceil(x) + " , " + Math.ceil(y) + ' : ' + fly_x + ', ' + fly_y);
-      if(Math.ceil(x) == fly_x && Math.ceil(y) == fly_y){
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      if(getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad && !win){
+        win = true;
+        document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
+        $('#resultModal').modal('show');
+      }
+      else{
+        console.log("Keep Looking");
       }
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
@@ -83,5 +99,57 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
       x = x - window.pageXOffset;
       y = y - window.pageYOffset;
       return {x : x, y : y};
+    }
+
+    function getDist(point1, point2){
+        return Math.sqrt(Math.pow((point1[0] - point2[0]), 2) + Math.pow((point1[1] - point2[1]), 2));
+    }
+
+    function stopWatch() { 
+        if (!win) { 
+            count++; 
+      
+            if (count == 100) { 
+                second++; 
+                count = 0; 
+            } 
+      
+            if (second == 60) { 
+                minute++; 
+                second = 0; 
+            } 
+      
+            if (minute == 60) { 
+                hour++; 
+                minute = 0; 
+                second = 0; 
+            } 
+            hrString = hour; 
+            minString = minute; 
+            secString = second; 
+            countString = count; 
+
+            if (hour < 10) { 
+                hrString = "0" + hrString; 
+            } 
+      
+            if (minute < 10) { 
+                minString = "0" + minString; 
+            } 
+      
+            if (second < 10) { 
+                secString = "0" + secString; 
+            } 
+      
+            if (count < 10) { 
+                countString = "0" + countString; 
+            } 
+      
+            document.getElementById('hr').innerHTML = hrString; 
+            document.getElementById('min').innerHTML = minString; 
+            document.getElementById('sec').innerHTML = secString; 
+            document.getElementById('count').innerHTML = countString; 
+            setTimeout(stopWatch, 10); 
+        }
     }
   }
