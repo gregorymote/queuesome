@@ -11,7 +11,7 @@ Django==5.0.1
 django-background-tasks-updated==1.2.7
 django-compat==1.0.15
 django-mysql==4.7.1
-fonttools==4.37.2
+fonttools==4.47.2
 gunicorn==19.9.0
 idna==2.8
 joblib==1.2.0
