@@ -28,7 +28,7 @@ def set_up(image_url, x_coord, y_coord):
     img1.paste(img2, (x_coord,y_coord), mask = img2)
 
     # Displaying the image 
-    file_name = 'static/fly-img-' + art_id +'.png'
+    file_name = 'static/images/fly-img-' + art_id +'.png'
     img1.save(file_name)
 
     x_mult = x_coord / img1.width
