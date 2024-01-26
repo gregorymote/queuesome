@@ -16,7 +16,6 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     glass.style.backgroundImage = "url('" + background_image + "')"; 
     glass.style.backgroundRepeat = "no-repeat";
     glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
-    glass.style.visibility = "hidden";
 
     bw = 3;
     w = glass.offsetWidth / 2;
@@ -25,7 +24,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     fly_x =  Math.ceil(x_mult * img.width);
     fly_y = Math.ceil(y_mult * img.height);
     rad = (10 / 75) * (img.width * .25);
-    console.log(rad);
+
     /* Execute a function when someone moves the magnifier glass over the image: */
     glass.addEventListener("mousemove", moveMagnifier);
     img.addEventListener("mousemove", moveMagnifier);
@@ -50,7 +49,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
 
 
     function moveMagnifier(e) {
-      glass.style.visibility = "initial";
+      //glass.style.visibility = "initial";
       var pos, x, y;
       /* Prevent any other actions that may occur when moving over the image */
       e.preventDefault();
@@ -72,19 +71,19 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
         x = img.width - (w / zoom);
-        glass.style.visibility = "hidden";
+        //glass.style.visibility = "hidden";
     }
       if (x < w / zoom) {
         x = w / zoom;
-        glass.style.visibility = "hidden";
+        //glass.style.visibility = "hidden";
     }
       if (y > img.height - (h / zoom)) {
         y = img.height - (h / zoom);
-        glass.style.visibility = "hidden";
+        //glass.style.visibility = "hidden";
     }
       if (y < h / zoom) {
         y = h / zoom;
-        glass.style.visibility = "hidden";
+        //glass.style.visibility = "hidden";
     }
       /* Set the position of the magnifier glass: */
       glass.style.left = (x) + "px";
