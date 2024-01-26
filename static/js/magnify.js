@@ -30,8 +30,8 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     //img.addEventListener("mousemove", moveMagnifier);
   
     /*and also for touch screens:*/
-    //glass.addEventListener("touchmove", moveMagnifier);
-    //img.addEventListener("touchmove", moveMagnifier);
+    glass.addEventListener("touchmove", moveMagnifier);
+    img.addEventListener("touchmove", moveMagnifier);
     
     var win = false;
     
