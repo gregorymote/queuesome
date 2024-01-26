@@ -16,7 +16,7 @@
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
-        magnify("artwork", 3, '{% static background %}', {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
+        magnify("artwork", 3, background, {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
         
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
@@ -87,7 +87,7 @@
     
 	<div style="position:relative">
 		<img id = "blur" class="blurry artwork-square" src="{{artwork}}" alt=""/>
-		<img id = "artwork" class="clear artwork-square" src="{% static background %}" alt=""/>
+		<img id = "artwork" class="clear artwork-square" src="{{background}}" alt=""/>
 	</div>
 	<div class="pt-1">
 		{% load static %}
