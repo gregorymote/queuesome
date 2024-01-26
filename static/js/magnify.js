@@ -1,5 +1,6 @@
-function magnify(imgID, zoom, background_image, x_mult, y_mult) {
+function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     var img, glass, w, h, bw, fly_x, fly_y, rad;
+    var path=[];
     img = document.getElementById(imgID);
   
     /* Create magnifier glass: */
@@ -45,6 +46,9 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
     let countString = count; 
 
     stopWatch();
+    
+
+
     function moveMagnifier(e) {
       glass.style.visibility = "initial";
       var pos, x, y;
@@ -54,7 +58,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
       pos = getCursorPos(e);
       x = pos.x;
       y = pos.y;
+      storeCoordinate(Math.floor(x), Math.floor(y), path);
+
       if(getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad && !win){
+        displayPath(path);
         win = true;
         document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
         $('#resultModal').modal('show');
@@ -85,6 +92,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
       
+    }
+
+    function storeCoordinate(xVal, yVal, array) {
+        array.push({x: xVal, y: yVal});
     }
   
     function getCursorPos(e) {
@@ -152,4 +163,28 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult) {
             setTimeout(stopWatch, 10); 
         }
     }
-  }
+
+    function displayPath(path){
+        var offscreenCanvas = document.createElement('canvas');
+        var offscreenC = offscreenCanvas.getContext('2d');
+
+        offscreenCanvas.width = img.width;
+        offscreenCanvas.height = img.height;
+        offscreenC.strokeStyle = 'white';
+        offscreenC.beginPath();
+        offscreenC.moveTo(path[0]['x'], path[0]['y']);
+
+        for(let i of path){
+                offscreenC.lineTo(i['x'], i['y']);
+                offscreenC.stroke();
+        }
+        var canvas = document.getElementById("myCanvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var context = canvas.getContext('2d');
+        context.fillStyle = color;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(offscreenCanvas, 0, 0);
+    }
+    
+}

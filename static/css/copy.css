@@ -1,5 +1,5 @@
 .copy-container {
-	width:fit-content
+	width:100%;
 }
 .copy-label {
 	padding: 10px;
@@ -12,6 +12,7 @@
 	border: 1px solid #ddd;
 	border-radius: 10px;
 	display: flex;
+    
 }
 .copy-text input.text {
 	padding: 10px;
@@ -35,10 +36,10 @@
 	background: #809ce2;
 }
 .copy-text button:before {
-	content: "Copied";
+	content: "Copied!";
 	position: absolute;
-	top: -45px;
-	right: 0px;
+	top: 0px;
+	right: 2em;
 	background: #5c81dc;
 	padding: 8px 10px;
 	border-radius: 20px;
@@ -48,8 +49,8 @@
 .copy-text button:after {
 	content: "";
 	position: absolute;
-	top: -20px;
-	right: 25px;
+	top: 34px;
+	right: 3em;
 	width: 10px;
 	height: 10px;
 	background: #5c81dc;

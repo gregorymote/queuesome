@@ -16,7 +16,7 @@
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
-        magnify("artwork", 3, '{% static background %}', {{x_mult}}, {{y_mult}});
+        magnify("artwork", 3, '{% static background %}', {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
         
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
@@ -139,12 +139,13 @@
             </div>
             <div class="modal-body" style="text-align: center;">
                 <div class="copy-container" style="margin:auto;">
+                    <canvas id="myCanvas" style="outline:black 1px solid"></canvas>
                     <div class="copy-label" style="text-align: left;">
                         Share
                     </div>
                     <div class="copy-text">
-                        <input  id="copy-input" type="text" class="text" value="🔎 🪰 00:00:00" />
-                        <button><i class="fa fa-clone"></i></button>
+                        <input  id="copy-input" style="width: 80%;" type="text" class="text" value="🔎 🪰 00:00:00" />
+                        <button style="width:20%;"><i class="fa fa-clone"></i></button>
                     </div>
                 </div> 
             </div>
