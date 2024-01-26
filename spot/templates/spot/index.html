@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block local_js %}
+{% load static %}
+<script src="{% static 'js/magnify.js' %}"></script>
+<link href="{% static 'css/copy.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+
+{% block page_content %}
+<script>
+    $(document).ready(function() {
+    	var song_title = document.getElementById('song_title');
+		var parent = document.getElementById('parent');
+        var background = "{{ background }}";
+		pan(song_title, parent, 3000)
+        magnify("artwork", 3, '{% static background %}', {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
+        
+        let copyText = document.querySelector(".copy-text");
+        copyText.querySelector("button").addEventListener("click", function () {
+        let input = copyText.querySelector("input.text");
+        input.select();
+        document.execCommand("copy");
+        copyText.classList.add("active");
+        window.getSelection().removeAllRanges();
+        setTimeout(function () {
+            copyText.classList.remove("active");
+        }, 2500);
+    });
+});
+</script>
+
+
+<style>
+	h6{
+		display: inline-block;
+		line-height: normal;
+	}
+	h5 {
+  		transition-duration: 5s;
+	}
+    .song-link{
+		text-decoration:none;
+	}
+    .img-magnifier-glass {
+        position: absolute;
+        border: 0px solid #000;
+        border-radius: 50%;
+        cursor: none;
+        z-index:1000;
+    }
+    .artwork-square{
+        border-radius: 4px;
+    }
+    .fly{
+		display:inline-block;
+		font-size: 2em;
+		position: relative;
+	}
+    .play-bar{
+		border-color: lightgray;
+		border-width: 2px;
+		border-style: solid;
+		border-radius: 12px;
+		height: auto;
+		border-bottom:none;
+		border-left: none;
+		border-right: none;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+		max-width:800px;
+		margin-left: auto;
+		margin-right: auto;
+		background-color: white;
+	}
+    .right-align{
+		text-align: right;
+	}
+</style>
+
+<div id="parent" class = "container text-center form-width">
+	<div style="visibility:hidden">
+		<p style="margin-bottom:0; line-height:.5em;">Rendering</p>
+	</div>
+    
+	<div style="position:relative">
+		<img id = "blur" class="blurry artwork-square" src="{{artwork}}" alt=""/>
+		<img id = "artwork" class="clear artwork-square" src="{% static background %}" alt=""/>
+	</div>
+	<div class="pt-1">
+		{% load static %}
+		<img id = "logo" style='display:initial;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+	</div>
+	<div class="song-title">
+		<h5 id="song_title" style="position:absolute;">{{song_title}}</h5>
+		<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+	</div>
+	<a id = "song_link" href ="{{song_link}}" style='position:relative; bottom: .5em; color: rgb({{color}});' class="song-link"><h6 id = "song_artist">{{artist_name}}</h6></a>
+</div>
+
+
+<div class="fixed-bottom">
+	<div id="play_bar" class="play-bar">
+		<div class="row pb-2">
+			<div id = "time" class="col-8 ps-4 pt-2 text-left" style="font-size:1.5em;letter-spacing:-.09em">
+                <span class="digit" id="hr" style="display:None;"> 
+                    00</span>  
+                <span class="txt" style="display:None;">:</span> 
+                <span class="digit" id="min"> 
+                    00</span> 
+                <span class="txt">:</span> 
+                <span class="digit" id="sec"> 
+                    00</span> 
+                <span class="txt">:</span> 
+                <span class="digit" id="count"> 
+                    00</span> 
+			</div>
+			<div class="col-4 pe-4 pt-2 right-align">
+				<div id="fly" class="fly pe-2" style="bottom:.20em; color: rgb({{color}});">
+					<em id="fly_icon" class="fa-solid fa-mosquito"></em>
+				</div>
+			</div>
+		</div>
+		<div class="text-center">
+			<a id="action" class ="btn btn-lg button-black action" style="display: none;" role="button"></a>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 0px;">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div class="copy-container" style="margin:auto;">
+                    <canvas id="myCanvas" style="outline:black 1px solid"></canvas>
+                    <div class="copy-label" style="text-align: left;">
+                        Share
+                    </div>
+                    <div class="copy-text">
+                        <input  id="copy-input" style="width: 80%;" type="text" class="text" value="🔎 🪰 00:00:00" />
+                        <button style="width:20%;"><i class="fa fa-clone"></i></button>
+                    </div>
+                </div> 
+            </div>
+            <div class="modal-footer pb-4" style="border-top: 0px; text-align: center;">
+                <div style="margin:auto;">
+                    <small><i>New Flys every day at 3:49 AM Eastern Daylight Time</i></small>
+                </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+{% endblock %}

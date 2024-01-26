@@ -22,4 +22,5 @@ urlpatterns = [
     path('party/', include('party.urls')),
     path('sesh/', include('game.urls')),
     path('blog/', include('blog.urls')),
+    path('spot/', include('spot.urls')),
 ]
