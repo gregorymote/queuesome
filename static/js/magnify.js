@@ -26,8 +26,8 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     rad = (10 / 75) * (img.width * .25);
     glass.style.visibility = "initial";
     /* Execute a function when someone moves the magnifier glass over the image: */
-   // glass.addEventListener("mousemove", moveMagnifier);
-    //img.addEventListener("mousemove", moveMagnifier);
+    glass.addEventListener("mousemove", moveMagnifier);
+    img.addEventListener("mousemove", moveMagnifier);
   
     /*and also for touch screens:*/
     glass.addEventListener("touchmove", moveMagnifier);
