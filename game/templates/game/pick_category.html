@@ -78,12 +78,25 @@
 		}
 
 		$(document).ready(function() {
-				var search = document.getElementById("id_search");
-				search.autocomplete="off";
-				search.addEventListener("input", update_categories);
-				var nav = document.getElementById('nav');
-				nav.classList.add('fixed-top');
+			var search = document.getElementById("id_search");
+			search.autocomplete="off";
+			search.addEventListener("input", update_categories);
+			var nav = document.getElementById('nav');
+			nav.classList.add('fixed-top');
+			var button = document.getElementById('button');
+			var carousel = document.getElementById('swipe');
+			initSwipeButton(button, carousel);
 		});
+
+		function swipeSubmit(){
+			document.pickCategory.submit();
+		}
+
+		async function validateInput(){
+			var valid = true;
+
+			return valid;
+		}
 
 		function update_categories(e){
 			clearTimeout(this.delay);
@@ -184,7 +197,29 @@
 				form_artist_input.value = "";
 				form_artist_input.required = false;
 			}
+			
 			$('#form_modal').modal('show');
+			document.getElementById('main_viewport').scroll(273,0);
+		}
+		function scrollVisible(){
+    		var slide = document.getElementById('carousel__slide1');
+			var width = getWidth(slide);
+			var main_viewport = document.getElementById('main_viewport');
+			console.log(main_viewport.scrollLeft);
+			var swipe_icon = document.getElementById('swipe_icon');
+			swipe_icon.style.visibility = 'visible';
+			if(width == main_viewport.scrollLeft){
+				swipe_icon.style.visibility = 'visible';
+				main_viewport.removeEventListener('scroll', scrollVisible);
+				main_viewport.addEventListener('scroll', scrollSubmit);
+				main_viewport.addEventListener('scroll', scrollAnimate);
+			}
+		}
+		function initPos(viewport){
+			var slide = document.getElementById('carousel__slide1');
+			var width = getWidth(slide);
+			console.log(width);
+			viewport.scroll(width, 0);
 		}
 	</script>
 	<div id="header" class="header fixed-top" style="margin-bottom: 0px;">
@@ -204,7 +239,7 @@
 	<div class="modal fade" id="form_modal" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content" id="form_content">
-				<form action="" method="post">
+				<form name="pickCategory" action="" method="post">
 					{% csrf_token %}
 				<div id="form_body" class="modal-body text-left">
 					<h4 id="form_name"></h4>
@@ -215,7 +250,7 @@
 					</div>
 					<div id="form_artist" class="pt-2" style="display:none;">{{ form.artist }}</div>
 					<p style="display:none;">{{ form.result }}</p>
-					<input type="submit" class="btn btn-lg button-black" style="margin-top:.5em" value="let's go with this one"></input>
+					{% include "swipe.html" with swipe_text="let's go with this one"  button_text="let's go with this one" %}
 				</div>
 				</form>
 			</div>
