@@ -43,7 +43,7 @@ def index(request):
     x_coord = 210
     y_coord = 350
     try:
-        Fly.objects.all().delete()
+        #Fly.objects.all().delete()
         fly = Fly.objects.get(image_url=artwork)
     except Exception as e:
         #Fly.objects.all().delete()
