@@ -1,16 +1,18 @@
 function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
-    var img, glass, w, h, bw, fly_x, fly_y, rad;
+    var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place;
+    var proportion = .4;
     var path=[];
     img = document.getElementById(imgID);
-  
+    glass_place = document.getElementById('glass_place');
     /* Create magnifier glass: */
     glass = document.createElement("DIV");
     glass.setAttribute("class", "img-magnifier-glass");
   
     /* Insert magnifier glass: */
-    img.parentElement.insertBefore(glass, img);
-    glass.style.width =  (img.width * .25) + "px"; 
-    glass.style.height =  (img.height * .25) + "px";
+    glass_place.parentElement.insertBefore(glass, glass_place);
+    glass.style.width =  (img.width * proportion) + "px"; 
+    glass.style.height =  (img.height * proportion) + "px";
+    glass.style.margin = 'auto';
 
     /* Set background properties for the magnifier glass: */
     glass.style.backgroundImage = "url('" + background_image + "')"; 
@@ -23,14 +25,14 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     
     fly_x =  Math.ceil(x_mult * img.width);
     fly_y = Math.ceil(y_mult * img.height);
-    rad = (10 / 75) * (img.width * .25);
-    glass.style.visibility = "initial";
+    rad = (img.width * proportion) / (zoom * 2.5);
+    
     /* Execute a function when someone moves the magnifier glass over the image: */
-    glass.addEventListener("mousemove", moveMagnifier);
+    //glass.addEventListener("mousemove", moveMagnifier);
     img.addEventListener("mousemove", moveMagnifier);
   
     /*and also for touch screens:*/
-    glass.addEventListener("touchmove", moveMagnifier);
+    //glass.addEventListener("touchmove", moveMagnifier);
     img.addEventListener("touchmove", moveMagnifier);
     
     var win = false;
@@ -49,7 +51,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
 
 
     function moveMagnifier(e) {
-      
+      //glass.style.visibility = "initial";
       var pos, x, y;
       /* Prevent any other actions that may occur when moving over the image */
       e.preventDefault();
@@ -58,15 +60,18 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       x = pos.x;
       y = pos.y;
       storeCoordinate(Math.floor(x), Math.floor(y), path);
-
+      console.log(fly_x + ', ' + fly_y + ' | ' + Math.floor(x) + ', ' + Math.floor(y) + ' | ' + getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) + ' - ' + rad);
       if(getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad && !win){
         displayPath(path);
         win = true;
+        var fly = document.getElementById("fly_icon");
+        fly.style.color = '#1ed760';
+        fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
         document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
         $('#resultModal').modal('show');
       }
       else{
-        console.log("Keep Looking");
+        //console.log("Keep Looking");
       }
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
@@ -86,8 +91,8 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
         //glass.style.visibility = "hidden";
     }
       /* Set the position of the magnifier glass: */
-      glass.style.left = (x) + "px";
-      glass.style.top = (y - h) + "px";
+      //glass.style.left = (x) + "px";
+      //glass.style.top = (y - h) + "px";
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
       
