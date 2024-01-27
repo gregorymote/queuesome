@@ -28,10 +28,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     rad = (img.width * proportion) / (zoom * 2.5);
     
     /* Execute a function when someone moves the magnifier glass over the image: */
-    //img.addEventListener("mousemove", moveMagnifier);
+    img.addEventListener("mousemove", moveMagnifier);
   
     /*and also for touch screens:*/
-    //img.addEventListener("touchmove", moveMagnifier);
+    img.addEventListener("touchmove", moveMagnifier);
     
     var win = false;
     
@@ -73,16 +73,16 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
         x = img.width - (w / zoom);
-    }
+      }
       if (x < w / zoom) {
         x = w / zoom;
-    }
+      }
       if (y > img.height - (h / zoom)) {
         y = img.height - (h / zoom);
-    }
+      }
       if (y < h / zoom) {
         y = h / zoom;
-    }
+      }
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
       
