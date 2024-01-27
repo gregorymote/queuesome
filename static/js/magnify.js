@@ -5,7 +5,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     img = document.getElementById(imgID);
     glass_place = document.getElementById('glass_place');
     /* Create magnifier glass: */
-    glass = document.createElement("DIV");
+    glass = document.createElement("div");
     glass.setAttribute("class", "img-magnifier-glass");
   
     /* Insert magnifier glass: */
@@ -18,7 +18,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     glass.style.backgroundImage = "url('" + background_image + "')"; 
     glass.style.backgroundRepeat = "no-repeat";
     glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
-
+    glass.style.display = 'block';
     bw = 3;
     w = glass.offsetWidth / 2;
     h = glass.offsetHeight / 2;
