@@ -16,7 +16,7 @@
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
-        magnify("artwork", 3, background, {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
+        magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
         
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
@@ -45,9 +45,8 @@
 		text-decoration:none;
 	}
     .img-magnifier-glass {
-        position: absolute;
+        position: relative;
         border: 0px solid #000;
-        border-radius: 50%;
         cursor: none;
         z-index:1000;
     }
@@ -98,6 +97,9 @@
 		<h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
 	</div>
 	<a id = "song_link" href ="{{song_link}}" style='position:relative; bottom: .5em; color: rgb({{color}});' class="song-link"><h6 id = "song_artist">{{artist_name}}</h6></a>
+    <div>
+        <div id = "glass_place"></div>
+    </div>
 </div>
 
 
@@ -135,16 +137,17 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header" style="border-bottom: 0px;">
+              <h5 class="modal-title">Woohoo..you did it 🎉</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center;">
                 <div class="copy-container" style="margin:auto;">
                     <canvas id="myCanvas" style="outline:black 1px solid"></canvas>
                     <div class="copy-label" style="text-align: left;">
-                        Share
+                    Share
                     </div>
                     <div class="copy-text">
-                        <input  id="copy-input" style="width: 80%;" type="text" class="text" value="🔎 🪰 00:00:00" />
+                        <input  id="copy-input" style="width: 80%;" type="text" class="text" readonly value="🔎 🪰 00:00:00" />
                         <button style="width:20%;"><i class="fa fa-clone"></i></button>
                     </div>
                 </div> 
