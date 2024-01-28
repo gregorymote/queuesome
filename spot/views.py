@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from utils.util_song import get_album_color
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from party.forms import BlankForm
 #from cairosvg import svg2png
 from PIL import Image
 from .models import Fly
@@ -67,3 +70,18 @@ def index(request):
         'y_mult': fly.y_mult,
     }
     return render(request, 'spot/index.html', context)
+
+
+def start(request):
+    if request.method == 'POST':
+        form = BlankForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(
+                reverse('index', kwargs={})
+            )
+    else:
+        form = BlankForm(initial={'device': ''})
+    context= {
+        'form': form
+    }
+    return render(request, 'spot/start.html', context)

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotThe~fly</a></em></a>{% endblock %}
+{% block page_content %}
+
+<script>
+	$(document).ready(function () {
+		var button = document.getElementById('button');
+		var carousel = document.getElementById('swipe');
+		initSwipeButton(button, carousel);
+
+        const color = randomColor();
+        console.log(color);
+        document.getElementById('square').style.backgroundColor = color;
+        document.getElementById('fly_icon').style.color = color;
+        const invert = invertColor(color);
+        document.getElementById('circle').style.backgroundColor = invert;
+        document.getElementById('square_2').style.backgroundColor = color;
+        document.getElementById('circle_2').style.backgroundColor = invert;
+        document.getElementById('fly_icon_2').style.color = color;
+	});
+
+    function randomColor(){
+        var valid = false;
+        while(!valid){
+            var hex = "#" + Math.floor(Math.random()*16777215).toString(16);
+            if (hex.indexOf('#') === 0) {
+                hex = hex.slice(1);
+            }
+            // convert 3-digit hex to 6-digits.
+            if (hex.length === 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+            if (hex.length !== 6) {
+                valid = false;
+            }
+            else{
+                valid = true;
+            }
+        }
+        return "#" + hex;
+    }
+	
+    function invertColor(hex) {
+        if (hex.indexOf('#') === 0) {
+            hex = hex.slice(1);
+        }
+        // convert 3-digit hex to 6-digits.
+        if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        if (hex.length !== 6) {
+            throw new Error('Invalid HEX color.');
+        }
+        // invert color components
+        var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
+            g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
+            b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
+        // pad each with zeros and return
+        return '#' + padZero(r) + padZero(g) + padZero(b);
+    }
+
+    function padZero(str, len) {
+        len = len || 2;
+        var zeros = new Array(len).join('0');
+        return (zeros + str).slice(-len);
+    }
+    
+    
+    function swipeSubmit(){
+		document.setDevice.submit();
+	}
+
+	async function validateInput(){
+		var valid = true;
+		var device_validator = document.getElementById('device_validator');
+		if(!valid){
+			device_validator.style.display = 'block';
+		}
+		else{
+			device_validator.style.display = 'none';
+		}
+		return valid;
+	}
+
+</script>
+
+<style>
+    #circle {
+        animation-name: LtopRbottom;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+    }
+    @keyframes LtopRbottom {
+      0%   { left:1px; top:1px;}
+      20%  { left:50px; top: 0px;}
+      40% { left:45px; top:50px;}
+      60% { left:15px; top:20px;}
+      80% { left:23px; top:48px;}
+      100% { left:23px; top:48px;}
+    }
+
+    @keyframes slideaway {
+        0% { opacity: 0;}
+        70% { opacity: 0;}
+        81% { opacity: 1;}
+        100% { transform: translateY(-40px); opacity: 1;}
+    }
+
+    .show {
+        animation-name: slideaway;
+        animation-duration: 4s;
+        display: initial;
+        animation-iteration-count: infinite;
+    }
+
+</style>
+
+<div class="container form-width">
+	<form name="setDevice" action="" method="post">
+		{% csrf_token %}
+		<div class="pt-2">
+			<div class="pb-3">
+				<h5><strong>How To Play</strong></h5>
+			</div>
+			<div id="message" class="ps-3 pb-3">
+				<h5>1. Pan through the album artwork</h5>
+                <h5>2. Look for the hidden fly icon </h5>
+                <h5>3. Spot it in the magnify glass</h5>
+                <div id="demo" style="display:inline-flex; margin-left:25%; align-items:end; margin-top: 1em;">
+                    <div id="square" style="width: 100px; height:100px; border: solid; margin-right:.5em;">
+                        <div id="circle" style="width: 33px; height:33px; background-color:gray; border-radius: 50%; position:relative; top:1px; left:1px"></div>
+                        <em id="fly_icon" class="fa-solid fa-mosquito" style="position: relative; z-index: 1000; top: 20px; left:30px;"></em>
+                    </div>
+                    <div id="square_2" style="width: 50px; height:50px; border: solid; margin-left:.5em;">
+                        <div id="circle_2" style="width: 33px; height:33px; background-color:gray; border-radius: 50%; position:relative; margin:auto; margin-top:11%;"></div>
+                        <em id="fly_icon_2" class="fa-solid fa-mosquito show" style="position: relative; z-index: 1000; top: -30px; left:12px; opacity:0;"></em>
+                    </div>
+                </div>			
+			</div>
+
+			<div id="device_validator" class="ps-3 validator">
+				<em>need an active device to continue</em>
+			</div>
+			{% include "swipe.html" with swipe_text="SPOT THE FLY"  button_text="Spot the Fly" %}
+		</div>
+	</form>
+</div>
+{% endblock %}
