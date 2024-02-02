@@ -11,25 +11,51 @@
 
 {% block page_content %}
 <script>
+    var path = {{path|safe}};
+    var win = '{{win}}' == 'True';
     $(document).ready(function() {
     	var song_title = document.getElementById('song_title');
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
+        
         magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
         
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
-        let input = copyText.querySelector("input.text");
-        input.select();
-        document.execCommand("copy");
-        copyText.classList.add("active");
-        window.getSelection().removeAllRanges();
-        setTimeout(function () {
-            copyText.classList.remove("active");
-        }, 2500);
+            let input = copyText.querySelector("input.text");
+            input.select();
+            document.execCommand("copy");
+            copyText.classList.add("active");
+            window.getSelection().removeAllRanges();
+            setTimeout(function () {
+                copyText.classList.remove("active");
+            }, 2500);
+        });
     });
-});
+
+    var inactivity = false;
+    function sendData() {
+		if (!inactivity) {
+			$.ajax({
+				url: '/spot/update_play',
+				data: {
+					'path': JSON.stringify(path),
+				},
+				dataType: 'json',
+				success: function (data) {
+					inactivity = data.stop;
+                    path = [];
+				},
+				complete: function(data){
+					setTimeout(sendData, 1000);
+				}
+			});
+		}
+	}
+    if(!win){
+	    setTimeout(sendData, 1000);
+    }
 </script>
 
 
@@ -100,6 +126,7 @@
     <div>
         <div id = "glass_place"></div>
     </div>
+    <p>Play:{{play}} | User:{{user}}</p>
 </div>
 
 

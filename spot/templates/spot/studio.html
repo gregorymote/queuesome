@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block local_js %}
+{% load static %}
+<script src="{% static 'js/magnify.js' %}"></script>
+<link href="{% static 'css/copy.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+
+{% block page_content %}
+<h1>{{fly}}</h1>
+{% endblock %}

@@ -1,7 +1,6 @@
 function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place;
     var proportion = .4;
-    var path=[];
     img = document.getElementById(imgID);
     glass_place = document.getElementById('glass_place');
     /* Create magnifier glass: */
@@ -27,14 +26,6 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     fly_y = Math.ceil(y_mult * img.height);
     rad = (img.width * proportion) / (zoom * 2.5);
     
-    /* Execute a function when someone moves the magnifier glass over the image: */
-    img.addEventListener("mousemove", moveMagnifier);
-  
-    /*and also for touch screens:*/
-    img.addEventListener("touchmove", moveMagnifier);
-    
-    var win = false;
-    
     let hour = 0; 
     let minute = 0; 
     let second = 0; 
@@ -42,11 +33,18 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     let hrString = hour; 
     let minString = minute; 
     let secString = second; 
-    let countString = count; 
+    let countString = count;
 
-    stopWatch();
-    
-
+    if(!win){
+      path = [];
+      stopWatch();
+      img.addEventListener("mousemove", moveMagnifier);
+      img.addEventListener("touchmove", moveMagnifier);
+    }
+    else{
+      setFly();
+      displayPath(path);
+    }
 
     function moveMagnifier(e) {
       var pos, x, y;
@@ -57,18 +55,16 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       x = pos.x;
       y = pos.y;
       storeCoordinate(Math.floor(x), Math.floor(y), path);
-      console.log(fly_x + ', ' + fly_y + ' | ' + Math.floor(x) + ', ' + Math.floor(y) + ' | ' + getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) + ' - ' + rad);
+      //console.log(fly_x + ', ' + fly_y + ' | ' + Math.floor(x) + ', ' + Math.floor(y) + ' | ' + getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) + ' - ' + rad);
       if(getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad && !win){
-        displayPath(path);
         win = true;
-        var fly = document.getElementById("fly_icon");
-        fly.style.color = '#1ed760';
-        fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
-        document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
+        getPath(x, y, function(saved_path){
+          displayPath(saved_path);
+        });
+        setFly();
         $('#resultModal').modal('show');
-      }
-      else{
-        //console.log("Keep Looking");
+        img.removeEventListener("touchmove", moveMagnifier);
+        img.removeEventListener("mousemove", moveMagnifier);
       }
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
@@ -85,11 +81,17 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       }
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
-      
+    }
+
+    function setFly(){
+      var fly = document.getElementById("fly_icon");
+      fly.style.color = '#1ed760';
+      fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
+      document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
     }
 
     function storeCoordinate(xVal, yVal, array) {
-        array.push({x: xVal, y: yVal});
+        array.push([xVal,yVal]);
     }
   
     function getCursorPos(e) {
@@ -118,12 +120,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
                 second++; 
                 count = 0; 
             } 
-      
             if (second == 60) { 
                 minute++; 
                 second = 0; 
             } 
-      
             if (minute == 60) { 
                 hour++; 
                 minute = 0; 
@@ -166,10 +166,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
         offscreenCanvas.height = img.height;
         offscreenC.strokeStyle = 'white';
         offscreenC.beginPath();
-        offscreenC.moveTo(path[0]['x'], path[0]['y']);
+        offscreenC.moveTo(path[0][0], path[0][1]);
 
         for(let i of path){
-                offscreenC.lineTo(i['x'], i['y']);
+                offscreenC.lineTo(i[0], i[1]);
                 offscreenC.stroke();
         }
         var canvas = document.getElementById("myCanvas");
@@ -180,5 +180,21 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(offscreenCanvas, 0, 0);
     }
-    
+
+    async function getPath(x, y, callback) {  
+      $.ajax({
+          url: '/spot/get_path',
+          data: {
+            'x' : x / img.width, 
+            'y' : y / img.width 
+          },
+          dataType: 'json',
+          success: function (data) {
+              saved_path = data.path;
+          },
+          complete: function(data){
+              console.log("complete");
+          }
+      }).done(function(){callback(saved_path)});
+    }
 }
