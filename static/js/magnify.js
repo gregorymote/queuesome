@@ -1,13 +1,12 @@
-function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
+function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, play_y_mult, color) {
     var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place;
     var proportion = .4;
-    var path=[];
     img = document.getElementById(imgID);
     glass_place = document.getElementById('glass_place');
     /* Create magnifier glass: */
     glass = document.createElement("div");
     glass.setAttribute("class", "img-magnifier-glass");
-  
+    
     /* Insert magnifier glass: */
     glass_place.parentElement.insertBefore(glass, glass_place);
     glass.style.width =  (img.width * proportion) + "px"; 
@@ -25,28 +24,44 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     
     fly_x =  Math.ceil(x_mult * img.width);
     fly_y = Math.ceil(y_mult * img.height);
+    play_x = Math.ceil(play_x_mult * img.width);
+    play_y = Math.ceil(play_y_mult * img.width);
     rad = (img.width * proportion) / (zoom * 2.5);
-    
-    /* Execute a function when someone moves the magnifier glass over the image: */
-    img.addEventListener("mousemove", moveMagnifier);
-  
-    /*and also for touch screens:*/
-    img.addEventListener("touchmove", moveMagnifier);
-    
-    var win = false;
+    glass.style.backgroundPosition = "-" + ((play_x * zoom) - w + bw) + "px -" + ((play_y * zoom) - h + bw) + "px";
     
     let hour = 0; 
     let minute = 0; 
     let second = 0; 
     let count = 0;
-    let hrString = hour; 
-    let minString = minute; 
-    let secString = second; 
-    let countString = count; 
+    let hrString = '0' + hour; 
+    let minString = '0' + minute; 
+    let secString = '0' + second; 
+    let countString = '0' + count;
 
-    stopWatch();
-    
-
+    if(!win){
+      pathm = [];
+      d = new Date();
+      if(start == 'None'){
+        console.log("Not Start");
+        start = d.toISOString().slice(11,23);
+      }
+      else{
+        var d_start = new Date(start);
+        var d_now = new Date();
+        var diff = d_now - d_start; 
+        //var now = diff.toISOString().slice(11,23);
+        console.log(d_now + ' ' + d_start);
+      }
+      stopWatch();
+      img.addEventListener("mousemove", moveMagnifier);
+      img.addEventListener("touchmove", moveMagnifier);
+    }
+    else{
+      setTime(time);
+      setWatch(hrString,minString,secString,countString);
+      setFly();
+      displayPath(pathm);
+    }
 
     function moveMagnifier(e) {
       var pos, x, y;
@@ -56,19 +71,19 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       pos = getCursorPos(e);
       x = pos.x;
       y = pos.y;
-      storeCoordinate(Math.floor(x), Math.floor(y), path);
-      console.log(fly_x + ', ' + fly_y + ' | ' + Math.floor(x) + ', ' + Math.floor(y) + ' | ' + getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) + ' - ' + rad);
+      storeCoordinate(x / img.width, y / img.width, pathm);
       if(getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad && !win){
-        displayPath(path);
+        var date = new Date();
+        var finish = date.toISOString().slice(11,23);
         win = true;
-        var fly = document.getElementById("fly_icon");
-        fly.style.color = '#1ed760';
-        fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
-        document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
+        getPath(x, y, finish, function(saved_path, time){
+          displayPath(saved_path);
+          setTime(time);
+        });
+        setFly();
         $('#resultModal').modal('show');
-      }
-      else{
-        //console.log("Keep Looking");
+        img.removeEventListener("touchmove", moveMagnifier);
+        img.removeEventListener("mousemove", moveMagnifier);
       }
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
@@ -85,11 +100,55 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
       }
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
+    }
+
+    function setFly(){
+      var fly = document.getElementById("fly_icon");
+      fly.style.color = '#1ed760';
+      document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
+      fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
+    }
+
+    function setTime(time){
+      //console.log(time)
+      min = parseInt(time.slice(3,5));
+      second = parseInt(time.slice(6,8));
+      count = parseInt(time.slice(9,11));
+      count++;
+      if (count == 100) { 
+        second++; 
+        count = 0; 
+      } 
+      if (second == 60) { 
+          minute++; 
+          second = 0; 
+      } 
+      if (minute == 60) { 
+          hour++; 
+          minute = 0; 
+          second = 0; 
+      } 
+      hrString = hour; 
+      minString = minute; 
+      secString = second; 
+      countString = count; 
+      if (hour < 10) { 
+          hrString = "0" + hrString; 
+      } 
+      if (minute < 10) { 
+          minString = "0" + minString; 
+      } 
+      if (second < 10) { 
+          secString = "0" + secString; 
+      } 
+      if (count < 10) { 
+          countString = "0" + countString; 
+      }
       
     }
 
     function storeCoordinate(xVal, yVal, array) {
-        array.push({x: xVal, y: yVal});
+        array.push([xVal,yVal]);
     }
   
     function getCursorPos(e) {
@@ -111,54 +170,20 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
     }
 
     function stopWatch() { 
-        if (!win) { 
-            count++; 
-      
-            if (count == 100) { 
-                second++; 
-                count = 0; 
-            } 
-      
-            if (second == 60) { 
-                minute++; 
-                second = 0; 
-            } 
-      
-            if (minute == 60) { 
-                hour++; 
-                minute = 0; 
-                second = 0; 
-            } 
-            hrString = hour; 
-            minString = minute; 
-            secString = second; 
-            countString = count; 
-
-            if (hour < 10) { 
-                hrString = "0" + hrString; 
-            } 
-      
-            if (minute < 10) { 
-                minString = "0" + minString; 
-            } 
-      
-            if (second < 10) { 
-                secString = "0" + secString; 
-            } 
-      
-            if (count < 10) { 
-                countString = "0" + countString; 
-            } 
-      
-            document.getElementById('hr').innerHTML = hrString; 
-            document.getElementById('min').innerHTML = minString; 
-            document.getElementById('sec').innerHTML = secString; 
-            document.getElementById('count').innerHTML = countString; 
+        if (!win) {
+            setTime(hrString+':'+minString+':'+secString+':'+countString);
+            setWatch(hrString,minString,secString,countString);
             setTimeout(stopWatch, 10); 
         }
     }
+    function setWatch(hrString,minString,secString,countString){
+      document.getElementById('hr').innerHTML = hrString; 
+      document.getElementById('min').innerHTML = minString; 
+      document.getElementById('sec').innerHTML = secString; 
+      document.getElementById('count').innerHTML = countString; 
+    }
 
-    function displayPath(path){
+    function displayPath(coords){
         var offscreenCanvas = document.createElement('canvas');
         var offscreenC = offscreenCanvas.getContext('2d');
 
@@ -166,10 +191,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
         offscreenCanvas.height = img.height;
         offscreenC.strokeStyle = 'white';
         offscreenC.beginPath();
-        offscreenC.moveTo(path[0]['x'], path[0]['y']);
+        offscreenC.moveTo(coords[0][0] * img.width, coords[0][1] * img.width);
 
-        for(let i of path){
-                offscreenC.lineTo(i['x'], i['y']);
+        for(let i of coords){
+                offscreenC.lineTo(i[0] * img.width, i[1] * img.width);
                 offscreenC.stroke();
         }
         var canvas = document.getElementById("myCanvas");
@@ -180,5 +205,24 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, color) {
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(offscreenCanvas, 0, 0);
     }
-    
+
+    async function getPath(x, y, finish, callback) { 
+      console.log("Finish: " + finish);
+      $.ajax({
+          url: '/spot/get_path',
+          data: {
+            'x' : x / img.width, 
+            'y' : y / img.width,
+            'finish' : finish 
+          },
+          dataType: 'json',
+          success: function (data) {
+              saved_path = data.pathm;
+              time = data.time;
+              if(time.length == 14){
+                time = '0' + time;
+              }
+          }
+      }).done(function(){callback(saved_path, time)});
+    }
 }
