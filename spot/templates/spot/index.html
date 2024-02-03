@@ -11,16 +11,19 @@
 
 {% block page_content %}
 <script>
-    var path = {{path|safe}};
+    var inactivity = false;
+    var pathm = {{pathm|safe}};
     var win = '{{win}}' == 'True';
+    var started = '{{started}}' == 'True';
+    var d;
+    var start = '{{start_time}}';
     $(document).ready(function() {
     	var song_title = document.getElementById('song_title');
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
         
-        magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, 'rgb({{color}})');
-        
+        magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, {{play_x_mult}}, {{play_y_mult}}, 'rgb({{color}})');
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
             let input = copyText.querySelector("input.text");
@@ -34,18 +37,17 @@
         });
     });
 
-    var inactivity = false;
     function sendData() {
 		if (!inactivity) {
 			$.ajax({
 				url: '/spot/update_play',
 				data: {
-					'path': JSON.stringify(path),
+                    'pathm': JSON.stringify(pathm)
 				},
 				dataType: 'json',
 				success: function (data) {
 					inactivity = data.stop;
-                    path = [];
+                    pathm = [];
 				},
 				complete: function(data){
 					setTimeout(sendData, 1000);
@@ -53,9 +55,31 @@
 			});
 		}
 	}
+    function sendTime() {
+        if(!started){
+            //console.log("START: " + start);
+            $.ajax({
+                url: '/spot/set_start',
+                data: {
+                    'start_time': start
+                },
+                dataType: 'json',
+                success: function (data) {
+                    started = data.success
+                },
+                complete: function(data){
+                    setTimeout(sendTime, 1000);
+                }
+            });
+        }
+	}
     if(!win){
 	    setTimeout(sendData, 1000);
     }
+    if(!started){
+	    sendTime();
+    }
+
 </script>
 
 
