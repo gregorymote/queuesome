@@ -14,7 +14,8 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     glass.style.margin = 'auto';
 
     /* Set background properties for the magnifier glass: */
-    document.getElementById('cache').innerHTML = is_cached(background_image);
+    
+    document.getElementById('cache').innerHTML = is_cached(background_image);   
     glass.style.backgroundImage = "url('" + background_image + "')"; 
     glass.style.backgroundRepeat = "no-repeat";
     glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";

@@ -92,7 +92,8 @@ def start(request):
     else:
         form = BlankForm(initial={'device': ''})
     context= {
-        'form': form
+        'form': form,
+        'background' : fly.image.url,
     }
     return render(request, 'spot/start.html', context)
 
