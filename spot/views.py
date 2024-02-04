@@ -3,6 +3,7 @@ from utils.util_song import get_album_color
 from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from party.forms import BlankForm
+from spot.forms import FlyForm
 #from cairosvg import svg2png
 from PIL import Image
 from datetime import date, datetime
@@ -104,25 +105,37 @@ def studio(request):
     artist_name = "Tom Petty and the Heartbreakers"
     album_name = "Tom Petty and the Heartbreakers Greatest Hits"
     album_link = "/"
-    try:
-        Fly.objects.all().delete()
-        fly = Fly.objects.get(date=date.today())
-    except Exception as e:
-        fly = Fly(
-            image_url = artwork,
-            date=date.today()
-        )
-        file_name, x_mult, y_mult  = set_up(artwork, x_coord, y_coord)
-        fly.image = file_name
-        fly.color = get_album_color(artwork)
-        fly.x_mult = x_mult
-        fly.y_mult = y_mult
-        fly.album_name = album_name
-        fly.artist_name = artist_name
-        fly.album_url = album_link
-        fly.save()
+
+    if request.method == 'POST':
+        form = FlyForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(
+                reverse('studio', kwargs={})
+            )
+    else:
+        form = FlyForm(initial={})
+
+
+
+    # try:
+    #     Fly.objects.all().delete()
+    #     fly = Fly.objects.get(date=date.today())
+    # except Exception as e:
+    #     fly = Fly(
+    #         image_url = artwork,
+    #         date=date.today()
+    #     )
+    #     file_name, x_mult, y_mult  = set_up(artwork, x_coord, y_coord)
+    #     fly.image = file_name
+    #     fly.color = get_album_color(artwork)
+    #     fly.x_mult = x_mult
+    #     fly.y_mult = y_mult
+    #     fly.album_name = album_name
+    #     fly.artist_name = artist_name
+    #     fly.album_url = album_link
+    #     fly.save()
     context= {
-        "fly":fly.id    
+        "form":form    
     }
     return render(request, 'spot/studio.html', context)
 

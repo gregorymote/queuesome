@@ -10,5 +10,10 @@
 {% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
 
 {% block page_content %}
-<h1>{{fly}}</h1>
+<div class="container form-width">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</div>
+
 {% endblock %}
