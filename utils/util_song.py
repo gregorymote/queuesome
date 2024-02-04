@@ -61,7 +61,9 @@ def get_album_color(image_url):
                 shutil.copyfileobj(response.raw, out_file)
             image = Image.open(img_id)
             numpydata = asarray(image)
+            print(img_id)
             if exists(img_id):
+                print("removing")
                 remove(img_id)
             try:
                 SBC = SpotifyBackgroundColor(img=numpydata)
@@ -74,6 +76,7 @@ def get_album_color(image_url):
             return color
         except Exception as e:
             print(QDEBUG,e)
-        finally:
+        finally:            
             if exists(img_id):
+                print("removing image ID")
                 remove(img_id)               
