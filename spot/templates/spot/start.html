@@ -9,7 +9,6 @@
 		var button = document.getElementById('button');
 		var carousel = document.getElementById('swipe');
 		initSwipeButton(button, carousel);
-
         const color = randomColor();
         document.getElementById('square').style.backgroundColor = color;
         document.getElementById('fly_icon').style.color = color;
@@ -18,6 +17,7 @@
         document.getElementById('square_2').style.backgroundColor = color;
         document.getElementById('circle_2').style.backgroundColor = invert;
         document.getElementById('fly_icon_2').style.color = color;
+        is_cached('{{background}}');
 	});
 
     function randomColor(){
@@ -82,7 +82,12 @@
 		}
 		return valid;
 	}
+    function is_cached(src) {
+        var image = new Image();
+        image.src = src;
 
+        return image.complete;
+    }
 </script>
 
 <style>
