@@ -10,6 +10,8 @@ from .models import Fly, User, Play
 import requests
 import shutil
 import json
+from os import remove
+from os.path import exists
 
 
 def index(request):
@@ -27,12 +29,10 @@ def index(request):
             reverse('start')
         )  
     play = Play.objects.filter(fly=fly, user=user).first()
-    #play.delete()
     if play is None:
         return HttpResponseRedirect(
             reverse('start')
         )
-    print('start:',play.start_time ,'finish:',play.finish_time, 'time', play.time)  
     win = play.finish_time is not None
     started = play.start_time is not None
     context = {
@@ -163,7 +163,7 @@ def get_path(request):
     if play:
         if not play.pathm:
             play.pathm = []
-        pathm = play.pathm
+        
         play.finish_time = request.GET.get('finish', None)
         play.x_mult = request.GET.get('x', None)
         play.y_mult = request.GET.get('y', None)
@@ -171,8 +171,9 @@ def get_path(request):
         play = Play.objects.filter(user=user.id, fly=fly.id).first()
         time = str(datetime.combine(date.today(), play.finish_time) - datetime.combine(date.today(), play.start_time))
         play.time = time
+        play.pathm.append([play.x_mult, play.y_mult])
         play.save()
-        print(time)
+        pathm = play.pathm
     data = {
         'pathm': pathm,
         'time': time
@@ -209,12 +210,12 @@ def set_up(image_url, x_coord, y_coord):
     if image_url and len(image_url.split('image/')) > 1:
         art_id = image_url.split('image/')[1]
     response = requests.get(image_url, stream=True)
-    img_id = 'artwork/img-'+ art_id+ '-' +'.png' 
+    img_id = 'artwork/img-'+ art_id +'.png' 
     with open(img_id, 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
     
     # Opening the primary image (used in background) 
-    img1 = Image.open('artwork/img-'+ art_id+ '-' +'.png' )
+    img1 = Image.open('artwork/img-'+ art_id +'.png' )
         
     # Opening the secondary image (overlay image) 
     img2 = Image.open('static/images/fly.png') 
@@ -227,7 +228,10 @@ def set_up(image_url, x_coord, y_coord):
     # Displaying the image 
     file_name = 'images/fly-img-' + art_id +'.png'
     img1.save('media/' + file_name)
+
     x_mult = x_coord / img1.width
     y_mult = y_coord / img1.height
     
+    if exists(img_id):
+        remove(img_id)
     return file_name, x_mult, y_mult

@@ -23,7 +23,7 @@
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
         
-        magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, {{play_x_mult}}, {{play_y_mult}}, 'rgb({{color}})');
+        magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, {{play_x_mult}}, {{play_y_mult}}, 'rgb({{color}})', '{{time}}');
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
             let input = copyText.querySelector("input.text");
@@ -38,7 +38,7 @@
     });
 
     function sendData() {
-		if (!inactivity) {
+		if (!inactivity && pathm.length > 0) {
 			$.ajax({
 				url: '/spot/update_play',
 				data: {
@@ -54,6 +54,9 @@
 				}
 			});
 		}
+        else if(!inactivity){
+            setTimeout(sendData, 1000);
+        }
 	}
     function sendTime() {
         if(!started){
@@ -150,7 +153,6 @@
     <div>
         <div id = "glass_place"></div>
     </div>
-    <p>Play:{{play}} | User:{{user}}</p>
 </div>
 
 
@@ -166,7 +168,7 @@
                 <span class="txt">:</span> 
                 <span class="digit" id="sec"> 
                     00</span> 
-                <span class="txt">:</span> 
+                <span class="txt">.</span> 
                 <span class="digit" id="count"> 
                     00</span> 
 			</div>

@@ -1,4 +1,4 @@
-function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, play_y_mult, color) {
+function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, play_y_mult, color, time) {
     var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place;
     var proportion = .4;
     img = document.getElementById(imgID);
@@ -28,38 +28,27 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     play_y = Math.ceil(play_y_mult * img.width);
     rad = (img.width * proportion) / (zoom * 2.5);
     glass.style.backgroundPosition = "-" + ((play_x * zoom) - w + bw) + "px -" + ((play_y * zoom) - h + bw) + "px";
-    
-    let hour = 0; 
-    let minute = 0; 
-    let second = 0; 
-    let count = 0;
-    let hrString = '0' + hour; 
-    let minString = '0' + minute; 
-    let secString = '0' + second; 
-    let countString = '0' + count;
-
+    forceRedraw(glass);
     if(!win){
       pathm = [];
-      d = new Date();
       if(start == 'None'){
-        console.log("Not Start");
+        d = new Date();
         start = d.toISOString().slice(11,23);
       }
-      else{
-        var d_start = new Date(start);
-        var d_now = new Date();
-        var diff = d_now - d_start; 
-        //var now = diff.toISOString().slice(11,23);
-        console.log(d_now + ' ' + d_start);
-      }
-      stopWatch();
+      var d_start = new Date();
+      d_start.setUTCHours(start.slice(0,2));
+      d_start.setUTCMinutes(start.slice(3,5));
+      d_start.setUTCSeconds(start.slice(6,8));
+      d_start.setUTCMilliseconds(start.slice(9,11));
+      var d_now = new Date();
+      var diff = msToTime(d_now - d_start); 
+      stopWatch(diff);
       img.addEventListener("mousemove", moveMagnifier);
       img.addEventListener("touchmove", moveMagnifier);
     }
     else{
-      setTime(time);
-      setWatch(hrString,minString,secString,countString);
-      setFly();
+      setWatch(time);
+      setFly(time);
       displayPath(pathm);
     }
 
@@ -78,9 +67,9 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
         win = true;
         getPath(x, y, finish, function(saved_path, time){
           displayPath(saved_path);
-          setTime(time);
+          setWatch(time);
+          setFly(time);
         });
-        setFly();
         $('#resultModal').modal('show');
         img.removeEventListener("touchmove", moveMagnifier);
         img.removeEventListener("mousemove", moveMagnifier);
@@ -102,53 +91,75 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
     }
 
-    function setFly(){
+    function setFly(time_str){
       var fly = document.getElementById("fly_icon");
       fly.style.color = '#1ed760';
-      document.getElementById("copy-input").value = "🔎 🪰" + minString +':'+secString +':'+ countString;
+      document.getElementById("copy-input").value = "🔎 🪰" + time_str.slice(3,5) +':'+ time_str.slice(6,8) +'.'+ time_str.slice(9,11);
       fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
     }
 
-    function setTime(time){
-      //console.log(time)
-      min = parseInt(time.slice(3,5));
-      second = parseInt(time.slice(6,8));
-      count = parseInt(time.slice(9,11));
-      count++;
-      if (count == 100) { 
-        second++; 
-        count = 0; 
+    function setTime(time_str){
+      var time = getTimeProps(time_str);
+      time[3]++;
+      if (time[3] == 100) { 
+        time[2]++; 
+        time[3] = 0; 
       } 
-      if (second == 60) { 
-          minute++; 
-          second = 0; 
+      if (time[2] == 60) { 
+          time[1]++; 
+          time[2] = 0; 
       } 
-      if (minute == 60) { 
-          hour++; 
-          minute = 0; 
-          second = 0; 
-      } 
-      hrString = hour; 
-      minString = minute; 
-      secString = second; 
-      countString = count; 
-      if (hour < 10) { 
+      if (time[1] == 60) { 
+          time[0]++; 
+          time[1] = 0; 
+          time[2] = 0; 
+      }
+      var hrString = time[0]; 
+      var minString = time[1]; 
+      var secString = time[2]; 
+      var countString = time[3]; 
+      if (time[0] < 10) { 
           hrString = "0" + hrString; 
       } 
-      if (minute < 10) { 
+      if (time[1] < 10) { 
           minString = "0" + minString; 
       } 
-      if (second < 10) { 
+      if (time[2] < 10) { 
           secString = "0" + secString; 
       } 
-      if (count < 10) { 
+      if (time[3] < 10) { 
           countString = "0" + countString; 
       }
-      
+      return hrString + ':' + minString + ':' + secString + '.' + countString;
+    }
+    
+    function msToTime(duration) {
+      var milliseconds = Math.floor((duration % 1000) / 100),
+        seconds = Math.floor((duration / 1000) % 60),
+        minutes = Math.floor((duration / (1000 * 60)) % 60),
+        hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+    
+      hours = (hours < 10) ? "0" + hours : hours;
+      minutes = (minutes < 10) ? "0" + minutes : minutes;
+      seconds = (seconds < 10) ? "0" + seconds : seconds;
+    
+      return hours + ":" + minutes + ":" + seconds + "." + milliseconds + '0';
+    }
+
+    function getTimeProps(time){
+      var t_hr, t_min, t_sec, t_ms;
+      t_hr = parseInt(time.slice(0,2));
+      t_min = parseInt(time.slice(3,5));
+      t_sec = parseInt(time.slice(6,8));
+      t_ms = parseInt(time.slice(9,11));
+
+      return [t_hr, t_min, t_sec, t_ms];
     }
 
     function storeCoordinate(xVal, yVal, array) {
+      if(xVal && yVal){
         array.push([xVal,yVal]);
+      }
     }
   
     function getCursorPos(e) {
@@ -169,18 +180,18 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
         return Math.sqrt(Math.pow((point1[0] - point2[0]), 2) + Math.pow((point1[1] - point2[1]), 2));
     }
 
-    function stopWatch() { 
+    function stopWatch(time) { 
         if (!win) {
-            setTime(hrString+':'+minString+':'+secString+':'+countString);
-            setWatch(hrString,minString,secString,countString);
-            setTimeout(stopWatch, 10); 
+            time = setTime(time);
+            setWatch(time);
+            setTimeout(stopWatch, 10, time); 
         }
     }
-    function setWatch(hrString,minString,secString,countString){
-      document.getElementById('hr').innerHTML = hrString; 
-      document.getElementById('min').innerHTML = minString; 
-      document.getElementById('sec').innerHTML = secString; 
-      document.getElementById('count').innerHTML = countString; 
+    function setWatch(time_str){
+      document.getElementById('hr').innerHTML = time_str.slice(0,2); 
+      document.getElementById('min').innerHTML = time_str.slice(3,5);
+      document.getElementById('sec').innerHTML = time_str.slice(6,8); 
+      document.getElementById('count').innerHTML = time_str.slice(9,11);
     }
 
     function displayPath(coords){
@@ -207,7 +218,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     }
 
     async function getPath(x, y, finish, callback) { 
-      console.log("Finish: " + finish);
+      //console.log("Finish: " + finish);
       $.ajax({
           url: '/spot/get_path',
           data: {
