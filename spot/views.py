@@ -100,41 +100,34 @@ def start(request):
 
 
 def studio(request):
-    artwork = 'https://i.scdn.co/image/ab67616d0000b2730c3a1b46b6b846dfdfbc6a7d'
-    x_coord = 210
-    y_coord = 350
-    artist_name = "Tom Petty and the Heartbreakers"
-    album_name = "Tom Petty and the Heartbreakers Greatest Hits"
-    album_link = "/"
-
     if request.method == 'POST':
+        Fly.objects.all().delete()
         form = FlyForm(request.POST)
         if form.is_valid():
+            artwork = form.cleaned_data['image_url']
+            x_coord = int(form.cleaned_data['x_coord'])
+            y_coord = int(form.cleaned_data['y_coord'])
+            
+            fly = Fly(
+                image_url = artwork,
+                date=form.cleaned_data['date']
+            )
+            file_name, x_mult, y_mult  = set_up(artwork, x_coord, y_coord)
+            fly.image = file_name
+            fly.color = get_album_color(artwork)
+            fly.x_mult = x_mult
+            fly.y_mult = y_mult
+            fly.album_name = form.cleaned_data['album_name']
+            fly.artist_name = form.cleaned_data['artist_name']
+            fly.album_url = form.cleaned_data['album_url']
+            fly.save()
+            print("fly Saved")
+            print(fly.id)
             return HttpResponseRedirect(
                 reverse('studio', kwargs={})
             )
     else:
-        form = FlyForm(initial={})
-
-
-
-    # try:
-    #     Fly.objects.all().delete()
-    #     fly = Fly.objects.get(date=date.today())
-    # except Exception as e:
-    #     fly = Fly(
-    #         image_url = artwork,
-    #         date=date.today()
-    #     )
-    #     file_name, x_mult, y_mult  = set_up(artwork, x_coord, y_coord)
-    #     fly.image = file_name
-    #     fly.color = get_album_color(artwork)
-    #     fly.x_mult = x_mult
-    #     fly.y_mult = y_mult
-    #     fly.album_name = album_name
-    #     fly.artist_name = artist_name
-    #     fly.album_url = album_link
-    #     fly.save()
+        form = FlyForm(initial={'date': date.today()})
     context= {
         "form":form    
     }
