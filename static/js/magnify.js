@@ -14,6 +14,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     glass.style.margin = 'auto';
 
     /* Set background properties for the magnifier glass: */
+    document.getElementById('cache').innerHTML = is_cached(background_image);
     glass.style.backgroundImage = "url('" + background_image + "')"; 
     glass.style.backgroundRepeat = "no-repeat";
     glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
@@ -28,7 +29,6 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     play_y = Math.ceil(play_y_mult * img.width);
     rad = (img.width * proportion) / (zoom * 2.5);
     glass.style.backgroundPosition = "-" + ((play_x * zoom) - w + bw) + "px -" + ((play_y * zoom) - h + bw) + "px";
-    forceRedraw(glass);
     if(!win){
       pathm = [];
       if(start == 'None'){
@@ -236,4 +236,11 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
           }
       }).done(function(){callback(saved_path, time)});
     }
+}
+
+function is_cached(src) {
+  var image = new Image();
+  image.src = src;
+
+  return image.complete;
 }
