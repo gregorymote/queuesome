@@ -2,17 +2,48 @@ from django.shortcuts import render
 from utils.util_song import get_album_color
 from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
+from django.contrib.auth.models import User as Admin
+from django.contrib.auth.decorators import user_passes_test
 from party.forms import BlankForm
 from spot.forms import FlyForm
 #from cairosvg import svg2png
 from PIL import Image
 from datetime import date, datetime
-from .models import Fly, User, Play
+from .models import Fly, User, Play, Studio
 import requests
 import shutil
 import json
 from os import remove
 from os.path import exists
+from utils.util_auth import create_token, check_token, get_url, generate_url
+from queue_it_up.settings import IP, PORT, HEROKU, QDEBUG, CLIENT_ID, CLIENT_SECRET, SCOPE, SPOT_URI
+
+@user_passes_test(lambda u: u.is_superuser)
+def auth(request):
+    url = get_url(str(request.get_full_path), HEROKU, IP, PORT)
+    token_info = json.dumps(create_token(url=url, redirect_uri=SPOT_URI, scope=''))
+    try:
+        studio = Studio.objects.get(admin=request.user)
+        studio.token_info = token_info
+    except Exception as e:
+        studio = Studio(
+            admin=request.user,
+            token_info = token_info
+        )
+    studio.save()
+    return HttpResponseRedirect(
+            reverse('studio', kwargs={'pid': 0})
+    )  
+
+@user_passes_test(lambda u: u.is_superuser)
+def login(request):
+    url = generate_url(
+        scope='',
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=SPOT_URI
+    )
+    return HttpResponseRedirect(url)
 
 
 def index(request):
@@ -99,7 +130,21 @@ def start(request):
     return render(request, 'spot/start.html', context)
 
 
-def studio(request):
+@user_passes_test(lambda u: u.is_superuser)
+def studio(request, pid):
+    studio = Studio.objects.get(admin=request.user)
+    print(json.loads(studio.token_info))
+
+    try:
+        fly = Fly.objects.get(id=pid)
+    except Exception as e:
+        if pid != 0:
+            return HttpResponseRedirect(
+                    reverse('studio', kwargs={'pid': 0})
+            )
+        else:
+            fly = Fly()
+
     if request.method == 'POST':
         Fly.objects.all().delete()
         form = FlyForm(request.POST)
@@ -107,11 +152,8 @@ def studio(request):
             artwork = form.cleaned_data['image_url']
             x_coord = int(form.cleaned_data['x_coord'])
             y_coord = int(form.cleaned_data['y_coord'])
-            
-            fly = Fly(
-                image_url = artwork,
-                date=form.cleaned_data['date']
-            )
+            fly.image_url = artwork,
+            fly.date=form.cleaned_data['date']
             file_name, x_mult, y_mult  = set_up(artwork, x_coord, y_coord)
             fly.image = file_name
             fly.color = get_album_color(artwork)
@@ -121,10 +163,8 @@ def studio(request):
             fly.artist_name = form.cleaned_data['artist_name']
             fly.album_url = form.cleaned_data['album_url']
             fly.save()
-            print("fly Saved")
-            print(fly.id)
             return HttpResponseRedirect(
-                reverse('studio', kwargs={})
+                reverse('studio', kwargs={'pid': fly.id})
             )
     else:
         form = FlyForm(initial={'date': date.today()})

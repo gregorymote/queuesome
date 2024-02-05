@@ -197,6 +197,7 @@ if HEROKU:
 else:
     URL=proto + IP + ':' + PORT
     URI = URL + '/party/auth/'
+SPOT_URI = URL + '/spot/auth/'
 
 CLIENT_SECRET=os.environ.get("SPOTIFY_CLIENT_SECRET")
 SCOPE = 'user-read-playback-state user-modify-playback-state'

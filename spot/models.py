@@ -35,3 +35,10 @@ class Play(models.Model):
     pathm = ArrayField(ArrayField(models.FloatField()), null=True)
     fly = models.ForeignKey('Fly', on_delete=models.CASCADE,)
     user = models.ForeignKey('User', on_delete=models.CASCADE,)
+
+
+from django.contrib.auth.models import User
+
+class Studio(models.Model):
+    token_info = models.CharField(max_length=1000, null = True)
+    admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
