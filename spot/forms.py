@@ -4,7 +4,7 @@ from spot.models import Fly
 
 class FlyForm(forms.Form):
 
-    image_url = forms.CharField(
+    artwork_url = forms.CharField(
         label = 'Album Image URL',
         widget=forms.TextInput(
             attrs={
@@ -58,4 +58,12 @@ class FlyForm(forms.Form):
     date = forms.DateField(
         label = 'Date'
     )
-
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Search Albums',
+            }))
+    result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
+    color = forms.CharField(label = 'Color', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
