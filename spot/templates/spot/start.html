@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 
 {% extends "base.html" %}
+
+{% block local_js %}
+{% load static %}
+<script src="{% static 'js/color.js' %}"></script>
+{% endblock %}
+
 {% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
 {% block page_content %}
 
@@ -20,51 +26,7 @@
         is_cached('{{background}}');
 	});
 
-    function randomColor(){
-        var valid = false;
-        while(!valid){
-            var hex = "#" + Math.floor(Math.random()*16777215).toString(16);
-            if (hex.indexOf('#') === 0) {
-                hex = hex.slice(1);
-            }
-            // convert 3-digit hex to 6-digits.
-            if (hex.length === 3) {
-                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-            }
-            if (hex.length !== 6) {
-                valid = false;
-            }
-            else{
-                valid = true;
-            }
-        }
-        return "#" + hex;
-    }
-	
-    function invertColor(hex) {
-        if (hex.indexOf('#') === 0) {
-            hex = hex.slice(1);
-        }
-        // convert 3-digit hex to 6-digits.
-        if (hex.length === 3) {
-            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-        }
-        if (hex.length !== 6) {
-            throw new Error('Invalid HEX color.');
-        }
-        // invert color components
-        var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
-            g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
-            b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
-        // pad each with zeros and return
-        return '#' + padZero(r) + padZero(g) + padZero(b);
-    }
 
-    function padZero(str, len) {
-        len = len || 2;
-        var zeros = new Array(len).join('0');
-        return (zeros + str).slice(-len);
-    }
     
     
     function swipeSubmit(){

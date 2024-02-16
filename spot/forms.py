@@ -55,6 +55,10 @@ class FlyForm(forms.Form):
         label = 'Y Coord'
     )
 
+    width = forms.FloatField(
+        label = 'width'
+    )
+
     date = forms.DateField(
         label = 'Date'
     )
@@ -67,3 +71,14 @@ class FlyForm(forms.Form):
             }))
     result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
     color = forms.CharField(label = 'Color', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
+
+
+class DayForm(forms.Form):
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Search Flys',
+    }))
+    result = forms.CharField(label = 'result pk', initial='-1', required = False,widget=forms.TextInput(attrs={'class':'form-control',}))
