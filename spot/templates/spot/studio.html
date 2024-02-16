@@ -26,10 +26,13 @@
         document.getElementById("id_x_coord").classList.add('form-control');
         document.getElementById("id_y_coord").addEventListener("input", setY);
         document.getElementById("id_y_coord").classList.add('form-control');
+        document.getElementById("id_width").classList.add('form-control');
         document.getElementById("id_date").classList.add('form-control');
         var color = document.getElementById("favcolor");
         color.value = '{{form.color.value}}';
         color.addEventListener("input", setColor);
+        //Align the fly icon on top of the design artwork
+        new ResizeObserver(findOffset).observe(document.getElementById("design_container"));
     });
     var albums;
     function update_search(e){
@@ -45,7 +48,6 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        console.log(data.status);
                         if(data.status == 'expired'){
                             window.location.replace("/spot/login");
                         }
@@ -109,7 +111,6 @@
 			return;
 		}
         var album = getAlbum(parent.id);
-        console.log(album);
         document.getElementById("id_artwork_url").value = album.image;
         document.getElementById("id_album_name").value = album.name;
         document.getElementById("id_artist_name").value = album.artist;
@@ -123,7 +124,6 @@
     }
 
     function getAlbum(album_id){
-        //console.log(albums);
         var x;
         albums.forEach(element => {
             if(element.id == album_id){
@@ -149,9 +149,31 @@
            
     }
 
-    function setX(e){
+    function findOffset(e){
+        var x = parseFloat(document.getElementById("id_x_coord").value);
+        var width = e[0].target.offsetWidth;
+        var artwork = width * .80;
+        if(artwork > 300){
+            artwork = 300;
+        }
+        var offset = ((width - artwork) / 2) + x;
         var fly = document.getElementById("fly");
-        fly.style.left = e.target.value + 'px';
+        fly.style.left = offset + 'px';
+        if(width != 0){
+            document.getElementById("id_width").value = artwork;
+        }
+    }
+
+    function setX(e){
+        var width =  document.getElementById("design_container").offsetWidth;
+        var offset = width * .80;
+        if(offset > 300){
+            offset = 300;
+        }
+        offset = (width - offset) / 2;
+        var x = offset + parseInt(e.target.value);
+        var fly = document.getElementById("fly");
+        fly.style.left = x + 'px';
     }
 
     function setY(e){
@@ -163,6 +185,8 @@
         fly.style.color = e.target.value;
         document.getElementById("id_color").value = e.target.value;
     }
+
+
 </script>
 <style>
 	p {
@@ -204,13 +228,11 @@
             {{ form.artist_name }}
             {{ form.album_url }}
             {{ form.result }}  
-            {{ form.color }}  
-            <div class="pt-2">
-                <input class="btn btn-lg button-black" type="submit" value="Submit">
-            </div>
+            {{ form.color }}
+            {{ form.width }}
         </div>
-        <div id ="design" class="tabs text-center" style="display: none;">
-            <div style="position:relative">
+        <div id ="design" class="tabs text-center" style="display:none;">
+            <div id="design_container" style="position:relative">
                 <img id = "blur" class=" blurry artwork-square" src="{{artwork_url}}" alt=""/>
                 <em id ="fly" class="fly fa-solid fa-mosquito" style="position:absolute; z-index:1000;"></em>
                 <img id = "artwork" class="clear artwork-square"  src="{{artwork_url}}" alt=""/>
@@ -222,7 +244,6 @@
                     {{ form.y_coord }}
                 </div>
                 <div class="pt-2" style="display: inline-flex;">
-                    {{ form.date }}
                     <input type="color" class='form-control' id="favcolor" name="favcolor" value="#ff0000">
                 </div>
             </div>
@@ -230,6 +251,9 @@
         <div id ="preview" class="tabs text-center" style="display: none;">
             <img id = "artwork" class=" blurry artwork-square" src="{{artwork_url}}" alt=""/>
             <img id = "preview" class="clear artwork-square" src="{{image}}" alt=""/>
+        </div>
+        <div class="pt-2">
+            <input class="btn btn-lg button-black" type="submit" value="Submit">
         </div>
     </form>
 </div>

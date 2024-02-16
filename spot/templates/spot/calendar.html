@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+{% block page_content %}
+
+<script>
+    const date = '{{date}}';
+	$(document).ready(function () {
+        document.getElementById('next').addEventListener("click", nextDate);
+        document.getElementById('prev').addEventListener("click", prevDate);
+        getDates(date);
+	});
+    
+    function getDates(start) { 
+        $.ajax({
+            url: '/spot/get_dates',
+            data: {
+                'start': start
+            },
+            dataType: 'json',
+            success: function (data) {
+                populateDates(data.days);
+            },
+        });
+	}
+
+    function populateDates(days){
+		var dates = document.getElementById("dates");
+		dates.innerHTML = "";
+		for(let day of days){
+			var option = document.createElement('div');
+			option.classList.add('row','option-padding', 'date-item');
+			option.id = day.date;
+			var wrapper = document.createElement('div');
+			option.appendChild(wrapper);
+			
+			var art = document.createElement('img');
+			art.src = day.image;
+			art.alt = day.name + ', ' + day.artist;
+			art.classList.add('artwork');
+						
+			var text = document.createElement('div');
+			text.classList.add('col','info');
+			text.id = "text_parent";
+			
+			var title = document.createElement('p');
+			title.innerHTML = day.date;
+			
+			text.appendChild(title);
+			
+			var artist = document.createElement('small');
+			artist.innerHTML = day.name;
+			artist.classList.add('text-muted');
+			
+			text.appendChild(artist);
+			wrapper.appendChild(text);
+            wrapper.appendChild(art);
+			dates.appendChild(option);
+			option.addEventListener("click", editDay);
+		}
+    }
+
+    Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+
+    function nextDate(e){
+        var next = new Date(date).addDays(7).toISOString().slice(0,10);
+        redirect(next);
+    }
+
+    function prevDate(e){
+        var prev = new Date(date).addDays(-7).toISOString().slice(0,10);
+        redirect(prev)
+    }
+
+    function redirect(date){
+        window.location.replace('/spot/calendar/' + date);
+    }
+
+    function editDay(e){
+        var parent;
+		if(e.target.parentElement.id == "text_parent"){
+			parent=e.target.parentElement.parentElement.parentElement;
+		}
+		else if (e.target.parentElement.id != ""){
+			parent=e.target.parentElement;
+		}
+		else{
+			parent=e.target.parentElement.parentElement;
+		}
+		if (parent.id == 'results' || parent.id == ""){
+			return;
+		}
+        var dayId = parent.id;
+        window.location.replace('/spot/day/' + dayId);
+    }
+</script>
+
+<style>
+    .header{
+        display:inline-block;
+    }
+    .info{
+        text-align:left;
+        margin-right:25%;
+    }
+    .option-padding{
+        padding-bottom:5px;
+    }
+    .date-item{
+        border:solid 1px lightgray;
+        border-radius:8px;
+        width:70%;
+        margin: 1% auto;
+    }
+	p {
+		text-overflow: ellipsis;
+		max-width: 220px;
+		white-space: nowrap;
+		overflow: hidden;
+		margin-bottom: -.4em !important;
+	}
+</style>
+
+<div class="container form-width">
+    <div id="card" class="pt-2 card">
+        <div class="pb-3 pt-2 text-center">
+            <div id="header">
+                <i id="prev" class="fa-solid fa-circle-chevron-left header"></i>
+                <h5 class="header" style="margin-left: 20%; margin-right: 20%;">Calendar</h5>
+                <i id="next" class="fa-solid fa-circle-chevron-right header"></i>
+            </div>
+            <hr>
+            <div id="dates">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
