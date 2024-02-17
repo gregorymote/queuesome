@@ -33,6 +33,8 @@ def index(request):
         user = Users.objects.get(sessionID=session_key)
         day = Day.objects.get(date=date.today())
         fly = Fly.objects.get(id=day.fly.id)
+        if not exists(fly.image.url[1:]):
+            raise Exception()
     except Exception as e:
         print("Could not locate User, Day, or Fly: " , e)
         return HttpResponseRedirect(
@@ -82,6 +84,8 @@ def start(request):
     try:
         day = Day.objects.get(date=date.today())
         fly = Fly.objects.get(id=day.fly.id)
+        if not exists(fly.image.url[1:]):
+            raise Exception()
     except Exception as e:
         return HttpResponseRedirect(
             reverse('sorry')
@@ -115,7 +119,10 @@ def start(request):
 
 def sorry(request):
     try:
-        Day.objects.get(date=date.today())
+        day = Day.objects.get(date=date.today())
+        fly = Fly.objects.get(id=day.fly.id)
+        if not exists(fly.image.url[1:]):
+            raise Exception()
         return HttpResponseRedirect(
             reverse('start')
         ) 
@@ -126,6 +133,13 @@ def sorry(request):
     }
     return render(request, 'spot/sorry.html', context)
 
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin(request):
+    context = {
+    }
+    return render(request, 'spot/admin.html', context)
 
 @user_passes_test(lambda u: u.is_superuser)
 def auth(request):
@@ -166,9 +180,7 @@ def studio(request, pid):
                     reverse('studio', kwargs={'pid': 0})
             )
         else:
-            fly = Fly(
-                date = date.today()
-            )
+            fly = Fly()
     if request.method == 'POST':
         form = FlyForm(request.POST)
         if form.is_valid():
@@ -209,12 +221,14 @@ def studio(request, pid):
         image = fly.image.url
     except Exception as e:
         image = ''
-
+    preview = exists(image[1:])
     context= {
+        "fly":fly,
         "form":form,
         "image":image,
         "artwork_url": fly.artwork_url,
-        "fly_size": fly_size
+        "fly_size": fly_size,
+        "preview" : preview
     }
     return render(request, 'spot/studio.html', context)
 
@@ -228,18 +242,12 @@ def calendar(request, date=str(date.today())):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def day(request, date):
-    ds = Day.objects.all()
-    print(len(ds))
-    for d in ds:
-        print(d.date)
+def day(request, date_param):
+    day_date = datetime.strptime(date_param, "%Y-%m-%d").date()
     try:
-        day = Day.objects.get(date=date)
-        
+        day = Day.objects.get(date=day_date)
     except Exception as e:
-        day = Day(
-                date = date
-        )
+        day = Day(date=day_date)
 
     if request.method == 'POST':
         form = DayForm(request.POST)
@@ -247,16 +255,19 @@ def day(request, date):
             fly_id = form.cleaned_data['result']
             fly = Fly.objects.get(id=fly_id)
             day.fly = fly         
-            day.date = date
+            day.date = day_date
             day.save()
             return HttpResponseRedirect(
-                reverse('calendar', kwargs={'date': date})
+                reverse('calendar', kwargs={'date': day_date})
         )
     else:
         form = DayForm(initial={
             'result': day.fly,     
         })
-        fly = Fly.objects.filter(id=day.id).first()
+        if day.fly:
+            fly = Fly.objects.filter(id=day.fly.id).first()
+        else:
+            fly = None
         if fly:
             artwork_url = fly.artwork_url
         else:
@@ -275,7 +286,6 @@ def get_dates(request):
     start = request.GET.get('start', None)
     find_date = datetime.strptime(start, "%Y-%m-%d").date()
     for i in range(1,8):
-        print(str(find_date))
         obj = {
            'date': str(find_date),
            'image': 'https://www.svgrepo.com/show/508699/landscape-placeholder.svg',

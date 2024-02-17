@@ -9,6 +9,7 @@
         var result = document.getElementById("id_result");
         if(result.value == ''){
             document.getElementById("submit").style.display = 'none';
+            document.getElementById("edit_link").style.display = 'none';
         }
         result.style.display = 'none';
         search.autocomplete="off";
@@ -86,6 +87,9 @@
 			return;
 		}
         document.getElementById("id_result").value = parent.id;
+        var edit_link = document.getElementById("edit_link");
+        edit_link.style.display = 'block';
+        edit_link.href = '/spot/studio/' + parent.id;
 		var results = document.getElementById("results");
 		results.innerHTML = "";
         var fly = document.getElementById("fly");
@@ -104,14 +108,22 @@
 		overflow: hidden;
 		margin-bottom: -.4em !important;
 	}
-
+    a{
+        text-decoration: none;
+        color:black;
+        margin-left: .5em;
+    }
     .fly {
-        width: 90%;
+        width: 75%;
         margin: 10px auto;
     }
 </style>
 
 <div class="container form-width">
+    <div class="pb-2" style="justify-content: flex-end; display:flex;">
+        <a href="/spot/studio/0"><i class="fa-solid fa-plus"></i></a>
+        <a href="/spot/admin"><i class="fa-solid fa-gear"></i></a>
+    </div>
     <form method="post">
         {% csrf_token %}
         <div id="card" class="pt-2 card">
@@ -119,14 +131,17 @@
                 <h2>{{day.date}}</h2>
                 <hr>
             </div>
-            <div id="fly" class="fly">
-                <div class="row option-padding" id="{{fly.id}}">
-                    <div><img id="artwork_url" src="{{artwork_url}}" class="artwork">
-                        <div class="col info" id="text_parent">
-                            <p>{{fly.album_name}}</p><small class="text-muted">{{fly.artist_name}}</small>
+            <div style= "display:inline-flex">
+                <div id="fly" class="fly">
+                    <div class="row option-padding" id="{{fly.id}}">
+                        <div><img id="artwork_url" src="{{artwork_url}}" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>{{fly.album_name}}</p><small class="text-muted">{{fly.artist_name}}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div id = edit class="row option-padding" style="margin: 10px auto;"><a id="edit_link" href="/spot/studio/{{fly.id}}">Edit</a></div>
             </div>
             <div id="search" class="tabs">
                 {{ form.result }}

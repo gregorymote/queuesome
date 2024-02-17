@@ -27,12 +27,21 @@
         document.getElementById("id_y_coord").addEventListener("input", setY);
         document.getElementById("id_y_coord").classList.add('form-control');
         document.getElementById("id_width").classList.add('form-control');
-        document.getElementById("id_date").classList.add('form-control');
         var color = document.getElementById("favcolor");
         color.value = '{{form.color.value}}';
         color.addEventListener("input", setColor);
         //Align the fly icon on top of the design artwork
         new ResizeObserver(findOffset).observe(document.getElementById("design_container"));
+
+        if('{{preview}}' == 'True'){
+            tabSection({'target':document.getElementById('previewTab')}, 'preview');
+        }
+        else if('{{ form.artwork_url.value }}' != 'None'){
+            tabSection({'target':document.getElementById('designTab')}, 'design');
+        }
+        if('{{fly.id}}' == 'None'){
+            document.getElementById("new").style.display="none";
+        }
     });
     var albums;
     function update_search(e){
@@ -134,7 +143,7 @@
     }
 
     function tabSection(e, tabName) {
-        var i, x, tablinks;       
+        var i, x;       
         x = document.getElementsByClassName("tabs");
         for (i = 0; i < x.length; i++) {
             x[i].style.display = "none";
@@ -196,6 +205,11 @@
 		overflow: hidden;
 		margin-bottom: -.4em !important;
 	}
+    a{
+        text-decoration: none;
+        color:black;
+        margin-left: .5em;
+    }
     i + i {
     margin-left: 2em;
     }
@@ -209,6 +223,10 @@
 </style>
 
 <div class="container form-width">
+    <div class="pb-2" style="justify-content: flex-end; display:flex;">
+        <a id="new" href="/spot/studio/0"><i class="fa-solid fa-plus"></i></a>
+        <a href="/spot/admin"><i class="fa-solid fa-gear"></i></a>
+    </div>
     <div id="icons" class="text-center pb-4">
         <i id="searchTab" class="tablink activeTab fa-solid fa-magnifying-glass" onClick= "tabSection(event, 'search')"></i>
         <i id="dataTab" class="tablink fa-solid fa-table-list" onClick= "tabSection(event, 'data')"></i>
@@ -243,8 +261,8 @@
                     {{ form.x_coord }}
                     {{ form.y_coord }}
                 </div>
-                <div class="pt-2" style="display: inline-flex;">
-                    <input type="color" class='form-control' id="favcolor" name="favcolor" value="#ff0000">
+                <div class="pt-2">
+                    <input type="color" class='form-control' id="favcolor" name="favcolor" value="{{fly.fly_color}}">
                 </div>
             </div>
         </div>
@@ -252,7 +270,7 @@
             <img id = "artwork" class=" blurry artwork-square" src="{{artwork_url}}" alt=""/>
             <img id = "preview" class="clear artwork-square" src="{{image}}" alt=""/>
         </div>
-        <div class="pt-2">
+        <div class="pt-4">
             <input class="btn btn-lg button-black" type="submit" value="Submit">
         </div>
     </form>
