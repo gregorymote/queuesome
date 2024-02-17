@@ -1,8 +1,17 @@
 function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, play_y_mult, color, time) {
-    var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place;
+    var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place, found;
     var proportion = .4;
     img = document.getElementById(imgID);
     glass_place = document.getElementById('glass_place');
+
+      /* Create Cursor: */
+    rad = (img.width * proportion) / (zoom * 2.5);
+    cursor = document.createElement("DIV");
+    cursor.setAttribute("class", "cursor");
+    cursor.style.width = rad + 2 +  'px';
+    cursor.style.height = rad + 2 + 'px';
+    img.parentElement.insertBefore(cursor, img);
+
     /* Create magnifier glass: */
     glass = document.createElement("div");
     glass.setAttribute("class", "img-magnifier-glass");
@@ -23,13 +32,18 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     bw = 3;
     w = glass.offsetWidth / 2;
     h = glass.offsetHeight / 2;
-    
+
+    var xOff = (document.getElementById('art_parent').offsetWidth - img.offsetWidth) / 2;
+    var cw = cursor.offsetWidth / 2;
+
     fly_x =  Math.ceil(x_mult * img.width);
     fly_y = Math.ceil(y_mult * img.height);
     play_x = Math.ceil(play_x_mult * img.width);
     play_y = Math.ceil(play_y_mult * img.width);
-    rad = (img.width * proportion) / (zoom * 2.5);
     glass.style.backgroundPosition = "-" + ((play_x * zoom) - w + bw) + "px -" + ((play_y * zoom) - h + bw) + "px";
+    cursor.style.left = play_x + xOff - cw + "px";
+    cursor.style.top = play_y - cw + "px";
+    
     if(!win){
       pathm = [];
       if(start == 'None'){
@@ -46,6 +60,8 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       stopWatch(diff);
       img.addEventListener("mousemove", moveMagnifier);
       img.addEventListener("touchmove", moveMagnifier);
+      cursor.addEventListener("mousemove", moveMagnifier);
+      cursor.addEventListener("touchmove", moveMagnifier);
     }
     else{
       setWatch(time);
@@ -62,19 +78,16 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       x = pos.x;
       y = pos.y;
       storeCoordinate(x / img.width, y / img.width, pathm);
-      if(getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad && !win){
-        var date = new Date();
-        var finish = date.toISOString().slice(11,23);
-        win = true;
-        getPath(x, y, finish, function(saved_path, time){
-          displayPath(saved_path);
-          setWatch(time);
-          setFly(time);
-        });
-        $('#resultModal').modal('show');
-        img.removeEventListener("touchmove", moveMagnifier);
-        img.removeEventListener("mousemove", moveMagnifier);
+      found = getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad
+      if(found){
+        console.log('starting');
+        setTimeout(function(){
+          if(found && !win){
+            setWin(); 
+          }
+        }, 1000);  
       }
+
       /* Prevent the magnifier glass from being positioned outside the image: */
       if (x > img.width - (w / zoom)) {
         x = img.width - (w / zoom);
@@ -88,9 +101,31 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       if (y < h / zoom) {
         y = h / zoom;
       }
+      //console.log("x: " + x + " y: " + y + " w: " + w + " h: " + h);
+      cursor.style.left = x + xOff - cw + "px";
+      cursor.style.top = y - cw + "px";
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
+
+      function setWin(){
+        console.log("WIN!");
+        var date = new Date();
+        var finish = date.toISOString().slice(11,23);
+        win = true;
+        getPath(x, y, finish, function(saved_path, time){
+          displayPath(saved_path);
+          setWatch(time);
+          setFly(time);
+        });
+        $('#resultModal').modal('show');
+        img.removeEventListener("touchmove", moveMagnifier);
+        img.removeEventListener("mousemove", moveMagnifier);
+        cursor.removeEventListener("mousemove", moveMagnifier);
+        cursor.removeEventListener("touchmove", moveMagnifier);
+
+      }
     }
+
 
     function setFly(time_str){
       var fly = document.getElementById("fly_icon");

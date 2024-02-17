@@ -102,6 +102,18 @@
         cursor: none;
         z-index:1000;
     }
+    .cursor {
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.5);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        opacity: 1;
+        z-index:500;
+        
+    }
+
     .artwork-square{
         border-radius: 4px;
     }
@@ -136,7 +148,7 @@
 		<p style="margin-bottom:0; line-height:.5em;">Rendering</p>
 	</div>
     
-	<div style="position:relative">
+	<div id="art_parent" style="position:relative">
 		<img id = "blur" class="blurry artwork-square" src="{{artwork}}" alt=""/>
 		<img id = "artwork" class="clear artwork-square" src="{{background}}" alt=""/>
 	</div>

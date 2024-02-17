@@ -58,10 +58,6 @@ class FlyForm(forms.Form):
     width = forms.FloatField(
         label = 'width'
     )
-
-    date = forms.DateField(
-        label = 'Date'
-    )
     search = forms.CharField(
         required=False,
         widget=forms.TextInput(
