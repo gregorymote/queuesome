@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from party.forms import BlankForm
 from spot.forms import FlyForm, DayForm
 from PIL import Image
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from .models import Day, Fly, Play, Studio, Users
 import requests
 import shutil
@@ -22,6 +22,8 @@ if STATE != 'DEV':
 
 
 fly_size = '16%'
+timezone_offset = -9.0 
+tzinfo = timezone(timedelta(hours=timezone_offset))
 
 def index(request):
     session_key = request.session.session_key
@@ -31,7 +33,7 @@ def index(request):
         )           
     try:
         user = Users.objects.get(sessionID=session_key)
-        day = Day.objects.get(date=date.today())
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
         if not exists(fly.image.url[1:]):
             raise Exception()
@@ -82,7 +84,7 @@ def start(request):
         )
         user.save()
     try:
-        day = Day.objects.get(date=date.today())
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
         if not exists(fly.image.url[1:]):
             raise Exception()
@@ -119,7 +121,7 @@ def start(request):
 
 def sorry(request):
     try:
-        day = Day.objects.get(date=date.today())
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
         if not exists(fly.image.url[1:]):
             raise Exception()
@@ -234,11 +236,31 @@ def studio(request, pid):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def calendar(request, date=str(date.today())):
+def calendar(request, date=str(datetime.now(tzinfo).date())):
     context = {
         'date' : date
     }
     return render(request, 'spot/calendar.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def stats(request, date_param=str(datetime.now(tzinfo).date())):
+    day_date = datetime.strptime(date_param, "%Y-%m-%d").date()
+    try:
+        day = Day.objects.get(date=day_date)
+    except Exception as e:
+        day = Day(date=day_date)
+    users_total = len(Users.objects.all())
+    plays_total = len(Play.objects.all())
+    users_today = len(Users.objects.filter(created__gte=day_date).all())
+    plays_today = len(Play.objects.filter(day=day.id).all())
+    context = {
+        'users_total' : users_total,
+        'plays_total' : plays_total,
+        'users_today' : users_today,
+        'plays_today' : plays_today
+    }
+    return render(request, 'spot/stats.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -370,7 +392,7 @@ def update_play(request):
     pathm = []
     session_key = request.session.session_key
     user = Users.objects.get(sessionID=session_key)
-    day = Day.objects.get(date=date.today())
+    day = Day.objects.get(date=datetime.now(tzinfo).date())
     play = Play.objects.get(user=user.id, day=day.id)
     if play and not play.finish_time:
         if not play.pathm:
@@ -396,7 +418,7 @@ def get_path(request):
     time = ''  
     session_key = request.session.session_key
     user = Users.objects.get(sessionID=session_key)
-    day = Day.objects.get(date=date.today())
+    day = Day.objects.get(date=datetime.now(tzinfo).date())
     play = Play.objects.get(user=user.id, day=day.id)
     if play:
         if not play.pathm:
@@ -406,7 +428,6 @@ def get_path(request):
         play.x_mult = request.GET.get('x', None)
         play.y_mult = request.GET.get('y', None)
         play.save()
-        print(play.finish_time , play.start_time)
         play = Play.objects.get(user=user.id, day=day.id)
         time = str(datetime.combine(date.today(), play.finish_time) - datetime.combine(date.today(), play.start_time))
         play.time = time
@@ -426,7 +447,7 @@ def set_start(request):
         if(start_time):
             session_key = request.session.session_key
             user = Users.objects.get(sessionID=session_key)
-            day = Day.objects.get(date=date.today())
+            day = Day.objects.get(date=datetime.now(tzinfo).date())
             play = Play.objects.get(user=user.id, day=day.id)
             play.start_time = start_time
             play.save()

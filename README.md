@@ -22,8 +22,6 @@
 
    <h3> Set Up Local Dev </h3>
    
-   Requires Python 3.7 or Higher
-
    <h4>Create Virtual Environment</h4>
 
    In Desired Directory Run
@@ -43,22 +41,22 @@
 
    <h4> Edit <I>queue_it_up/settings.py</I> </h4>
 
-   line 17: HEROKU = False
+   line 16: STATE = "DEV"
 
-   line 90: Configure Local Database
+   line 105: Configure Local Database
 
-   line 177: YOUR-SPOTIFY-CLIENT-ID
+   line 204: YOUR-SPOTIFY-CLIENT-ID
 
 
    <h4> Add The Following Environment Variables </h4>
 
    You can also hardcode your own values. Line numbers refer to <I>queue_it_up/settings.py</I>
 
-   line 27: DJANGO_SECRET_Q
+   line 38: DJANGO_SECRET_Q
 
-   line 175: SPOTIFY_CLIENT_SECRET
+   line 202: SPOTIFY_CLIENT_SECRET
 
-   line 178: SYSTEM_USER_ID
+   line 205: SYSTEM_USER_ID
 
 
    <h4> Migrate Database </h4>

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
+{% block page_content %}
+
+<script>
+	$(document).ready(function () {
+	});
+</script>
+
+<style>
+    .stat{
+        padding-top: .25em; 
+        font-weight: bold;
+    }
+    .stats{
+        display: flex;
+        justify-content: center;
+    }
+    .links{
+        width: 90%;
+        margin: 0 auto;
+    }
+    .card-content{
+        margin: .5em;
+        font-size: 2em;
+    }
+    .card{
+        margin-top:1em;
+        box-shadow: 5px 5px 8px rgb(54, 54, 54), 10px 10px 8px gray, 15px 15px 8px lightgray;
+        max-width: 300px;
+    }
+    .form-width{
+        max-width: 450px;
+    }
+    a{
+        text-decoration: none;
+        color: black;
+    }
+</style>
+
+
+<div class="container form-width stats">
+    <div class="pb-3 pt-2">
+        <div class="card text-center">
+            <div class="card-content">
+                <div class="header">Total Users</div>
+                <div class="stat">{{users_total}}</div>
+            </div>
+        </div>
+        <div class="card text-center">
+            <div class="card-content">
+                <div class="header">Total Plays</div>
+                <div class="stat">{{plays_total}}</div>
+            </div>
+        </div>
+        <div class="card text-center">
+            <div class="card-content">
+                <div class="header">New Users Today</div>
+                <div class="stat">{{users_today}}</div>
+            </div>
+        </div>
+        <div class="card text-center">
+            <div class="card-content">
+                <div class="header">Plays Today</div>
+                <div class="stat">{{plays_today}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

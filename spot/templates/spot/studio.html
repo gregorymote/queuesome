@@ -7,7 +7,7 @@
 <link href="{% static 'css/copy.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
 
 {% block page_content %}
 <script type="text/javascript">
@@ -42,6 +42,16 @@
         if('{{fly.id}}' == 'None'){
             document.getElementById("new").style.display="none";
         }
+
+        var x_slider = document.getElementById("xSlider");
+        x_slider.value = '{{ form.x_coord.value }}';
+        x_slider.addEventListener("change", updateX);
+        x_slider.addEventListener("change", setX);
+
+        var y_slider = document.getElementById("ySlider");
+        y_slider.value = '{{ form.y_coord.value }}';
+        y_slider.addEventListener("change", updateY);
+        y_slider.addEventListener("change", setY);
     });
     var albums;
     function update_search(e){
@@ -170,7 +180,17 @@
         fly.style.left = offset + 'px';
         if(width != 0){
             document.getElementById("id_width").value = artwork;
+            document.getElementById("xSlider").max = artwork;
+            document.getElementById("ySlider").max = artwork;
         }
+    }
+
+    function updateX(e){
+        document.getElementById("id_x_coord").value = e.target.value;
+    }
+
+    function updateY(e){
+        document.getElementById("id_y_coord").value = e.target.value;
     }
 
     function setX(e){
@@ -261,6 +281,8 @@
                     {{ form.x_coord }}
                     {{ form.y_coord }}
                 </div>
+                <input id="xSlider" type="range" min="1" max="100" class="slider">
+                <input id="ySlider" type="range" min="1" max="100" class="slider">
                 <div class="pt-2">
                     <input type="color" class='form-control' id="favcolor" name="favcolor" value="{{fly.fly_color}}">
                 </div>

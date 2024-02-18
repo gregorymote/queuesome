@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
 {% block page_content %}
 
 <script>
@@ -127,11 +127,13 @@
     a{
         text-decoration: none;
         color:black;
+        margin-left: .5em;
     }
 </style>
 
 <div class="container form-width">
     <div class="pb-2" style="justify-content: flex-end; display:flex;">
+        <a href="/spot/calendar"><i class="fa-regular fa-calendar"></i></a>
         <a href="/spot/admin"><i class="fa-solid fa-gear"></i></a>
     </div>
     <div id="card" class="pt-2 card">
