@@ -1,5 +1,5 @@
-function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, play_y_mult, color, time) {
-    var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place, found;
+function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, play_y_mult, color, time) {  
+  var img, glass, w, h, bw, fly_x, fly_y, rad, glass_place, found;
     var proportion = .4;
     img = document.getElementById(imgID);
     glass_place = document.getElementById('glass_place');
@@ -80,7 +80,6 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       storeCoordinate(x / img.width, y / img.width, pathm);
       found = getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad
       if(found){
-        console.log('starting');
         setTimeout(function(){
           if(found && !win){
             setWin(); 
@@ -101,14 +100,12 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       if (y < h / zoom) {
         y = h / zoom;
       }
-      //console.log("x: " + x + " y: " + y + " w: " + w + " h: " + h);
       cursor.style.left = x + xOff - cw + "px";
       cursor.style.top = y - cw + "px";
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
 
       function setWin(){
-        console.log("WIN!");
         var date = new Date();
         var finish = date.toISOString().slice(11,23);
         win = true;
@@ -130,7 +127,13 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     function setFly(time_str){
       var fly = document.getElementById("fly_icon");
       fly.style.color = '#1ed760';
-      document.getElementById("copy-input").value = "🔎 🪰" + time_str.slice(3,5) +':'+ time_str.slice(6,8) +'.'+ time_str.slice(9,11);
+      var hr_str = '';
+      if(time_str.slice(0,2) != '00'){
+         hr_str = time_str.slice(0,2) + ':'
+      }
+
+      var share_str = "🔎 🪰" + hr_str + time_str.slice(3,5) +':'+ time_str.slice(6,8) +'.'+ time_str.slice(9,11);
+      document.getElementById("copy-input").value = share_str;
       fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
     }
 
@@ -228,6 +231,11 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       document.getElementById('min').innerHTML = time_str.slice(3,5);
       document.getElementById('sec').innerHTML = time_str.slice(6,8); 
       document.getElementById('count').innerHTML = time_str.slice(9,11);
+
+      if(time_str.slice(0,2) != '00'){
+        document.getElementById('hr').style.display= 'initial';
+        document.getElementById('hr_colon').style.display= 'initial';
+      }
     }
 
     function displayPath(coords){
@@ -254,7 +262,6 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     }
 
     async function getPath(x, y, finish, callback) { 
-      //console.log("Finish: " + finish);
       $.ajax({
           url: '/spot/get_path',
           data: {

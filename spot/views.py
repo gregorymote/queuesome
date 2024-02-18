@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from party.forms import BlankForm
 from spot.forms import FlyForm, DayForm
 from PIL import Image
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from .models import Day, Fly, Play, Studio, Users
 import requests
 import shutil
@@ -22,6 +22,8 @@ if STATE != 'DEV':
 
 
 fly_size = '16%'
+timezone_offset = -9.0 
+tzinfo = timezone(timedelta(hours=timezone_offset))
 
 def index(request):
     session_key = request.session.session_key
@@ -31,7 +33,7 @@ def index(request):
         )           
     try:
         user = Users.objects.get(sessionID=session_key)
-        day = Day.objects.get(date=date.today())
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
         if not exists(fly.image.url[1:]):
             raise Exception()
@@ -82,7 +84,7 @@ def start(request):
         )
         user.save()
     try:
-        day = Day.objects.get(date=date.today())
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
         if not exists(fly.image.url[1:]):
             raise Exception()
@@ -119,7 +121,7 @@ def start(request):
 
 def sorry(request):
     try:
-        day = Day.objects.get(date=date.today())
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
         if not exists(fly.image.url[1:]):
             raise Exception()
@@ -370,7 +372,7 @@ def update_play(request):
     pathm = []
     session_key = request.session.session_key
     user = Users.objects.get(sessionID=session_key)
-    day = Day.objects.get(date=date.today())
+    day = Day.objects.get(date=datetime.now(tzinfo).date())
     play = Play.objects.get(user=user.id, day=day.id)
     if play and not play.finish_time:
         if not play.pathm:
@@ -396,7 +398,7 @@ def get_path(request):
     time = ''  
     session_key = request.session.session_key
     user = Users.objects.get(sessionID=session_key)
-    day = Day.objects.get(date=date.today())
+    day = Day.objects.get(date=datetime.now(tzinfo).date())
     play = Play.objects.get(user=user.id, day=day.id)
     if play:
         if not play.pathm:
@@ -406,7 +408,6 @@ def get_path(request):
         play.x_mult = request.GET.get('x', None)
         play.y_mult = request.GET.get('y', None)
         play.save()
-        print(play.finish_time , play.start_time)
         play = Play.objects.get(user=user.id, day=day.id)
         time = str(datetime.combine(date.today(), play.finish_time) - datetime.combine(date.today(), play.start_time))
         play.time = time
@@ -426,7 +427,7 @@ def set_start(request):
         if(start_time):
             session_key = request.session.session_key
             user = Users.objects.get(sessionID=session_key)
-            day = Day.objects.get(date=date.today())
+            day = Day.objects.get(date=datetime.now(tzinfo).date())
             play = Play.objects.get(user=user.id, day=day.id)
             play.start_time = start_time
             play.save()

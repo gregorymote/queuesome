@@ -7,7 +7,7 @@
 <link href="{% static 'css/copy.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spot-the-fly</a></em></a>{% endblock %}
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
 
 {% block page_content %}
 <script>
@@ -22,13 +22,13 @@
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
 		pan(song_title, parent, 3000)
-        
         magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, {{play_x_mult}}, {{play_y_mult}}, 'rgb({{color}})', '{{time}}');
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
             let input = copyText.querySelector("input.text");
             input.select();
             document.execCommand("copy");
+            navigator.clipboard.writeText(input.value + '\n' + window.location.href);
             copyText.classList.add("active");
             window.getSelection().removeAllRanges();
             setTimeout(function () {
@@ -98,9 +98,11 @@
 	}
     .img-magnifier-glass {
         position: relative;
-        border: 0px solid #000;
+        border: 2px solid lightgray;
         cursor: none;
-        z-index:1000;
+        z-index:1031;
+        border-radius: 100px;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
     }
     .cursor {
         border-radius: 50%;
@@ -173,7 +175,7 @@
 			<div id = "time" class="col-8 ps-4 pt-2 text-left" style="font-size:1.5em;letter-spacing:-.09em">
                 <span class="digit" id="hr" style="display:None;"> 
                     00</span>  
-                <span class="txt" style="display:None;">:</span> 
+                <span class="txt" id="hr_colon" style="display:None;">:</span> 
                 <span class="digit" id="min"> 
                     00</span> 
                 <span class="txt">:</span> 
