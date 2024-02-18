@@ -236,11 +236,31 @@ def studio(request, pid):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def calendar(request, date=str(date.today())):
+def calendar(request, date=str(datetime.now(tzinfo).date())):
     context = {
         'date' : date
     }
     return render(request, 'spot/calendar.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def stats(request, date_param=str(datetime.now(tzinfo).date())):
+    day_date = datetime.strptime(date_param, "%Y-%m-%d").date()
+    try:
+        day = Day.objects.get(date=day_date)
+    except Exception as e:
+        day = Day(date=day_date)
+    users_total = len(Users.objects.all())
+    plays_total = len(Play.objects.all())
+    users_today = len(Users.objects.filter(created__gte=day_date).all())
+    plays_today = len(Play.objects.filter(day=day.id).all())
+    context = {
+        'users_total' : users_total,
+        'plays_total' : plays_total,
+        'users_today' : users_today,
+        'plays_today' : plays_today
+    }
+    return render(request, 'spot/stats.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
