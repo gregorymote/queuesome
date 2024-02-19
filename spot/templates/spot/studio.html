@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block local_js %}
+{% load static %}
+<script src="{% static 'js/magnify.js' %}"></script>
+<link href="{% static 'css/copy.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
+
+{% block page_content %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        var search = document.getElementById("id_search");
+        search.autocomplete="off";
+        search.addEventListener("input", update_search);
+
+        var fly = document.getElementById("fly");
+        fly.style.fontSize = '{{fly_size}}';
+        fly.style.left = '{{ form.x_coord.value }}px';
+        fly.style.top = '{{ form.y_coord.value }}px';
+        fly.style.color = '{{ form.color.value }}';
+
+        document.getElementById("id_x_coord").addEventListener("input", setX);       
+        document.getElementById("id_x_coord").classList.add('form-control');
+        document.getElementById("id_y_coord").addEventListener("input", setY);
+        document.getElementById("id_y_coord").classList.add('form-control');
+        document.getElementById("id_width").classList.add('form-control');
+        var color = document.getElementById("favcolor");
+        color.value = '{{form.color.value}}';
+        color.addEventListener("input", setColor);
+        //Align the fly icon on top of the design artwork
+        new ResizeObserver(findOffset).observe(document.getElementById("design_container"));
+
+        if('{{preview}}' == 'True'){
+            tabSection({'target':document.getElementById('previewTab')}, 'preview');
+        }
+        else if('{{ form.artwork_url.value }}' != 'None'){
+            tabSection({'target':document.getElementById('designTab')}, 'design');
+        }
+        if('{{fly.id}}' == 'None'){
+            document.getElementById("new").style.display="none";
+        }
+
+        var x_slider = document.getElementById("xSlider");
+        x_slider.value = '{{ form.x_coord.value }}';
+        x_slider.addEventListener("change", updateX);
+        x_slider.addEventListener("change", setX);
+
+        var y_slider = document.getElementById("ySlider");
+        y_slider.value = '{{ form.y_coord.value }}';
+        y_slider.addEventListener("change", updateY);
+        y_slider.addEventListener("change", setY);
+    });
+    var albums;
+    function update_search(e){
+        clearTimeout(this.delay);
+        this.delay = setTimeout(function(){
+            if (e.target.value != ''){
+                var result = document.getElementById("id_result");
+                $.ajax({
+                    url: '/spot/update_search',
+                    data: {
+                    'text': e.target.value,
+                    'result': result.value,
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data.status == 'expired'){
+                            window.location.replace("/spot/login");
+                        }
+                        albums=data.albums;
+                        populateOptions(data.albums);
+                } });
+            }
+        }, 300);
+    }
+
+    function populateOptions(albums){
+		var results = document.getElementById("results");
+		results.innerHTML = "";
+		for(var i=0; i<albums.length; i++){
+			var option = document.createElement('div');
+			option.classList.add('row','option-padding');
+			option.id = albums[i].id;
+			var wrapper = document.createElement('div');
+			option.appendChild(wrapper);
+			
+			var art = document.createElement('img');
+			art.src = albums[i].image;
+			art.alt = albums[i].name + ', ' + albums[i].artist;
+			art.classList.add('artwork');
+			
+			wrapper.appendChild(art);
+			
+			var text = document.createElement('div');
+			text.classList.add('col','info');
+			text.id = "text_parent";
+			
+			var title = document.createElement('p');
+			title.innerHTML = albums[i].name;
+			
+			text.appendChild(title);
+			
+			var artist = document.createElement('small');
+			artist.innerHTML = albums[i].artist;
+			artist.classList.add('text-muted');
+			
+			text.appendChild(artist);
+			wrapper.appendChild(text);
+			results.appendChild(option);
+			option.addEventListener("click", getOption);
+		}
+    }
+
+
+    function getOption(e){
+		var parent;
+		if(e.target.parentElement.id == "text_parent"){
+			parent=e.target.parentElement.parentElement.parentElement;
+		}
+		else if (e.target.parentElement.id != ""){
+			parent=e.target.parentElement;
+		}
+		else{
+			parent=e.target.parentElement.parentElement;
+		}
+		if (parent.id == 'results' || parent.id == ""){
+			return;
+		}
+        var album = getAlbum(parent.id);
+        document.getElementById("id_artwork_url").value = album.image;
+        document.getElementById("id_album_name").value = album.name;
+        document.getElementById("id_artist_name").value = album.artist;
+        document.getElementById("id_album_url").value = album.uri;
+        document.getElementById("id_result").value = parent.id;
+
+        var art = parent.getElementsByClassName("artwork")[0];
+        document.getElementById('artwork').src = art.src;
+        document.getElementById('blur').src = art.src;
+        tabSection({'target':document.getElementById('designTab')}, 'design');
+    }
+
+    function getAlbum(album_id){
+        var x;
+        albums.forEach(element => {
+            if(element.id == album_id){
+                x = element;
+            } 
+        });
+        return x;
+    }
+
+    function tabSection(e, tabName) {
+        var i, x;       
+        x = document.getElementsByClassName("tabs");
+        for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+        }
+        x = document.getElementsByClassName("tablink");
+        for (i = 0; i < x.length; i++) {
+            x[i].classList.remove('activeTab');
+        }
+
+        document.getElementById(tabName).style.display = "block"; 
+        e.target.classList.add('activeTab');
+           
+    }
+
+    function findOffset(e){
+        var x = parseFloat(document.getElementById("id_x_coord").value);
+        var width = e[0].target.offsetWidth;
+        var artwork = width * .80;
+        if(artwork > 300){
+            artwork = 300;
+        }
+        var offset = ((width - artwork) / 2) + x;
+        var fly = document.getElementById("fly");
+        fly.style.left = offset + 'px';
+        if(width != 0){
+            document.getElementById("id_width").value = artwork;
+            document.getElementById("xSlider").max = artwork;
+            document.getElementById("ySlider").max = artwork;
+        }
+    }
+
+    function updateX(e){
+        document.getElementById("id_x_coord").value = e.target.value;
+    }
+
+    function updateY(e){
+        document.getElementById("id_y_coord").value = e.target.value;
+    }
+
+    function setX(e){
+        var width =  document.getElementById("design_container").offsetWidth;
+        var offset = width * .80;
+        if(offset > 300){
+            offset = 300;
+        }
+        offset = (width - offset) / 2;
+        var x = offset + parseInt(e.target.value);
+        var fly = document.getElementById("fly");
+        fly.style.left = x + 'px';
+    }
+
+    function setY(e){
+        var fly = document.getElementById("fly");
+        fly.style.top = e.target.value + 'px';
+    }
+    function setColor(e){
+        var fly = document.getElementById("fly");
+        fly.style.color = e.target.value;
+        document.getElementById("id_color").value = e.target.value;
+    }
+
+
+</script>
+<style>
+	p {
+		text-overflow: ellipsis;
+		max-width: 220px;
+		white-space: nowrap;
+		overflow: hidden;
+		margin-bottom: -.4em !important;
+	}
+    a{
+        text-decoration: none;
+        color:black;
+        margin-left: .5em;
+    }
+    i + i {
+    margin-left: 2em;
+    }
+    .tablink{
+        padding: 5px;
+    }
+    .activeTab{
+        border-bottom:solid blue;
+        color: blue;
+    }
+</style>
+
+<div class="container form-width">
+    <div class="pb-2" style="justify-content: flex-end; display:flex;">
+        <a id="new" href="/spot/studio/0"><i class="fa-solid fa-plus"></i></a>
+        <a href="/spot/admin"><i class="fa-solid fa-gear"></i></a>
+    </div>
+    <div id="icons" class="text-center pb-4">
+        <i id="searchTab" class="tablink activeTab fa-solid fa-magnifying-glass" onClick= "tabSection(event, 'search')"></i>
+        <i id="dataTab" class="tablink fa-solid fa-table-list" onClick= "tabSection(event, 'data')"></i>
+        <i id="designTab" class="tablink fa-solid fa-paintbrush" onClick= "tabSection(event, 'design')"></i>
+        <i id ="previewTab" class="tablink fa-solid fa-mosquito" onClick= "tabSection(event, 'preview')"></i>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div id="search" class="tabs">
+            {{ form.search }}
+            
+            <div id="results"></div>
+        </div>
+        <div id="data" class="tabs" style="display: none;">
+            {{ form.artwork_url }}
+            {{ form.album_name }}
+            {{ form.artist_name }}
+            {{ form.album_url }}
+            {{ form.result }}  
+            {{ form.color }}
+            {{ form.width }}
+        </div>
+        <div id ="design" class="tabs text-center" style="display:none;">
+            <div id="design_container" style="position:relative">
+                <img id = "blur" class=" blurry artwork-square" src="{{artwork_url}}" alt=""/>
+                <em id ="fly" class="fly fa-solid fa-mosquito" style="position:absolute; z-index:1000;"></em>
+                <img id = "artwork" class="clear artwork-square"  src="{{artwork_url}}" alt=""/>
+            </div>
+
+            <div class="pt-4" style="width:75%;margin:auto;">
+                <div style="display: inline-flex;">
+                    {{ form.x_coord }}
+                    {{ form.y_coord }}
+                </div>
+                <input id="xSlider" type="range" min="1" max="100" class="slider">
+                <input id="ySlider" type="range" min="1" max="100" class="slider">
+                <div class="pt-2">
+                    <input type="color" class='form-control' id="favcolor" name="favcolor" value="{{fly.fly_color}}">
+                </div>
+            </div>
+        </div>
+        <div id ="preview" class="tabs text-center" style="display: none;">
+            <img id = "artwork" class=" blurry artwork-square" src="{{artwork_url}}" alt=""/>
+            <img id = "preview" class="clear artwork-square" src="{{image}}" alt=""/>
+        </div>
+        <div class="pt-4">
+            <input class="btn btn-lg button-black" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

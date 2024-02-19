@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import dj_database_url
 
-STATE="DEV"
+STATE="STAGE"
 if STATE=="DEV":
     HEROKU = False
     STAGE = False
@@ -111,23 +111,23 @@ if HEROKU:
     DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 else:
     ##Local Postgresql
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.postgresql',
-    #         'NAME': 'queue_it_up',
-    #         'USER': 'admin',
-    #         'PASSWORD': 'admin',
-    #         'HOST': '127.0.0.1',
-    #         'PORT': '',
-    #     }
-    # }
-    ##Local SQL Lite
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'queue_it_up',
+            'USER': 'admin',
+            'PASSWORD': 'admin',
+            'HOST': '127.0.0.1',
+            'PORT': '',
         }
     }
+    ##Local SQL Lite
+    #DATABASES = {
+    #    'default': {
+    #        'ENGINE': 'django.db.backends.sqlite3',
+    #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #    }
+    #}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -174,9 +174,20 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-
 #  Add configuration for static files storage using whitenoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_ROOT = os.path.join(PROJECT_ROOT,'media')
+MEDIA_URL = 'media/'
+
+# aws settings
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_CUSTOM_DOMAIN = 'https://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_FILE_OVERWRITE = True
+
 
 PORT='8000'
 if STAGE:
@@ -194,6 +205,7 @@ if HEROKU:
 else:
     URL=proto + IP + ':' + PORT
     URI = URL + '/party/auth/'
+SPOT_URI = URL + '/spot/auth/'
 
 CLIENT_SECRET=os.environ.get("SPOTIFY_CLIENT_SECRET")
 SCOPE = 'user-read-playback-state user-modify-playback-state'

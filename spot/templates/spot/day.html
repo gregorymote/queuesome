@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
+{% block page_content %}
+
+<script>
+	$(document).ready(function () {
+        var search = document.getElementById("id_search");
+        var result = document.getElementById("id_result");
+        if(result.value == ''){
+            document.getElementById("submit").style.display = 'none';
+            document.getElementById("edit_link").style.display = 'none';
+        }
+        result.style.display = 'none';
+        search.autocomplete="off";
+        search.addEventListener("input", update_flys);
+	});
+
+    function update_flys(e){
+        console.log(e.target.value);
+        clearTimeout(this.delay);
+        this.delay = setTimeout(function(){   
+            $.ajax({
+                url: '/spot/get_flys',
+                data: {
+                'text': e.target.value,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    populateOptions(data.flys);
+            }});
+            
+        }, 300);
+    }
+
+
+    function populateOptions(flys){
+		var results = document.getElementById("results");
+		results.innerHTML = "";
+		for(var i=0; i<flys.length; i++){
+			var option = document.createElement('div');
+			option.classList.add('row','option-padding');
+			option.id = flys[i].id;
+			var wrapper = document.createElement('div');
+			option.appendChild(wrapper);
+			
+			var art = document.createElement('img');
+			art.src = flys[i].image;
+			art.alt = flys[i].name + ', ' + flys[i].artist;
+			art.classList.add('artwork');
+			
+			wrapper.appendChild(art);
+			
+			var text = document.createElement('div');
+			text.classList.add('col','info');
+			text.id = "text_parent";
+			
+			var title = document.createElement('p');
+			title.innerHTML = flys[i].name;
+			
+			text.appendChild(title);
+			
+			var artist = document.createElement('small');
+			artist.innerHTML = flys[i].artist;
+			artist.classList.add('text-muted');
+			
+			text.appendChild(artist);
+			wrapper.appendChild(text);
+			results.appendChild(option);
+			option.addEventListener("click", getOption);
+		}
+    }
+
+    function getOption(e){
+		var parent;
+		if(e.target.parentElement.id == "text_parent"){
+			parent=e.target.parentElement.parentElement.parentElement;
+		}
+		else if (e.target.parentElement.id != ""){
+			parent=e.target.parentElement;
+		}
+		else{
+			parent=e.target.parentElement.parentElement;
+		}
+		if (parent.id == 'results' || parent.id == ""){
+			return;
+		}
+        document.getElementById("id_result").value = parent.id;
+        var edit_link = document.getElementById("edit_link");
+        edit_link.style.display = 'block';
+        edit_link.href = '/spot/studio/' + parent.id;
+		var results = document.getElementById("results");
+		results.innerHTML = "";
+        var fly = document.getElementById("fly");
+        fly.innerHTML = '';
+		fly.appendChild(parent);
+        document.getElementById("id_search").value = '';
+        document.getElementById("submit").style.display = 'block';
+    }
+
+</script>
+<style>
+    p {
+		text-overflow: ellipsis;
+		max-width: 220px;
+		white-space: nowrap;
+		overflow: hidden;
+		margin-bottom: -.4em !important;
+	}
+    a{
+        text-decoration: none;
+        color:black;
+        margin-left: .5em;
+    }
+    .fly {
+        width: 75%;
+        margin: 10px auto;
+    }
+</style>
+
+<div class="container form-width">
+    <div class="pb-2" style="justify-content: flex-end; display:flex;">
+        <a href="/spot/studio/0"><i class="fa-solid fa-plus"></i></a>
+        <a href="/spot/admin"><i class="fa-solid fa-gear"></i></a>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div id="card" class="pt-2 card">
+            <div class="pb-3 pt-2 text-center">
+                <h2>{{day.date}}</h2>
+                <hr>
+            </div>
+            <div style= "display:inline-flex">
+                <div id="fly" class="fly">
+                    <div class="row option-padding" id="{{fly.id}}">
+                        <div><img id="artwork_url" src="{{artwork_url}}" class="artwork">
+                            <div class="col info" id="text_parent">
+                                <p>{{fly.album_name}}</p><small class="text-muted">{{fly.artist_name}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id = edit class="row option-padding" style="margin: 10px auto;"><a id="edit_link" href="/spot/studio/{{fly.id}}">Edit</a></div>
+            </div>
+            <div id="search" class="tabs">
+                {{ form.result }}
+                {{ form.search }}
+                <div id="results"></div>
+            </div>
+        </div>
+        <div class="pt-2" id="submit" style="display:none;">
+            <input class="btn btn-lg button-black" type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}
