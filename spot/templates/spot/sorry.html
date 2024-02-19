@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block local_js %}
+{% load static %}
+<script src="{% static 'js/color.js' %}"></script>
+{% endblock %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
+{% block page_content %}
+
+<script>
+	$(document).ready(function () {
+        const color = randomColor();
+        const invert = invertColor(color);
+        const textColor = getTextColor(invert);
+        document.getElementById('fly_icon').style.color = color;
+        document.getElementById('card').style.backgroundColor = invert;
+        document.getElementById('face').style.color = color;
+        document.getElementById('message').style.color = textColor;
+	});
+</script>
+
+
+<style>   
+    .vertical-center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+<div class="container form-width vertical-center">
+    <div id="card" class="pt-2 card">
+        <div class="pb-3 pt-2 text-center">
+            <em id="face" style="font-size:6em;" class="fa-regular fa-face-frown"></em>
+            <div class="pt-3">
+                <h5 id="message"><strong>Sorry...no <em id="fly_icon" class="fa-solid fa-mosquito"></em>'s today</strong></h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

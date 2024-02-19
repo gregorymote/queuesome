@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block right_header %}<a href="/spot"><em><a style="font-family: 'Righteous', cursive; color:rgb(0, 0, 0); padding-right: 5px;">spotTheFly</a></em></a>{% endblock %}
+{% block page_content %}
+
+<script>
+	$(document).ready(function () {
+	});
+</script>
+
+<style>
+    .icon{
+        padding-top: .25em; 
+        width:25%;
+    }
+    .title{
+        width:75%;
+        font-weight: bold;
+
+    }
+    .links{
+        width: 90%;
+        margin: 0 auto;
+    }
+    .card-content{
+        display: inline-flex;
+        margin: .5em;
+        align-content: center;
+        font-size: 2em;
+    }
+    .card{
+        margin-top:1em;
+        box-shadow: 5px 5px 8px rgb(54, 54, 54), 10px 10px 8px gray, 15px 15px 8px lightgray;
+    }
+    .form-width{
+        max-width: 450px;
+    }
+    a{
+        text-decoration: none;
+        color: black;
+    }
+</style>
+
+
+<div class="container form-width">
+    <div class="pb-3 pt-2 links">
+        <a href="/spot/calendar">
+            <div class="card">
+                <div class="card-content">
+                    <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="title">Upcoming</div>
+                </div>
+            </div>
+        </a>
+        <a href="/spot/studio/0">
+            <div class="card">
+                <div class="card-content">
+                    <div class="icon"><i class="fa-solid fa-paintbrush"></i></div>
+                    <div class="title">Studio</div>
+                </div>
+            </div>
+        </a>
+        <a href="/spot">
+            <div class="card">
+                <div class="card-content">
+                    <div class="icon"><i class="fa-solid fa-mosquito"></i></div>
+                    <div class="title">Spot the Fly</div>
+                </div>
+            </div>
+        </a>
+        <a href="/spot/stats">
+            <div class="card">
+                <div class="card-content">
+                    <div class="icon"><i class="fa-solid fa-chart-simple"></i></div>
+                    <div class="title">Stats</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+
+{% endblock %}
