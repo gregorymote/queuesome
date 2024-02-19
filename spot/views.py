@@ -128,7 +128,7 @@ def sorry(request):
     try:
         day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
-        if not exists(fly.image_url):
+        if not fly.image_url:
             raise Exception()
         return HttpResponseRedirect(
             reverse('start')
