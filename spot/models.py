@@ -15,7 +15,7 @@ class Fly(models.Model):
     album_url = models.CharField(max_length=255, null = True)
     artist_name = models.CharField(max_length=255, null = True)
     artwork_url = models.CharField(max_length=255, null = True)
-    image = models.ImageField(upload_to='images/')
+    image_url = models.CharField(max_length=255, null = True)
     x_coord = models.IntegerField(default = 1)
     y_coord = models.IntegerField(default = 1)
     x_mult = models.FloatField(default=0)
