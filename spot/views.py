@@ -13,10 +13,15 @@ import requests
 import shutil
 import json
 import spotipy
+import boto3
 from os import remove
 from os.path import exists
 from utils.util_auth import create_token, check_token, get_url, generate_url
-from queue_it_up.settings import IP, PORT, HEROKU, CLIENT_ID, CLIENT_SECRET, SPOT_URI, STATE
+from queue_it_up.settings import (
+    IP, PORT, HEROKU, CLIENT_ID, CLIENT_SECRET, SPOT_URI, STATE,
+    AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME,
+    AWS_S3_CUSTOM_DOMAIN
+)
 if STATE != 'DEV':
     from cairosvg import svg2png
 
@@ -35,7 +40,7 @@ def index(request):
         user = Users.objects.get(sessionID=session_key)
         day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
-        if not exists(fly.image.url[1:]):
+        if not fly.image_url:
             raise Exception()
     except Exception as e:
         print("Could not locate User, Day, or Fly: " , e)
@@ -54,7 +59,7 @@ def index(request):
         'song_link' : fly.album_url,
         'artist_name' : fly.artist_name,
         'artwork' : fly.artwork_url,
-        'background' : fly.image.url,
+        'background' : fly.image_url,
         'color' : fly.color,
         'x_mult': fly.x_mult,
         'y_mult': fly.y_mult,
@@ -86,7 +91,7 @@ def start(request):
     try:
         day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
-        if not exists(fly.image.url[1:]):
+        if not fly.image_url:
             raise Exception()
     except Exception as e:
         return HttpResponseRedirect(
@@ -114,7 +119,7 @@ def start(request):
         form = BlankForm(initial={'device': ''})
     context= {
         'form': form,
-        'background' : fly.image.url,
+        'background' : fly.image_url,
     }
     return render(request, 'spot/start.html', context)
 
@@ -123,7 +128,7 @@ def sorry(request):
     try:
         day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
-        if not exists(fly.image.url[1:]):
+        if not exists(fly.image_url):
             raise Exception()
         return HttpResponseRedirect(
             reverse('start')
@@ -170,69 +175,6 @@ def login(request):
         redirect_uri=SPOT_URI
     )
     return HttpResponseRedirect(url)
-
-
-@user_passes_test(lambda u: u.is_superuser)
-def studio(request, pid):
-    try:
-        fly = Fly.objects.get(id=pid)
-    except Exception as e:
-        if pid != 0:
-            return HttpResponseRedirect(
-                    reverse('studio', kwargs={'pid': 0})
-            )
-        else:
-            fly = Fly()
-    if request.method == 'POST':
-        form = FlyForm(request.POST)
-        if form.is_valid():
-            artwork = form.cleaned_data['artwork_url']
-            width = float(form.cleaned_data['width'])
-            x_mult = int(form.cleaned_data['x_coord']) / width
-            y_mult = int(form.cleaned_data['y_coord']) / width
-            fly.x_mult = x_mult
-            fly.y_mult = y_mult
-            fly.width = width
-            fly_color = form.cleaned_data['color']
-            fly.artwork_url = artwork
-            fly.album_id = form.cleaned_data['result']
-            file_name = set_up(artwork, x_mult, y_mult, fly_color)
-            fly.image = file_name
-            fly.color = get_album_color(artwork)
-            fly.fly_color = fly_color
-            fly.album_name = form.cleaned_data['album_name']
-            fly.artist_name = form.cleaned_data['artist_name']
-            fly.album_url = form.cleaned_data['album_url']
-            fly.save()
-            return HttpResponseRedirect(
-                reverse('studio', kwargs={'pid': fly.id})
-            )
-    else:
-        form = FlyForm(initial={
-            'artwork_url': fly.artwork_url,
-            'album_name': fly.album_name,
-            'artist_name': fly.artist_name,
-            'album_url': fly.album_url,
-            'x_coord': fly.x_mult * fly.width,
-            'y_coord': fly.y_mult * fly.width,
-            'color': fly.fly_color,
-            'result': fly.album_id,
-            'width' : fly.width     
-        })
-    try:
-        image = fly.image.url
-    except Exception as e:
-        image = ''
-    preview = exists(image[1:])
-    context= {
-        "fly":fly,
-        "form":form,
-        "image":image,
-        "artwork_url": fly.artwork_url,
-        "fly_size": fly_size,
-        "preview" : preview
-    }
-    return render(request, 'spot/studio.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -462,6 +404,69 @@ def set_start(request):
     return JsonResponse(data)
 
 
+@user_passes_test(lambda u: u.is_superuser)
+def studio(request, pid):
+    try:
+        fly = Fly.objects.get(id=pid)
+    except Exception as e:
+        if pid != 0:
+            return HttpResponseRedirect(
+                    reverse('studio', kwargs={'pid': 0})
+            )
+        else:
+            fly = Fly()
+    if request.method == 'POST':
+        form = FlyForm(request.POST)
+        if form.is_valid():
+            artwork = form.cleaned_data['artwork_url']
+            width = float(form.cleaned_data['width'])
+            x_mult = int(form.cleaned_data['x_coord']) / width
+            y_mult = int(form.cleaned_data['y_coord']) / width
+            fly.x_mult = x_mult
+            fly.y_mult = y_mult
+            fly.width = width
+            fly_color = form.cleaned_data['color']
+            fly.artwork_url = artwork
+            fly.album_id = form.cleaned_data['result']
+            file_name = set_up(artwork, x_mult, y_mult, fly_color)
+            fly.image_url = AWS_S3_CUSTOM_DOMAIN + '/' + file_name
+            fly.color = get_album_color(artwork)
+            fly.fly_color = fly_color
+            fly.album_name = form.cleaned_data['album_name']
+            fly.artist_name = form.cleaned_data['artist_name']
+            fly.album_url = form.cleaned_data['album_url']
+            fly.save()
+            return HttpResponseRedirect(
+                reverse('studio', kwargs={'pid': fly.id})
+            )
+    else:
+        form = FlyForm(initial={
+            'artwork_url': fly.artwork_url,
+            'album_name': fly.album_name,
+            'artist_name': fly.artist_name,
+            'album_url': fly.album_url,
+            'x_coord': fly.x_mult * fly.width,
+            'y_coord': fly.y_mult * fly.width,
+            'color': fly.fly_color,
+            'result': fly.album_id,
+            'width' : fly.width     
+        })
+    try:
+        image = fly.image_url
+    except Exception as e:
+        image = ''
+    preview = fly.image_url != None
+    context= {
+        "fly":fly,
+        "form":form,
+        "image":image,
+        "artwork_url": fly.artwork_url,
+        "fly_size": fly_size,
+        "preview" : preview
+    }
+    return render(request, 'spot/studio.html', context)
+
+
 def set_up(artwork_url, x_mult, y_mult, fly_color):
     if STATE != 'DEV':
         svg_code = '<svg xmlns="http://www.w3.org/2000/svg" height="8" width="10" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="{color}" d="M463.7 505.9c9.8-8.9 10.7-24.3 2.1-34.3l-42.1-49 0-54.7c0-5.5-1.8-10.8-5.1-15.1L352 266.3l0-.3L485.4 387.8C542.4 447.6 640 405.2 640 320.6c0-47.9-34-88.3-79.4-94.2l-153-23.9 40.8-40.9c7.8-7.8 9.4-20.1 3.9-29.8L428.5 90.1l38.2-50.9c8-10.6 6.1-25.9-4.3-34.1s-25.2-6.3-33.2 4.4l-48 63.9c-5.9 7.9-6.6 18.6-1.7 27.2L402.2 140 352 190.3l0-38.2c0-14.9-10.2-27.4-24-31l0-57.2c0-4.4-3.6-8-8-8s-8 3.6-8 8l0 57.2c-13.8 3.6-24 16.1-24 31l0 38.1L237.8 140l22.6-39.5c4.9-8.6 4.2-19.3-1.7-27.2l-48-63.9c-8-10.6-22.8-12.6-33.2-4.4s-12.2 23.5-4.3 34.1l38.2 50.9-23.9 41.7c-5.5 9.7-3.9 22 3.9 29.8l40.8 40.9-153 23.9C34 232.3 0 272.7 0 320.6c0 84.6 97.6 127 154.6 67.1L288 266l0 .3-66.5 86.4c-3.3 4.3-5.1 9.6-5.1 15.1l0 54.7-42.1 49c-8.6 10.1-7.7 25.5 2.1 34.3s24.7 7.9 33.4-2.1l48-55.9c3.8-4.4 5.9-10.2 5.9-16.1l0-55.4L288 344.7l0 63.1c0 17.7 14.3 32 32 32s32-14.3 32-32l0-63.1 24.3 31.6 0 55.4c0 5.9 2.1 11.7 5.9 16.1l48 55.9c8.6 10.1 23.6 11 33.4 2.1z"/></svg>'
@@ -488,9 +493,16 @@ def set_up(artwork_url, x_mult, y_mult, fly_color):
     img1.paste(img2, (x_coord,y_coord), mask = img2)
 
     # Displaying the image 
-    file_name = 'images/fly-img-' + art_id +'.png'
-    img1.save('media/' + file_name)
-
+    file_name = 'media/images/fly-img-' + art_id +'.png'    
+    img1.save(file_name)
+    s3_key = STATE + '/images/'  + 'fly-img-' + art_id
+    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    s3.upload_file(file_name, AWS_STORAGE_BUCKET_NAME,  s3_key, ExtraArgs={'ContentType': 'image/png'})
+    
     if exists(img_id):
         remove(img_id)
-    return file_name
+
+    if exists(file_name):
+        remove(file_name)
+
+    return s3_key
