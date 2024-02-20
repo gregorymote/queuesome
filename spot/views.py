@@ -196,11 +196,13 @@ def stats(request, date_param=str(datetime.now(tzinfo).date())):
     plays_total = len(Play.objects.all())
     users_today = len(Users.objects.filter(created__gte=day_date).all())
     plays_today = len(Play.objects.filter(day=day.id).all())
+    users_return = len(Users.objects.filter(created__lte=day_date, last_visited__gte=day.date).all())
     context = {
         'users_total' : users_total,
         'plays_total' : plays_total,
         'users_today' : users_today,
-        'plays_today' : plays_today
+        'plays_today' : plays_today,
+        'users_return' : users_return
     }
     return render(request, 'spot/stats.html', context)
 
