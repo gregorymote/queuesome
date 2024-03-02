@@ -40,9 +40,18 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     fly_y = Math.ceil(y_mult * img.height);
     play_x = Math.ceil(play_x_mult * img.width);
     play_y = Math.ceil(play_y_mult * img.width);
-    glass.style.backgroundPosition = "-" + ((play_x * zoom) - w + bw) + "px -" + ((play_y * zoom) - h + bw) + "px";
-    cursor.style.left = play_x + xOff - cw + "px";
-    cursor.style.top = play_y - cw + "px";
+    
+    if(!give_up){
+      glass.style.backgroundPosition = "-" + ((play_x * zoom) - w + bw) + "px -" + ((play_y * zoom) - h + bw) + "px";
+      cursor.style.left = play_x + xOff - cw + "px";
+      cursor.style.top = play_y - cw + "px";
+    }
+    else{
+      glass.style.backgroundPosition = "-" + ((fly_x * zoom) - w + bw) + "px -" + ((fly_y * zoom) - h + bw) + "px";
+      cursor.style.left = fly_x + xOff - cw + "px";
+      cursor.style.top = fly_y - cw + "px";
+    }
+
     
     if(!win){
       pathm = [];
@@ -62,11 +71,22 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       img.addEventListener("touchmove", moveMagnifier);
       cursor.addEventListener("mousemove", moveMagnifier);
       cursor.addEventListener("touchmove", moveMagnifier);
+      document.getElementById('give_up_button').addEventListener("click", giveUp);
     }
     else{
       setWatch(time);
       setFly(time);
       displayPath(pathm);
+    }
+
+    function giveUp(){
+      console.log("HERE");
+      $('#giveModal').modal('hide');
+      give_up=true;
+      setWin(fly_x,fly_y);
+      glass.style.backgroundPosition = "-" + ((fly_x * zoom) - w + bw) + "px -" + ((fly_y * zoom) - h + bw) + "px";
+      cursor.style.left = fly_x + xOff - cw + "px";
+      cursor.style.top = fly_y - cw + "px";
     }
 
     function moveMagnifier(e) {
@@ -79,10 +99,10 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       y = pos.y;
       storeCoordinate(x / img.width, y / img.width, pathm);
       found = getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad
-      if(found){
+      if(found || give_up){
         setTimeout(function(){
-          if(found && !win){
-            setWin(); 
+          if((found || give_up) && !win){
+            setWin(x, y); 
           }
         }, 1000);  
       }
@@ -104,37 +124,47 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       cursor.style.top = y - cw + "px";
       /* Display what the magnifier glass "sees": */
       glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
+    }
 
-      function setWin(){
-        var date = new Date();
-        var finish = date.toISOString().slice(11,23);
-        win = true;
-        getPath(x, y, finish, function(saved_path, time){
-          displayPath(saved_path);
-          setWatch(time);
-          setFly(time);
-        });
-        $('#resultModal').modal('show');
-        img.removeEventListener("touchmove", moveMagnifier);
-        img.removeEventListener("mousemove", moveMagnifier);
-        cursor.removeEventListener("mousemove", moveMagnifier);
-        cursor.removeEventListener("touchmove", moveMagnifier);
-
-      }
+    function setWin(x, y){
+      var date = new Date();
+      var finish = date.toISOString().slice(11,23);
+      win = true;
+      getPath(x, y, finish, give_up, function(saved_path, time){
+        displayPath(saved_path);
+        setWatch(time);
+        setFly(time);
+      });
+      $('#resultModal').modal('show');
+      img.removeEventListener("touchmove", moveMagnifier);
+      img.removeEventListener("mousemove", moveMagnifier);
+      cursor.removeEventListener("mousemove", moveMagnifier);
+      cursor.removeEventListener("touchmove", moveMagnifier);
     }
 
 
     function setFly(time_str){
       var fly = document.getElementById("fly_icon");
-      fly.style.color = '#1ed760';
+      var resultTitle = document.getElementById("resultTitle");    
       var hr_str = '';
       if(time_str.slice(0,2) != '00'){
          hr_str = time_str.slice(0,2) + ':'
       }
 
       var share_str = "🔎 🪰" + hr_str + time_str.slice(3,5) +':'+ time_str.slice(6,8) +'.'+ time_str.slice(9,11);
+      if(!give_up){
+        fly.style.color = '#1ed760';
+      }
+      else{
+        fly.style.color = 'gray';
+        share_str += '🏳️';
+        resultTitle.innerText = "Oh hmm...well at least you tried 🏳️"
+      }
       document.getElementById("copy-input").value = share_str;
       fly.addEventListener("click", function(){ $('#resultModal').modal('show'); });
+
+      document.getElementById("fly").style.display = 'initial';
+      document.getElementById("flag").style.display = 'none';
     }
 
     function setTime(time_str){
@@ -261,13 +291,14 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
         context.drawImage(offscreenCanvas, 0, 0);
     }
 
-    async function getPath(x, y, finish, callback) { 
+    async function getPath(x, y, finish, give_up, callback) { 
       $.ajax({
           url: '/spot/get_path',
           data: {
             'x' : x / img.width, 
             'y' : y / img.width,
-            'finish' : finish 
+            'finish' : finish,
+            'give_up': give_up 
           },
           dataType: 'json',
           success: function (data) {
