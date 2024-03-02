@@ -19,5 +19,6 @@ urlpatterns = [
     path('get_flys', views.get_flys, name="get_flys"),
     path('get_path', views.get_path, name="get_path"),
     path('set_start', views.set_start, name="set_start"),
-    path('get_dates', views.get_dates, name="get_dates")
+    path('get_dates', views.get_dates, name="get_dates"),
+    path('give_up', views.update_give_up, name="give_up")
 ]

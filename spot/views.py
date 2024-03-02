@@ -69,6 +69,7 @@ def index(request):
         'user' : user.id,
         'win' : win,
         'started' : started,
+        'give_up' : play.give_up,
         'time' : str(play.time),
         'start_time': str(play.start_time),
         'pathm' : play.pathm
@@ -381,6 +382,7 @@ def get_path(request):
         play.finish_time = request.GET.get('finish', None)
         play.x_mult = request.GET.get('x', None)
         play.y_mult = request.GET.get('y', None)
+        play.give_up = request.GET.get('give_up', None) == "true"
         play.save()
         play = Play.objects.get(user=user.id, day=day.id)
         time = str(datetime.combine(date.today(), play.finish_time) - datetime.combine(date.today(), play.start_time))
@@ -416,6 +418,23 @@ def set_start(request):
     }
     return JsonResponse(data)
 
+
+def update_give_up(request):
+    try:
+        tzinfo = get_tz_info()
+        session_key = request.session.session_key
+        user = Users.objects.get(sessionID=session_key)
+        day = Day.objects.get(date=datetime.now(tzinfo).date())
+        play = Play.objects.get(user=user.id, day=day.id)
+        play.give_up = True
+        play.save()
+        success = True
+    except Exception as e:
+        success = False
+    data = {
+        'success': success
+    }
+    return JsonResponse(data)
 
 @user_passes_test(lambda u: u.is_superuser)
 def studio(request, pid):
