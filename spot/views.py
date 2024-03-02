@@ -27,10 +27,10 @@ if STATE != 'DEV':
 
 
 fly_size = '16%'
-timezone_offset = -9.0 
-tzinfo = timezone(timedelta(hours=timezone_offset))
+
 
 def index(request):
+    tzinfo = get_tz_info()
     session_key = request.session.session_key
     if session_key is None:
         return HttpResponseRedirect(
@@ -77,6 +77,7 @@ def index(request):
 
 
 def start(request):
+    tzinfo = get_tz_info()
     if request.session.session_key is None:
         request.session.create()
     session_key = request.session.session_key
@@ -125,6 +126,7 @@ def start(request):
 
 
 def sorry(request):
+    tzinfo = get_tz_info()
     try:
         day = Day.objects.get(date=datetime.now(tzinfo).date())
         fly = Fly.objects.get(id=day.fly.id)
@@ -178,15 +180,21 @@ def login(request):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def calendar(request, date=str(datetime.now(tzinfo).date())):
+def calendar(request, date_param='default'):
+    tzinfo = get_tz_info()
+    if date_param == 'default':
+        date_param = str(datetime.now(tzinfo).date())
     context = {
-        'date' : date
+        'date' : date_param
     }
     return render(request, 'spot/calendar.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def stats(request, date_param=str(datetime.now(tzinfo).date())):
+def stats(request, date_param='default'):
+    tzinfo = get_tz_info()
+    if date_param == 'default':
+        date_param = str(datetime.now(tzinfo).date())
     day_date = datetime.strptime(date_param, "%Y-%m-%d").date()
     try:
         day = Day.objects.get(date=day_date)
@@ -196,7 +204,7 @@ def stats(request, date_param=str(datetime.now(tzinfo).date())):
     plays_total = len(Play.objects.all())
     users_today = len(Users.objects.filter(created__gte=day_date).all())
     plays_today = len(Play.objects.filter(day=day.id).all())
-    users_return = len(Users.objects.filter(created__lte=day_date, last_visited__gte=day.date).all())
+    users_return = len(Users.objects.filter(created__lte=day_date, last_visited__gte=day_date).all())
     context = {
         'users_total' : users_total,
         'plays_total' : plays_total,
@@ -224,7 +232,7 @@ def day(request, date_param):
             day.date = day_date
             day.save()
             return HttpResponseRedirect(
-                reverse('calendar', kwargs={'date': day_date})
+                reverse('calendar', kwargs={'date_param': day_date})
         )
     else:
         form = DayForm(initial={
@@ -332,6 +340,7 @@ def update_search(request):
 
 
 def update_play(request):
+    tzinfo = get_tz_info()
     stop = False
     pathm = []
     session_key = request.session.session_key
@@ -358,6 +367,7 @@ def update_play(request):
 
 
 def get_path(request):
+    tzinfo = get_tz_info()
     pathm = []  
     time = ''  
     session_key = request.session.session_key
@@ -386,6 +396,7 @@ def get_path(request):
 
 
 def set_start(request):
+    tzinfo = get_tz_info()
     try: 
         start_time = request.GET.get('start_time', None)
         if(start_time):
@@ -508,3 +519,9 @@ def set_up(artwork_url, x_mult, y_mult, fly_color):
         remove(file_name)
 
     return s3_key
+
+
+def get_tz_info():
+    timezone_offset = -9.0 
+    tzinfo = timezone(timedelta(hours=timezone_offset))
+    return tzinfo
