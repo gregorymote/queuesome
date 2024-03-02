@@ -44,6 +44,7 @@ class Play(models.Model):
     pathm = ArrayField(ArrayField(models.FloatField()), null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     last_updated = models.DateTimeField(auto_now=True, null=True)
+    give_up = models.BooleanField(default=False)
     day = models.ForeignKey('Day', on_delete=models.CASCADE, null=True)
     user = models.ForeignKey('Users', on_delete=models.CASCADE,)
 

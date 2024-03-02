@@ -19,19 +19,19 @@
     var pathm = {{pathm|safe}};
     var win = '{{win}}' == 'True';
     var started = '{{started}}' == 'True';
+    var give_up = '{{give_up}}' == 'True';
     var d;
     var start = '{{start_time}}';
     $(document).ready(function() {
     	var song_title = document.getElementById('song_title');
 		var parent = document.getElementById('parent');
         var background = "{{ background }}";
+        document.getElementById('flag').addEventListener("click", function(){ $('#giveModal').modal('show'); });
 		pan(song_title, parent, 3000)
         magnify("artwork", 4, background, {{x_mult}}, {{y_mult}}, {{play_x_mult}}, {{play_y_mult}}, 'rgb({{color}})', '{{time}}');
         let copyText = document.querySelector(".copy-text");
         copyText.querySelector("button").addEventListener("click", function () {
             let input = copyText.querySelector("input.text");
-            //input.select();
-            //document.execCommand("copy");
             copyText.classList.add("active");
             window.getSelection().removeAllRanges();
             setTimeout(function () {
@@ -79,7 +79,7 @@
             });
         }
 	}
-    if(!win){
+    if(!win && !give_up){
 	    setTimeout(sendData, 1000);
     }
     if(!started){
@@ -190,8 +190,11 @@
                     00</span> 
 			</div>
 			<div class="col-4 pe-4 pt-2 right-align">
-				<div id="fly" class="fly pe-2" style="bottom:.20em; color: rgb({{color}});">
+				<div id="fly" class="fly pe-2" style="bottom:.20em; display:none;">
 					<em id="fly_icon" class="fa-solid fa-mosquito"></em>
+				</div>
+                <div id="flag" class="fly pe-2" style="bottom:.20em; color: gray">
+					<em id="fly_icon" class="fa-solid fa-flag"></em>
 				</div>
 			</div>
 		</div>
@@ -207,7 +210,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header" style="border-bottom: 0px;">
-              <h5 class="modal-title">Woohoo..you did it 🎉</h5>
+              <h5 id="resultTitle" class="modal-title">Woohoo..you did it 🎉</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center;">
@@ -225,6 +228,26 @@
             <div class="modal-footer pb-4" style="border-top: 0px; text-align: center;">
                 <div style="margin:auto;">
                     <small><i>New Flys every day at 3:49 AM Eastern Daylight Time</i></small>
+                </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+<!-- Give Up Modal -->
+<div class="modal fade" id="giveModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 0px;">
+              <h5 class="modal-title">Yikes...you sure 🏳️ ?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <button id="give_up_button" class="btn btn-lg button-black" type="submit" value="Give Up?">Give Up?</button>
+            </div>
+            <div class="modal-footer pb-4" style="border-top: 0px; text-align: center;">
+                <div style="margin:auto;">
                 </div>
             </div>
           </div>
