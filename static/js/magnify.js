@@ -96,7 +96,7 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
       /* Get the cursor's x and y positions: */
       pos = getCursorPos(e);
       x = pos.x;
-      y = pos.y;
+      y = pos.y;    
       storeCoordinate(x / img.width, y / img.width, pathm);
       found = getDist([Math.floor(x), Math.floor(y)], [fly_x, fly_y]) < rad
       if(found || give_up){
@@ -234,11 +234,21 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     function getCursorPos(e) {
       var a, x = 0, y = 0;
       e = e || window.event;
+      /* Account for Android touchEvent issue */
+      var pageX, pageY;
+      if (e.type == 'mousemove'){
+        pageX = e.pageX;
+        pageY = e.pageY;
+      }
+      else{
+        pageX = e.touches[0].pageX;
+        pageY = e.touches[0].pageY;
+      }
       /* Get the x and y positions of the image: */
       a = img.getBoundingClientRect();
       /* Calculate the cursor's x and y coordinates, relative to the image: */
-      x = e.pageX - a.left;
-      y = e.pageY - a.top;
+      x = pageX - a.left;
+      y = pageY - a.top;
       /* Consider any page scrolling: */
       x = x - window.pageXOffset;
       y = y - window.pageYOffset;
