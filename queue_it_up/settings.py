@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import dj_database_url
 
-STATE="PROD"
+STATE="STAGE"
 if STATE=="DEV":
     HEROKU = False
     STAGE = False
@@ -21,7 +21,7 @@ if STATE=="DEV":
 elif STATE == "STAGE":
     HEROKU = True
     STAGE = True
-    DEBUG = False
+    DEBUG = True
 else:
     HEROKU = True
     DEBUG = False
