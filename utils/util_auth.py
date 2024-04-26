@@ -62,7 +62,6 @@ def generate_url(scope=SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET,
 
 
 def get_url(path, is_cloud, ip, port):
-    print(path[0:])
     i = 0
     while path[i] != '/':
         i = i + 1
@@ -82,9 +81,7 @@ def get_url(path, is_cloud, ip, port):
     
 def create_token(url, scope=SCOPE, client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET, redirect_uri=URI, show_dialog=False):
-    
-    print(redirect_uri)
-    print(url)
+
     sp_oauth = oauth2.SpotifyOAuth(
         client_id=client_id,
         client_secret=client_secret,
@@ -93,7 +90,6 @@ def create_token(url, scope=SCOPE, client_id=CLIENT_ID,
         show_dialog=show_dialog
     )
     code = sp_oauth.parse_response_code(url)
-    print(code)
     if code:
         token_info = sp_oauth.get_access_token(code=code, check_cache=False)
     else:
