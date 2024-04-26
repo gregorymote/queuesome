@@ -62,6 +62,7 @@ def generate_url(scope=SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET,
 
 
 def get_url(path, is_cloud, ip, port):
+    print(path[0:])
     i = 0
     while path[i] != '/':
         i = i + 1
