@@ -153,7 +153,6 @@ def admin(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def auth(request):
-    print(str(request.get_full_path))
     url = get_url(str(request.get_full_path), HEROKU, IP, PORT)
     token_info = json.dumps(create_token(url=url, redirect_uri=SPOT_URI, scope=''))
     try:
