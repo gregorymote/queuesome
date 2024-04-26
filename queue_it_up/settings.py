@@ -24,7 +24,7 @@ elif STATE == "STAGE":
     DEBUG = True
 else:
     HEROKU = True
-    DEBUG = False
+    DEBUG = True
     STAGE = False
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
