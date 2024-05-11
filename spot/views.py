@@ -514,9 +514,11 @@ def set_up(artwork_url, x_mult, y_mult, fly_color):
     
     # Opening the primary image (used in background) 
     img1 = Image.open('artwork/img-'+ art_id +'.png' )
+    if img1.mode == "CMYK":
+        img1 = img1.convert("RGB")
         
     # Opening the secondary image (overlay image) 
-    img2 = Image.open('artwork/fly.png') 
+    img2 = Image.open('artwork/fly.png')
     
     # Pasting img2 image on top of img1  
     # starting at coordinates (0, 0) 
