@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<style>
+	h6{
+		display: inline-block;
+		line-height: normal;
+	}
+	h5 {
+  		transition-duration: 5s;
+	}
+    .carousel {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 80vh; /* Adjust height to fill more of the page */
+        position: relative;
+        margin: auto;
+        overflow: hidden;
+    }
+
+    .carousel-frame {
+        flex: 1; /* Make each frame take up equal space */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 1s ease-in-out;
+    }
+
+    .artwork-square {
+        width: 100%;
+        height: 100%;
+    }
+
+    .frame {
+        width: 90%; /* Adjust width to fill more space */
+        height: 90%; /* Adjust height to fill more space */
+        background-color: lightgray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .oval-frame {
+        border-radius: 50%;
+    }
+
+    .rounded-rect-frame {
+        border-radius: 15px;
+    }
+</style>
+
+<script type="text/javascript">
+	var refresh_rate = 1000;//{{user.refreshRate}} * 1000;
+	var wait = true;
+	var party = {
+		"device_error" : "{{party.device_error}}",
+		"name" : "{{party.name | safe}}",
+		"state": "{{party.state}}",
+		"joinCode" : "{{party.joinCode}}",
+	}
+	var category = {
+		"name": "{{category.name | safe}}",
+		"leader": "{{category.leader.name | safe}}",
+		"full": "{{ full }}",
+	}
+	var song = {
+		"name": "{{song.name | safe}}",
+		"title": "{{song.title | safe}}",
+		"artist": "{{song.artist | safe}}",
+		"link": "{{song.link | safe}}",
+		"user": "{{song.user.pk}}",
+		"art": "{{song.art}}",
+		"color": "{{song.color}}"
+	}
+	var results = {{ results|safe }};
+	var totals = {{ totals|safe }};
+
+	window.onload = function() {
+		updatePage(party, category, song, results, totals, onLoad=true);
+	};
+	
+	function getPlayData(){
+		$.ajax({
+			url: '/sesh/update_play',
+			data: {
+			'pid': {{ party.pk }}
+			},
+			dataType: 'json',
+			success: function (data) {
+				updatePage(data.party, data.category, data.song, data.results, data.totals);			
+			},
+			complete: function (data){
+				setTimeout(getPlayData, refresh_rate);
+			}
+	 	});
+	}
+	setTimeout(getPlayData, refresh_rate);
+
+	$(document).ready(function() {
+		var song_title = document.getElementById('song_title');
+		var parent = document.getElementById('parent');
+		pan(song_title, parent, 3000)
+		var category_name = document.getElementById('category_name');
+		var category_parent = document.getElementById('category_parent');
+		pan(category_name, category_parent, 5000);
+	});
+
+	function updatePage(party, category, song, results, totals, onLoad=false){
+		var redraw = false;
+		var inactive = decodeBool(party.inactive);
+		if (inactive){
+			window.location.replace('/index');
+		}
+		var category_name = document.getElementById('category_name');
+		var category_leader = document.getElementById('category_leader');
+		var blur = document.getElementById('blur');
+		var artwork = document.getElementById('artwork');
+		var logo = document.getElementById('logo');
+		var logo_placeholder = document.getElementById('logo_placeholder');
+		var song_title = document.getElementById('song_title');
+		var song_link = document.getElementById('song_link');
+		var song_artist = document.getElementById('song_artist');
+
+		if (category_name.innerHTML != encodeText(category.name)){
+			category_name.innerHTML = category.name;
+			setWidth(category_name);
+			redraw = true;
+		}
+		if (song.art != "lull"){
+			if(category_leader.innerHTML != encodeText(category.leader+"'s Vibe")){
+				category_leader.innerHTML=category.leader+"'s Vibe";
+				redraw = true;
+			}
+			if (logo.style.display != 'initial'){
+				logo.style.display = 'initial';
+				logo_placeholder.style.display='none';
+			}
+			if(song_title.innerHTML != encodeText(song.title)){
+				song_title.innerHTML = song.title;
+				setWidth(song_title);
+				redraw = true;
+			}
+
+			if(song_artist.innerHTML != encodeText(song.artist)){
+				song_link.href=song.link;
+				song_link.style.visibility='initial';
+				song_artist.innerHTML = song.artist;
+			}
+
+			if(song.art == 'duplicate'){
+				{% load static %}
+				if(artwork.src.indexOf('twosome') == -1){
+					artwork.src = "{% static 'images/twosome.png' %}";
+					blur.src = "{% static 'images/twosome.png' %}";
+					redraw = true;
+				}
+			}
+			else{
+				if(artwork.src != song.art){
+					artwork.src = song.art;
+					blur.src = song.art;
+					redraw = true;
+				}
+			}
+			wait = true;
+		}
+		else{
+			category_leader.innerHTML = party.name;
+			if(logo.style.display != 'none'){
+				logo.style.display='none';
+				logo_placeholder.style.display='initial';
+			}
+			song_link.removeAttribute("href");
+			song_artist.innerHTML = '';
+			song_link.style.visibility='hidden';
+			if(onLoad || !wait){
+				{% load static %}
+				artwork.src = "{% static 'images/queue_it_to_it_brah.png' %}";
+				blur.src = "{% static 'images/queue_it_to_it_brah.png' %}";
+				
+				if(party.state == 'pick_song'){
+					if(song_title.innerHTML != "Someone Needs to Pick a Song"){
+						song_title.innerHTML="Someone Needs to Pick a Song";
+						setWidth(song_title);
+						redraw = true;
+					}
+				}
+				else{
+					if(song_title.innerHTML !="Someone Needs to Curate the Vibe"){
+						song_title.innerHTML="Someone Needs to Curate the Vibe";
+						setWidth(song_title);
+						redraw = true;
+					}
+				}
+				wait = true;
+			}
+			else{
+				wait = false;
+				redraw = false;
+			}
+		}
+
+		if(updateColor('song-color', 'rgb('+ song.color + ')')){
+			redraw = true;
+		}
+		//Force Redraw
+		if(redraw){
+			var parent = document.getElementById('parent');
+			forceRedraw(parent);
+		}
+	}
+
+	function updateColor(name, color) {
+		var update = false;
+		var cols = document.getElementsByClassName(name);
+		for(i = 0; i < cols.length; i++) {
+			if(cols[i].style.color != color){
+				cols[i].style.color = color;
+				update = true;
+			}
+		}
+		return update;
+	}
+
+	function encodeText(str){
+		var p = document.createElement('p');
+		p.innerHTML = str;
+		return p.innerHTML;
+	}
+
+	function decodeBool(input){
+		if (input == 'True' || input == 'true' || input == true){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+</script>
+<style>
+	.song-link{
+		text-decoration:none;
+	}
+
+	.category-name {
+		white-space: nowrap;
+		overflow: hidden;
+		position: relative;
+		width: 90%;
+		margin:auto;
+	}
+
+	.play-bar{
+		border-color: lightgray;
+		border-width: 2px;
+		border-style: solid;
+		border-radius: 12px;
+		height: auto;
+		border-bottom:none;
+		border-left: none;
+		border-right: none;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+		max-width:800px;
+		margin-left: auto;
+		margin-right: auto;
+		background-color: white;
+	}
+
+	.action:hover{
+		width: 90%; 
+		border-radius:500px; 
+		color:white !important;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+		text-decoration: none;
+	}
+
+	.action{
+		width: 90%; 
+		border-radius:500px; 
+		color:white !important;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+		text-decoration: none;
+	}
+
+	.like{
+		display:inline-block;
+		font-size: 2em;
+		position: relative;
+	}
+	.song-color{
+		color: rgb(130, 128, 131);
+	}
+	.right-align{
+		text-align: right;
+	}
+	.btn {
+		border-width: 0px !important;
+	}
+    .frame {
+        width: 80%;
+        height: 80%;
+        background-color: lightgray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .oval-frame {
+        border-radius: 50%;
+    }
+
+    .rounded-rect-frame {
+        border-radius: 15px;
+    }
+
+    .artwork-square {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div id="parent" class="container-fluid text-center form-width">
+    <div style="visibility:hidden">
+        <p style="margin-bottom:0; line-height:.5em;">Rendering</p>
+    </div>
+    <div class="carousel">
+        <div class="carousel-frame">
+            <div class="frame oval-frame">
+                <h2>VIBE PICKS</h2>
+            </div>
+        </div>
+        <div class="carousel-frame">
+            <div style="position:relative">
+                <img id="blur" class="blurry artwork-square" alt=""/>
+                <img id="artwork" class="clear artwork-square" alt=""/>
+            </div>
+        </div>
+        <div class="carousel-frame">
+            <div class="frame rounded-rect-frame">
+                <h2>LIKES</h2>
+            </div>
+        </div>
+    </div>
+    <div class="pt-1">
+        {% load static %}
+        <img id="logo" style='display:none;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+    </div>
+    <div class="song-title">
+        <h5 id="song_title" style="position:absolute;"></h5>
+        <h5 style="visibility:hidden;">Text to Set the Height of the Parent Div</h5>
+    </div>
+    <a id="song_link" style='visibility:hidden; position:relative; bottom: .5em;' class="song-link song-color"><h6 id="song_artist"></h6></a>
+    <div class="pt-1">
+        {% load static %}
+        <img id="logo_placeholder" style='visibility:hidden;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
+    </div>
+</div>
+
+<div class="fixed-bottom">
+	<div id="play_bar" class="play-bar">
+		<div class="row pb-2">
+			<div class="col-8 pt-2 text-left ">
+				<div id="category_parent" class="category-name">
+					<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
+					<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
+					<h6 id ="category_leader" class="category-leader song-color"></h6>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let currentIndex = 0;
+        const frames = document.querySelectorAll('.carousel-frame');
+
+        setInterval(() => {
+            frames.forEach((frame, index) => {
+                frame.style.order = (index - currentIndex + 3) % 3 + 1;
+            });
+            currentIndex = (currentIndex + 1) % 3;
+        }, 10000);
+
+        var song_title = document.getElementById('song_title');
+        var parent = document.getElementById('parent');
+        if (song_title && parent) {
+            pan(song_title, parent, 3000);
+        }
+        var category_name = document.getElementById('category_name');
+        var category_parent = document.getElementById('category_parent');
+        if (category_name && category_parent) {
+            pan(category_name, category_parent, 5000);
+        }
+    });
+</script>
+
+{% endblock %}
