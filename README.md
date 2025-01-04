@@ -81,10 +81,10 @@
 
    <I>from party.models import Library</I>
 
-   <I>cats = ["new cat1", "new cat2"]</I>
+   <I>cats = ["custom", "create your own", "cat"]</I>
 
    <I>for x in cats:</I>
-       <I>l = library(name = x)</I>
+       <I>l = Library(name = x, visible = True)</I>
        <I>l.save()</I>
 
 
