@@ -277,6 +277,20 @@
 			}	
 		}
 
+		// Update users table
+		const usersTableBody = document.getElementById('users_table_body');
+		usersTableBody.innerHTML = ''; // Clear existing rows
+		party.users.forEach(u => {
+			const row = document.createElement('tr');
+			row.innerHTML = `
+				<td>${u.name}</td>
+				<td>${u.hasPickedVibe ? 'Yes' : 'No'}</td>
+				<td>${u.hasPickedSong ? 'Yes' : 'No'}</td>
+				${party.isHost && !u.isHost ? `<td><button class="btn text-danger bg-white" name="${u.sessionID}"><em class="fa fa-times"></em></button></td>` : ''}
+			`;
+			usersTableBody.appendChild(row);
+		});
+
 		if(updateColor('song-color', 'rgb('+ song.color + ')')){
 			redraw = true;
 		}
@@ -388,6 +402,10 @@
 
     .oval-frame {
         border-radius: 50%;
+        width: 100%; /* Make the oval frame responsive */
+        height: auto; /* Make the oval frame responsive */
+        padding: 20px; /* Add some padding for better appearance */
+        box-sizing: border-box; /* Include padding in the element's total width and height */
     }
 
     .rounded-rect-frame {
@@ -407,12 +425,31 @@
     <div class="carousel">
         <div class="carousel-frame">
             <div class="frame oval-frame">
-                <h2>VIBE PICKS</h2>
+                <h2>VIBE PICKS
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Picked Vibe?</th>
+								<th>Picked Song?</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="users_table_body">
+							<!-- User rows will be dynamically inserted here -->
+						</tbody>
+					</table>
+				</h2>
             </div>
         </div>
         <div class="carousel-frame">
             <div style="position:relative">
-                <img id="blur" class="blurry artwork-square" alt=""/>
+                <div id="category_parent" class="category-name">
+					<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
+					<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
+					<h6 id ="category_leader" class="category-leader song-color"></h6>
+				</div>
+				<img id="blur" class="blurry artwork-square" alt=""/>
                 <img id="artwork" class="clear artwork-square" alt=""/>
 				<div class="pt-1">
 					{% load static %}
@@ -470,20 +507,6 @@
         {% load static %}
         <img id="logo_placeholder" style='visibility:hidden;' src="{% static 'images/Spotify_Icon_RGB_Green.png' %}" width="21" height="21" alt="...">
     </div>
-</div>
-
-<div class="fixed-bottom">
-	<div id="play_bar" class="play-bar">
-		<div class="row pb-2">
-			<div class="col-8 pt-2 text-left ">
-				<div id="category_parent" class="category-name">
-					<h5 id = "category_name" style="position:absolute; margin-bottom:0"></h5>
-					<h5 id = "category_name_hidden" style="visibility:hidden; margin-bottom:0">Text to Set the Height of the Parent Div</h5>
-					<h6 id ="category_leader" class="category-leader song-color"></h6>
-				</div>
-			</div>
-		</div>
-	</div>
 </div>
 
 <script>
