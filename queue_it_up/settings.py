@@ -194,7 +194,7 @@ if STAGE:
     proto='http://'
     IP='q-it-up-staging.herokuapp.com'
 elif HEROKU:
-    proto='https://'
+    proto='https://www.'
     IP='queuesome.com'
 else:
     proto='http://'

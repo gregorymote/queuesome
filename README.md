@@ -2,7 +2,7 @@
 
    A Django Web Application Powered By Spotipy
 
-   See how it works at <a href="https://queuesome.com/tutorial">queuesome.com</a>
+   See how it works at <a href="https://www.queuesome.com/tutorial">queuesome.com</a>
 
 
 

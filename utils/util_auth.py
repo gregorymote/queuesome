@@ -81,7 +81,7 @@ def get_url(path, is_cloud, ip, port):
     
 def create_token(url, scope=SCOPE, client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET, redirect_uri=URI, show_dialog=False):
-    
+    print(url)
     sp_oauth = oauth2.SpotifyOAuth(
         client_id=client_id,
         client_secret=client_secret,
