@@ -41,6 +41,15 @@ class Party(models.Model):
     def __str__(self):
         return self.name or ''
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['joinCode'],
+                condition=models.Q(active=True, joinCode__isnull=False),
+                name='unique_active_party_join_code',
+            ),
+        ]
+
 class Users(models.Model):
     name = models.CharField(max_length=35)
     party = models.ForeignKey('Party', on_delete=models.CASCADE,)
@@ -57,6 +66,15 @@ class Users(models.Model):
     created = models.DateTimeField(auto_now_add=True, blank=True)
     def __str__(self):
         return self.name or ''
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['party', 'sessionID'],
+                condition=models.Q(active=True, sessionID__isnull=False),
+                name='unique_active_party_session',
+            ),
+        ]
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

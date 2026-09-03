@@ -27,6 +27,8 @@ Semantic Versioning once releases resume.
   CSRF-protected POST requests.
 - Bound Spotify authorization callbacks to one-time session state, validated
   callback parameters, and deferred party creation until token exchange succeeds.
+- Enforced unique active party codes and session memberships, safely retried
+  code collisions, and hardened missing and inactive join-code handling.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced
