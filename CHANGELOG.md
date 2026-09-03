@@ -33,6 +33,8 @@ Semantic Versioning once releases resume.
   and rejected song results that do not belong to the submitting member.
 - Serialized category transitions, restricted library selections to choices
   offered to the current leader, and made replayed selections harmless.
+- Completed song selection atomically when all remaining members have picked,
+  and claimed playback before starting a worker to prevent duplicate runners.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced

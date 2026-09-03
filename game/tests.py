@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from game.views import claim_playback
 from party.models import Category, Library, Party, Searches, Songs, Users
 
 
@@ -168,6 +169,14 @@ class RoundTransitionTests(TestCase):
             set(Songs.objects.values_list('user_id', flat=True)),
             {first_user.pk, second_user.pk},
         )
+        party.refresh_from_db()
+        category.refresh_from_db()
+        first_user.refresh_from_db()
+        second_user.refresh_from_db()
+        self.assertEqual(party.state, 'assign')
+        self.assertTrue(category.full)
+        self.assertFalse(first_user.hasPicked)
+        self.assertFalse(second_user.hasPicked)
         self.assertEqual(thread.call_count, 2)
 
     @patch('game.views.threading.Thread')
@@ -194,6 +203,57 @@ class RoundTransitionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Songs.objects.filter(user=user).exists())
         thread.assert_not_called()
+
+    def test_member_removal_can_complete_song_selection(self):
+        party = Party.objects.create(
+            name='Picking party', state='pick_song', roundTotal=1
+        )
+        category = Category.objects.create(
+            name='Round one', party=party, roundNum=1
+        )
+        host_client, host = self.create_party_user(
+            party, 'Host', is_host=True
+        )
+        leaving_client, leaving = self.create_party_user(party, 'Leaving')
+        host.hasPicked = True
+        host.save(update_fields=['hasPicked'])
+
+        response = host_client.post(
+            reverse('users', kwargs={'pid': party.pk}),
+            {leaving.sessionID: '', 'blank': ''},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        party.refresh_from_db()
+        category.refresh_from_db()
+        leaving.refresh_from_db()
+        host.refresh_from_db()
+        self.assertFalse(leaving.active)
+        self.assertEqual(party.state, 'assign')
+        self.assertTrue(category.full)
+        self.assertFalse(host.hasPicked)
+
+    def test_playback_is_claimed_only_once(self):
+        party = Party.objects.create(name='Playable party', roundNum=1)
+        user = Users.objects.create(name='Member', party=party)
+        category = Category.objects.create(
+            name='Full category', party=party, roundNum=1, full=True
+        )
+        Songs.objects.create(
+            name='Song',
+            uri='spotify:track:song',
+            art='art',
+            user=user,
+            category=category,
+        )
+
+        first_claim = claim_playback(party.pk)
+        second_claim = claim_playback(party.pk)
+
+        self.assertTrue(first_claim)
+        self.assertFalse(second_claim)
+        party.refresh_from_db()
+        self.assertTrue(party.thread)
 
 
 class CategoryTransitionTests(TestCase):
