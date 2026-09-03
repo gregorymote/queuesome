@@ -8,6 +8,7 @@ from utils.util_party import get_inactivity, clean_up_party
 from utils.util_rand import get_code
 from utils.util_device import get_devices, get_active_device
 from django.shortcuts import render
+from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.http import (
     HttpResponseBadRequest,
@@ -25,6 +26,7 @@ from html import escape
 import random
 
 logger = logging.getLogger(__name__)
+MAX_JOIN_CODE_ATTEMPTS = 10
 
 
 def auth(request):
@@ -201,15 +203,15 @@ def name_party(request, pid):
         if form.is_valid():
             party_name = escape(form.cleaned_data['party_name'])
             party.name = party_name[:Party._meta.get_field('name').max_length]
-            unique = False
-            while not unique:
-                join_code = get_code(4)
+            for attempt in range(MAX_JOIN_CODE_ATTEMPTS):
+                party.joinCode = get_code(4)
                 try:
-                    Party.objects.get(joinCode=join_code)
-                except Exception:
-                    party.joinCode = join_code
-                    unique = True
-            party.save()
+                    with transaction.atomic():
+                        party.save()
+                    break
+                except IntegrityError:
+                    if attempt == MAX_JOIN_CODE_ATTEMPTS - 1:
+                        raise
             user_name = escape(form.cleaned_data['user_name'])
             user.name = user_name[:Users._meta.get_field('name').max_length]
             user.icon = get_random_emoji()
@@ -238,7 +240,8 @@ def join_party(request):
     party_name = ""
     host = ""
     if not session_key:
-        session_key = request.session.create()
+        request.session.create()
+        session_key = request.session.session_key
 
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
@@ -293,11 +296,8 @@ def join_party(request):
 
 
 def validate_code(request):
-    valid = False
-    code = escape(request.GET.get('code', None))
-    party = Party.objects.filter(joinCode=code.upper(), active=True).first()
-    if party:
-        valid = True
+    code = request.GET.get('code', '')[:4].upper()
+    valid = Party.objects.filter(joinCode=code, active=True).exists()
     data = {
         'valid': valid
     }
