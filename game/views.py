@@ -302,6 +302,56 @@ def update_like(request):
     return JsonResponse(data)
 
 
+def _complete_song_selection(party):
+    if party.state != 'pick_song':
+        return False
+    if Users.objects.filter(
+        party=party, active=True, hasPicked=False
+    ).exists():
+        return False
+    category = Category.objects.filter(
+        party=party, roundNum=party.roundTotal
+    ).first()
+    if category is None:
+        return False
+    category.full = True
+    category.save(update_fields=['full'])
+    party.state = 'assign'
+    party.save(update_fields=['state'])
+    reset_users(party)
+    return True
+
+
+def complete_song_selection(party_id):
+    with transaction.atomic():
+        party = Party.objects.select_for_update().filter(
+            pk=party_id, active=True
+        ).first()
+        if party is None:
+            return False
+        return _complete_song_selection(party)
+
+
+def claim_playback(party_id):
+    with transaction.atomic():
+        party = Party.objects.select_for_update().filter(
+            pk=party_id, active=True
+        ).first()
+        if party is None:
+            return False
+        has_songs = Songs.objects.filter(
+            category__party=party,
+            category__roundNum=party.roundNum,
+            state='not_played',
+            category__full=True,
+        ).exists()
+        if party.device_error or party.thread or not has_songs:
+            return False
+        party.thread = True
+        party.save(update_fields=['thread'])
+        return True
+
+
 @background()
 def run_game(pid):
     ''' Background Task to update the game logic and trigger the song thread 
@@ -328,39 +378,12 @@ def run_game(pid):
             party.save()
             print(QDEBUG,'Set state to choose category: ', party.state)
                     
-        if Party.objects.filter(pk=pid,active=True,state='pick_song').first() \
-                and not \
-                Users.objects.filter(hasPicked=False,party__pk=pid,active=True
-            ).all():
-            party = Party.objects.get(pk=pid)
-            category = Category.objects.filter(
-                party=party,roundNum=party.roundTotal).first()
-            category.full = True
-            category.save()
-            print(QDEBUG,'Set Category to Full: ', category.full)
-            party.state = 'assign'
-            party.save()
-            print(QDEBUG,'Set state to assign: ', party.state)
-            reset_users(party) 
+        complete_song_selection(pid)
         
         party = Party.objects.get(pk=pid)
-        if Party.objects.filter(
-                pk=pid,
-                active=True,
-                device_error=False,
-                thread=False
-            ).first() and \
-            Songs.objects.filter(
-                category__party__pk=pid,
-                category__roundNum=party.roundNum,
-                state='not_played',
-                category__full=True
-          ):
+        if claim_playback(pid):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
-            party = Party.objects.get(pk=pid)
-            party.thread = True
-            party.save()
             print(QDEBUG,'Set Thread to True: ', party.thread)
 
     print(QDEBUG, "exiting task: ", Party.objects.filter(pk=pid, active=True).first())
@@ -632,6 +655,7 @@ def pick_song(request, pid):
                     Searches.objects.filter(user=user, party=party).delete()
                     user.hasPicked = True
                     user.save(update_fields=['hasPicked'])
+                    _complete_song_selection(party)
                     transaction.on_commit(
                         lambda: threading.Thread(
                             target=get_bg_color, args=(song.id,)
@@ -798,21 +822,17 @@ def users(request, pid):
             else:
                 for user in users:
                     if (user.sessionID in request.POST):
-                        user.active=False
-                        user.sessionID = ""
-                        user.save()
-                        not_picked = Users.objects.filter(
-                            party=party,
-                            active=True,
-                            hasPicked=False
-                        ).all()
-                        if not not_picked:
-                            category = Category.objects.filter(
-                                party=party,
-                                roundNum=party.roundTotal
-                            ).first()
-                            category.full = True
-                            category.save()
+                        with transaction.atomic():
+                            party = Party.objects.select_for_update().get(
+                                pk=pid, active=True
+                            )
+                            user = Users.objects.select_for_update().get(
+                                pk=user.pk, party=party, active=True
+                            )
+                            user.active = False
+                            user.sessionID = ""
+                            user.save(update_fields=['active', 'sessionID'])
+                            _complete_song_selection(party)
                         return HttpResponseRedirect(
                             reverse('users', kwargs={'pid':pid})
                         )
