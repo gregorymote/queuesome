@@ -17,6 +17,9 @@ Semantic Versioning once releases resume.
 
 ### Changed
 
+- Established `stage` as the integration and staging-deployment branch, with
+  production releases promoted from tested staging builds.
+- Updated the GitHub Actions runtime dependencies to their Node.js 24 versions.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced

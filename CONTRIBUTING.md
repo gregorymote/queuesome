@@ -6,7 +6,7 @@ starting work.
 
 ## Workflow
 
-1. Branch from the latest `main` using `feature/`, `fix/`, or `chore/`.
+1. Branch from the latest `stage` using `feature/`, `fix/`, or `chore/`.
 2. Keep a pull request focused on one deployable outcome.
 3. Add or update tests for every behavior change and regression fix.
 4. Update the `Unreleased` section of `CHANGELOG.md` for user-visible,
