@@ -9,6 +9,11 @@ Semantic Versioning once releases resume.
 
 - Documented the trunk-based branching, Heroku promotion, and release strategy.
 - Added a phased modernization roadmap and acceptance criteria.
+- Added a Docker Compose PostgreSQL development service and documented the
+  environment-based local setup.
+- Added GitHub Actions checks for dependencies, Django configuration, migration
+  drift, fresh migrations, static collection, and tests on Python 3.13.
+- Added smoke coverage for resolving and rendering the public start page.
 
 ### Changed
 
