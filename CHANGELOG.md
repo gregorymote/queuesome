@@ -21,3 +21,7 @@ Semantic Versioning once releases resume.
   compatible SciPy runtime it requires.
 - Replaced runtime SVG rendering with Pillow-based recoloring of the existing
   fly mask, removing Queuesome's native Cairo system-library dependency.
+- Replaced hard-coded deployment modes, production hosts, URLs, and credentials
+  with validated environment-based Django settings.
+- Updated static and media configuration for Django 5 and enabled secure cookie,
+  HTTPS redirect, proxy SSL, and configurable HSTS settings outside development.
