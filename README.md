@@ -102,6 +102,24 @@
    visit <a href="http://localhost:8000">http://localhost:8000</a> to view application
 
 
+   <h3>Deploying to Heroku Staging</h3>
+
+   The <I>stage</I> branch deploys to the <I>q-it-up-staging</I> app only after
+   its required GitHub checks pass. The staging app must define:
+
+   <ul>
+      <li><I>DJANGO_ENV=staging</I></li>
+      <li><I>DJANGO_ALLOWED_HOSTS=q-it-up-staging.herokuapp.com</I></li>
+      <li><I>DJANGO_CSRF_TRUSTED_ORIGINS=https://q-it-up-staging.herokuapp.com</I></li>
+   </ul>
+
+   Keep secrets such as <I>DJANGO_SECRET_KEY</I> and Spotify credentials in
+   Heroku config vars, never in this repository. Heroku runs database
+   migrations in the release phase before starting the new web process. A
+   failed release phase prevents the new version from replacing the current
+   staging release.
+
+
    <h4>To Create Access to other Devices from Your IP Address</h4>
 
    Edit queue_it_up/settings.py and add IP address to ALLOWED_HOSTS
@@ -120,7 +138,6 @@
    http://YOUR_IP:YOUR_PORT/party/auth/
    
    to Redirect URI's
-
 
 
 

@@ -47,6 +47,15 @@ jobs:
       - name: Run Django checks
         run: python manage.py check
 
+      - name: Run staging deployment checks
+        env:
+          DJANGO_ENV: staging
+          DJANGO_SECRET_KEY: ci-only-staging-check-secret-with-more-than-fifty-random-characters-2026
+          DJANGO_ALLOWED_HOSTS: q-it-up-staging.herokuapp.com
+          DJANGO_CSRF_TRUSTED_ORIGINS: https://q-it-up-staging.herokuapp.com
+          DJANGO_SECURE_HSTS_SECONDS: "31536000"
+        run: python manage.py check --deploy
+
       - name: Check application migration drift
         run: python manage.py makemigrations party blog spot --check --dry-run
 
