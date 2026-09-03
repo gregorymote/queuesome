@@ -6,7 +6,8 @@ from utils.util_rand import get_code
 from utils.util_device import get_devices, get_active_device
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.views.decorators.http import require_POST
 from party.models import Party, Users, Devices
 from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
  BlankForm)
@@ -86,9 +87,12 @@ def set_device(request, pid):
     return render(request, 'party/set_device.html', context)
 
 
+@require_POST
 def update_set_device(request):
-    pid = request.GET.get('pid', None)
-    party = Party.objects.get(pk=pid)
+    pid = request.POST.get('pid')
+    if not check_permission(pid, request):
+        return HttpResponseForbidden()
+    party = Party.objects.get(pk=pid, active=True)
     device = get_active_device(party)
     if device["id"] != party.deviceID and device["id"]:
         party.deviceID = device['id']
@@ -137,7 +141,9 @@ def choose_device(request, pid):
 #OBE
 def update_devices(request):
     pid = request.GET.get('pid', None)
-    party = Party.objects.get(pk=pid)
+    if not check_permission(pid, request):
+        return HttpResponseForbidden()
+    party = Party.objects.get(pk=pid, active=True)
     token = check_token(token_info=party.token_info, party_id=pid)
     spotify_object = spotipy.Spotify(auth=token)
     device_results = spotify_object.devices()['devices']
@@ -288,5 +294,3 @@ def get_random_emoji():
 
 
     return random.choice(emojis)
-
-

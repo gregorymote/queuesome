@@ -39,7 +39,9 @@ def check_permission(pid, request):
         return False
     session_key = request.session.session_key
     try:
-        user = Users.objects.get(sessionID=session_key, party=party)
+        user = Users.objects.get(
+            sessionID=session_key, party=party, active=True
+        )
     except Exception:
         return False
     if not user.isHost:

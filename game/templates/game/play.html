@@ -14,8 +14,10 @@
 			if (!inactivity){
 				$.ajax({
 					url: '/party/update_set_device',
+					type: 'POST',
 					data: {
-					'pid': {{ party.pk }}
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+						'pid': {{ party.pk }}
 					},
 					dataType: 'json',
 					success: function (data) {
@@ -400,7 +402,9 @@
 		}
 		$.ajax({
 			url: '/sesh/update_like',
+			type: 'POST',
 			data: {
+				'csrfmiddlewaretoken': '{{ csrf_token }}',
 				'pid': {{ party.pk }},
 				'like': like,
 				'action': button.id,

@@ -9,7 +9,8 @@ from utils.util_party import (get_party, clean_up_party, get_inactivity,
      create_category, check_duplicate, wait_for_song)
 from utils.util_device import get_active_device
 from utils.util_song import get_bg_color
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.views.decorators.http import require_POST
 from party.models import Party, Users, Category, Songs, Searches, Devices, Library
 from game.forms import (blankForm, chooseCategoryForm, pickCategoryForm,
     searchForm, settingsForm)
@@ -33,11 +34,14 @@ def lobby(request, pid):
 
     '''
     party = get_party(pid)
-    if party == -1:
+    current_user = get_user(request, party)
+    if party == -1 or current_user == -1:
         return HttpResponseRedirect(reverse('index'))
     if get_inactivity(pid,19):
         clean_up_party(party.pk)
     if request.method == 'POST':
+        if not current_user.isHost:
+            return HttpResponseForbidden()
         form = blankForm(request.POST)
         if form.is_valid():
             category = Category(name='New queue Coming Soon...', party=party)
@@ -57,7 +61,6 @@ def lobby(request, pid):
     names=[]
     for user in users:
         names.append(user.icon + ' ' + user.name)
-    current_user = get_user(request, pid)
     if current_user.isHost:
         device = get_active_device(party)
     else:
@@ -83,7 +86,9 @@ def update_lobby(request):
 
     '''
     pid = request.GET.get('pid', None)
-    party = Party.objects.get(pk = pid)
+    party = get_party(pid)
+    if party == -1 or get_user(request, party) == -1:
+        return HttpResponseForbidden()
     if get_inactivity(pid,19):
         clean_up_party(party.pk)
     users = Users.objects.filter(party=pid, active=True).all()
@@ -173,11 +178,12 @@ def update_play(request):
 
     '''
     pid = request.GET.get('pid', None)
-    party = Party.objects.get(pk=pid)
+    party = get_party(pid)
+    user = get_user(request, party)
+    if party == -1 or user == -1:
+        return HttpResponseForbidden()
     if get_inactivity(pid,19):
         party.active = False
-    
-    user = get_user(request, pid)
 
     song = Songs.objects.filter(category__party=party, state='playing').first()
     if song:
@@ -245,6 +251,7 @@ def update_play(request):
     return JsonResponse(data)
 
 
+@require_POST
 def update_like(request):
     ''' Ajax call to increment or Decrement the like field of a Song object
         based on the request. Prevents user from liking one song multiple times.
@@ -254,10 +261,13 @@ def update_like(request):
         - request - web request
 
     '''
-    pid = request.GET.get('pid', None)
-    like = request.GET.get('like', None)
-    action = request.GET.get('action', None)
-    user = get_user(request, pid)
+    pid = request.POST.get('pid')
+    party = get_party(pid)
+    user = get_user(request, party)
+    if party == -1 or user == -1:
+        return HttpResponseForbidden()
+    like = request.POST.get('like')
+    action = request.POST.get('action')
     if like == 'true':
         if action == 'like_icon': 
             user.hasLiked = True
@@ -601,6 +611,7 @@ def pick_song(request, pid):
     return render(request, 'game/pick_song.html', context)
 
 
+@require_POST
 def update_search(request):
     ''' Ajax request made to update search results 
 
@@ -609,17 +620,19 @@ def update_search(request):
         - request - web request
 
     '''
-    pid = request.GET.get('pid', None)   
-    party = Party.objects.get(pk = pid)
+    pid = request.POST.get('pid')
+    party = get_party(pid)
     user = get_user(request, party)
-    result = request.GET.get('result', None)
+    if party == -1 or user == -1:
+        return HttpResponseForbidden()
+    result = request.POST.get('result')
     Searches.objects.filter(
         user=user,
         party=party
     ).exclude(uri=result,user=user, party=party).delete()
     current = Searches.objects.filter(
         uri=result, user=user, party=party).first()
-    search_text = request.GET.get('text', None)
+    search_text = request.POST.get('text')
     token = check_token(token_info=party.token_info,party_id=pid)
     spotify_object = spotipy.Spotify(auth=token)
     search_results = spotify_object.search(search_text, 15, 0, 'track')
@@ -715,6 +728,8 @@ def users(request, pid):
         return HttpResponseRedirect(reverse('index'))
     users = Users.objects.filter(party=party, active=True).all()
     if request.method == 'POST':
+        if not current_user.isHost:
+            return HttpResponseForbidden()
         form = blankForm(request.POST)
         if form.is_valid():
             party = Party.objects.get(pk=pid)
@@ -843,4 +858,3 @@ def play_songs(pid):
     party.save()
     print(QDEBUG,'Set Thread Flag to False: ', party.thread)
     print(QDEBUG,'EXITING THREAD')
-
