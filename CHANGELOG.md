@@ -29,6 +29,8 @@ Semantic Versioning once releases resume.
   callback parameters, and deferred party creation until token exchange succeeds.
 - Enforced unique active party codes and session memberships, safely retried
   code collisions, and hardened missing and inactive join-code handling.
+- Serialized party starts and song picks, made repeated submissions idempotent,
+  and rejected song results that do not belong to the submitting member.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced

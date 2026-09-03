@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import transaction
 from django.urls import reverse
 from background_task import background
 from utils.util_auth import check_token
@@ -44,13 +45,25 @@ def lobby(request, pid):
             return HttpResponseForbidden()
         form = blankForm(request.POST)
         if form.is_valid():
-            category = Category(name='New queue Coming Soon...', party=party)
-            category.save()
-            party.lib_repo = set_lib_repo()
-            party.started = True
-            party.save()
-            task = threading.Thread(target=call_task, args=(pid,))
-            task.start()
+            with transaction.atomic():
+                party = Party.objects.select_for_update().get(
+                    pk=pid, active=True
+                )
+                if party.started:
+                    return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid': pid})
+                    )
+                Category.objects.create(
+                    name='New queue Coming Soon...', party=party
+                )
+                party.lib_repo = set_lib_repo()
+                party.started = True
+                party.save()
+                transaction.on_commit(
+                    lambda: threading.Thread(
+                        target=call_task, args=(pid,)
+                    ).start()
+                )
             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -553,52 +566,63 @@ def pick_song(request, pid):
         form = searchForm(request.POST)
         if form.is_valid():
             result = form.cleaned_data['result']
-            picked_song = Songs.objects.filter(
-                user=user, category=category
-                ).first()
-            if picked_song:
-                user.hasPicked = True
-                user.save()
-                print(
-                    QDEBUG,'Set User has Picked: ',user.name,'-',user.hasPicked
-                    )
-                return HttpResponseRedirect(
-                    reverse('play', kwargs={'pid':pid})
+            with transaction.atomic():
+                party = Party.objects.select_for_update().get(
+                    pk=pid, active=True
                 )
-            elif result != '-1':
+                user = Users.objects.select_for_update().get(
+                    pk=user.pk, party=party, active=True
+                )
+                if party.state != 'pick_song' or user.hasPicked:
+                    return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid': pid})
+                    )
+                category = Category.objects.filter(
+                    party=party, roundNum=party.roundTotal
+                ).first()
+                picked_song = Songs.objects.filter(
+                    user=user, category=category
+                ).first()
+                if picked_song:
+                    user.hasPicked = True
+                    user.save(update_fields=['hasPicked'])
+                    return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid': pid})
+                    )
+
                 search = Searches.objects.filter(
                     uri=result,
-                    user=user, 
-                    party=party
-                ).first()
-                song = Songs(
-                    name=search.name,
-                    title = search.title,
-                    artist = search.artist,
-                    uri=search.uri,
-                    art=search.art,
                     user=user,
-                    category=category,
-                    played=False,
-                    order=random.randint(1,101),
-                    state='not_played',
-                    link=search.link,
-                    duration=search.duration,
-                )
-                song.save()
-                thread = threading.Thread(target=get_bg_color, args=(song.id,))
-                thread.start()
-                Searches.objects.filter(user=user, party=party).delete()
-                user.hasPicked = True
-                user.save()
-                print(
-                    QDEBUG,'Set User has Picked: ',user.name,'-',user.hasPicked
+                    party=party,
+                ).first()
+                if result == '-1' or search is None or category is None:
+                    invalid = True
+                else:
+                    song = Songs.objects.create(
+                        name=search.name,
+                        title=search.title,
+                        artist=search.artist,
+                        uri=search.uri,
+                        art=search.art,
+                        user=user,
+                        category=category,
+                        played=False,
+                        order=random.randint(1, 101),
+                        state='not_played',
+                        link=search.link,
+                        duration=search.duration,
                     )
-                return HttpResponseRedirect(
-                    reverse('play', kwargs={'pid':pid})
-                )
-            else:
-                invalid=True
+                    Searches.objects.filter(user=user, party=party).delete()
+                    user.hasPicked = True
+                    user.save(update_fields=['hasPicked'])
+                    transaction.on_commit(
+                        lambda: threading.Thread(
+                            target=get_bg_color, args=(song.id,)
+                        ).start()
+                    )
+                    return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid': pid})
+                    )
     else:
         form = searchForm()
     
