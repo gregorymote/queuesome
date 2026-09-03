@@ -2,7 +2,6 @@ __author__ = "davidkrantz"
 __source__ = "https://github.com/davidkrantz/Colorfy/blob/master/spotify_background_color.py" 
 
 import numpy as np
-import scipy.misc as sp
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from PIL import Image
