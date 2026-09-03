@@ -25,6 +25,8 @@ Semantic Versioning once releases resume.
 - Restricted party mutations to active session members, required host access
   for game administration, and converted device, like, and search mutations to
   CSRF-protected POST requests.
+- Bound Spotify authorization callbacks to one-time session state, validated
+  callback parameters, and deferred party creation until token exchange succeeds.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced
