@@ -20,7 +20,11 @@
 
 
 
-   <h3> Set Up Local Dev </h3>
+   <h3> Set Up Local Development </h3>
+
+   Queuesome requires Python 3.13 and PostgreSQL. Docker is used for the local
+   database so developers do not need to install or configure PostgreSQL
+   directly.
    
    <h4>Create Virtual Environment</h4>
 
@@ -29,7 +33,7 @@
    <I>python -m venv venv</I>
 
 
-   <h4>Activate Virutal Environment</h4>
+   <h4>Activate Virtual Environment</h4>
  
    <I>C:\> venv\Scripts\activate.bat</I>
 
@@ -39,36 +43,39 @@
    <I>pip install -r requirements.txt</I>
 
 
-   <h4> Edit <I>queue_it_up/settings.py</I> </h4>
-
-   line 16: STATE = "DEV"
-
-   line 105: Configure Local Database
-
-   line 204: YOUR-SPOTIFY-CLIENT-ID
+   On macOS or Linux: <I>source venv/bin/activate</I>
 
 
-   <h4> Add The Following Environment Variables </h4>
+   <h4>Start PostgreSQL</h4>
 
-   You can also hardcode your own values. Line numbers refer to <I>queue_it_up/settings.py</I>
+   <I>docker compose up -d db</I>
 
-   line 38: DJANGO_SECRET_Q
 
-   line 202: SPOTIFY_CLIENT_SECRET
+   <h4>Configure the Environment</h4>
 
-   line 205: SYSTEM_USER_ID
+   Copy <I>.env.example</I> to <I>.env</I> and add your Spotify credentials.
+   Django does not automatically load this file, so export the values in your
+   shell or configure them through your IDE. The defaults in
+   <I>queue_it_up/settings.py</I> connect to the Docker database above.
 
 
    <h4> Migrate Database </h4>
-
-   <I>python manage.py makemigrations</I>
 
    <I>python manage.py migrate</I>
 
 
    <h4> Collect Static Images </h4>
 
-   <I>python manage.py collectstatic</I>
+   <I>python manage.py collectstatic --noinput</I>
+
+
+   <h4>Run Checks and Tests</h4>
+
+   <I>python manage.py check</I>
+
+   <I>python manage.py makemigrations party blog spot --check --dry-run</I>
+
+   <I>python manage.py test</I>
 
 
    <h4>Add Categories via Python Shell</h4>
@@ -113,7 +120,6 @@
    http://YOUR_IP:YOUR_PORT/party/auth/
    
    to Redirect URI's
-
 
 
 

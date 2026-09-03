@@ -8,3 +8,16 @@ db.sqlite3
 *.cache-temp
 staticfiles/
 __pycache__/
+.agent-harness/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Test and analysis artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
