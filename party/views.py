@@ -1,65 +1,83 @@
+import logging
+import secrets
+
 import spotipy
-from utils.util_auth import create_token, check_token, get_url
+from utils.util_auth import OAUTH_STATE_SESSION_KEY, create_token, check_token
 from utils.util_user import get_user, check_permission
 from utils.util_party import get_inactivity, clean_up_party
 from utils.util_rand import get_code
 from utils.util_device import get_devices, get_active_device
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.views.decorators.http import require_POST
 from party.models import Party, Users, Devices
 from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
  BlankForm)
-from queue_it_up.settings import IP, PORT, HEROKU, QDEBUG
+from queue_it_up.settings import QDEBUG
 from datetime import datetime, timezone
 from html import escape
 import random
 
+logger = logging.getLogger(__name__)
+
 
 def auth(request):
-    url = get_url(str(request.get_full_path), HEROKU, IP, PORT)
-    if 'access_denied' in url:
+    expected_state = request.session.pop(OAUTH_STATE_SESSION_KEY, None)
+    received_state = request.GET.get('state', '')
+    if not expected_state or not secrets.compare_digest(
+        expected_state, received_state
+    ):
+        return HttpResponseBadRequest('Invalid OAuth state.')
+
+    if request.GET.get('error'):
         return HttpResponseRedirect(reverse('index'))
-    party = Party(name=str(datetime.now(timezone.utc)))
-    party.save()
+
+    code = request.GET.get('code')
+    if not code:
+        return HttpResponseBadRequest('Missing authorization code.')
+
+    try:
+        token_info = create_token(code=code)
+    except spotipy.SpotifyException:
+        logger.exception('Spotify token exchange failed.')
+        return HttpResponseRedirect(reverse('index'))
+    if not token_info or not token_info.get('access_token'):
+        return HttpResponseRedirect(reverse('index'))
+
     if request.session.session_key is None:
-        session_key = request.session.create()      
-    else:
-        session_key = request.session.session_key
+        request.session.create()
+    session_key = request.session.session_key
+
+    party = Party.objects.create(
+        name=str(datetime.now(timezone.utc)),
+        token=token_info['access_token'],
+        token_info=token_info,
+    )
+
     old_users = Users.objects.filter(sessionID=session_key, active=True)
     for user in old_users:
         if user.isHost:
-            old_party=user.party
-            old_party.active=False
+            old_party = user.party
+            old_party.active = False
             old_party.save()
         user.active = False
         user.save()
-    party.url = url
-    party.save()
-    token_info = create_token(url=party.url)
-    if token_info:
-        party.token = token_info['access_token']
-        party.token_info = token_info
-        party.save()
-    else:
-        return HttpResponseRedirect(reverse('index'))
-    
-    if request.session.session_key is None:
-        session_key = request.session.create()      
-    else:
-        session_key = request.session.session_key
 
-    user = Users(
-            name='Host',
-            party=party,
-            sessionID=session_key,
-            isHost=True,
+    Users.objects.create(
+        name='Host',
+        party=party,
+        sessionID=session_key,
+        isHost=True,
     )
-    user.save()
 
     return HttpResponseRedirect(
-        reverse('set_device', kwargs={'pid': party.pk,})
+        reverse('set_device', kwargs={'pid': party.pk})
     )
 
 
