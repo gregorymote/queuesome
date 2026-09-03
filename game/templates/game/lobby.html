@@ -18,7 +18,9 @@
 			if (!inactivity){
 				$.ajax({
 					url: '/party/update_set_device',
+					type: 'POST',
 					data: {
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
 					'pid': {{ party.pk }}
 					},
 					dataType: 'json',

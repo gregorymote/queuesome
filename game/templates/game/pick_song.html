@@ -89,8 +89,10 @@
 				var result = document.getElementById("id_result");
 				$.ajax({
 					url: '/sesh/update_search',
+					type: 'POST',
 					data: {
-					'pid': {{ party.pk }},
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+						'pid': {{ party.pk }},
 					'text': e.target.value,
 					'result': result.value,
 					},
@@ -211,6 +213,5 @@
 	</form>	
 </div>
 {% endblock %}
-
 
 
