@@ -14,6 +14,8 @@ Semantic Versioning once releases resume.
 - Added GitHub Actions checks for dependencies, Django configuration, migration
   drift, fresh migrations, static collection, and tests on Python 3.13.
 - Added smoke coverage for resolving and rendering the public start page.
+- Added a Heroku release phase for applying database migrations and a CI check
+  for staging-grade Django deployment settings.
 
 ### Changed
 
