@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from party.models import Category, Party, Searches, Songs, Users
+from party.models import Category, Library, Party, Searches, Songs, Users
 
 
 class PartyAuthorizationTests(TestCase):
@@ -194,3 +194,123 @@ class RoundTransitionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Songs.objects.filter(user=user).exists())
         thread.assert_not_called()
+
+
+class CategoryTransitionTests(TestCase):
+    def setUp(self):
+        self.party = Party.objects.create(
+            name='Category party',
+            state='choose_category',
+            lib_repo=set(),
+            indices=set(),
+        )
+        self.client = Client()
+        session = self.client.session
+        session.save()
+        self.leader = Users.objects.create(
+            name='Leader',
+            party=self.party,
+            sessionID=session.session_key,
+            turn='picking',
+        )
+        self.member = Users.objects.create(
+            name='Member', party=self.party, turn='not_picked'
+        )
+
+    def offer_library(self, name='Rock'):
+        library = Library.objects.create(name=name, visible=True)
+        self.party.lib_repo = {str(library.pk)}
+        self.party.indices = {'0'}
+        self.party.save()
+        return library
+
+    def test_leader_category_selection_is_idempotent(self):
+        library = self.offer_library()
+        data = {
+            'result': str(library.pk),
+            'artist': '',
+            'custom': '',
+            'custom_desc': '',
+        }
+
+        first = self.client.post(
+            reverse('pick_category', kwargs={'pid': self.party.pk}), data
+        )
+        replay = self.client.post(
+            reverse('pick_category', kwargs={'pid': self.party.pk}), data
+        )
+
+        self.assertEqual(first.status_code, 302)
+        self.assertEqual(replay.status_code, 302)
+        self.party.refresh_from_db()
+        self.leader.refresh_from_db()
+        self.assertEqual(self.party.state, 'pick_song')
+        self.assertEqual(self.party.roundTotal, 1)
+        self.assertEqual(self.leader.turn, 'has_picked')
+        self.assertEqual(
+            Category.objects.filter(party=self.party, roundNum=1).count(), 1
+        )
+
+    def test_unoffered_library_is_rejected(self):
+        self.offer_library('Offered')
+        unoffered = Library.objects.create(name='Unoffered', visible=True)
+
+        response = self.client.post(
+            reverse('pick_category', kwargs={'pid': self.party.pk}),
+            {
+                'result': str(unoffered.pk),
+                'artist': '',
+                'custom': '',
+                'custom_desc': '',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.party.refresh_from_db()
+        self.assertEqual(self.party.state, 'choose_category')
+        self.assertEqual(self.party.roundTotal, 0)
+        self.assertFalse(Category.objects.filter(party=self.party).exists())
+
+    def test_non_leader_cannot_select_offered_category(self):
+        library = self.offer_library()
+        member_client = Client()
+        session = member_client.session
+        session.save()
+        self.member.sessionID = session.session_key
+        self.member.save(update_fields=['sessionID'])
+
+        response = member_client.post(
+            reverse('pick_category', kwargs={'pid': self.party.pk}),
+            {
+                'result': str(library.pk),
+                'artist': '',
+                'custom': '',
+                'custom_desc': '',
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.party.refresh_from_db()
+        self.assertEqual(self.party.state, 'choose_category')
+        self.assertFalse(Category.objects.filter(party=self.party).exists())
+
+    def test_legacy_picker_uses_same_transition_rules(self):
+        library = self.offer_library()
+
+        response = self.client.post(
+            reverse('choose_category', kwargs={'pid': self.party.pk}),
+            {
+                'cat_choice': str(library.pk),
+                'artist': '',
+                'custom': '',
+                'custom_desc': '',
+                'scatt_radio': 'Song',
+                'search': '',
+                'result': '-1',
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.party.refresh_from_db()
+        self.assertEqual(self.party.state, 'pick_song')
+        self.assertEqual(self.party.roundTotal, 1)

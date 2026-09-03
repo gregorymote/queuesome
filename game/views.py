@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db import transaction
+from django.db.models import Q
 from django.urls import reverse
 from background_task import background
 from utils.util_auth import check_token
@@ -365,6 +366,41 @@ def run_game(pid):
     print(QDEBUG, "exiting task: ", Party.objects.filter(pk=pid, active=True).first())
 
 
+def complete_category_selection(
+        party_id, user_id, category, artist, custom, custom_desc='', sc_type=''):
+    with transaction.atomic():
+        party = Party.objects.select_for_update().get(pk=party_id, active=True)
+        user = Users.objects.select_for_update().get(
+            pk=user_id, party=party, active=True
+        )
+        if party.state != 'choose_category' or user.turn != 'picking':
+            return 'stale'
+
+        valid = create_category(
+            party=party,
+            user=user,
+            category=category,
+            artist=artist,
+            custom=custom,
+            custom_desc=custom_desc,
+            sc_type=sc_type,
+        )
+        if not valid:
+            return 'invalid'
+
+        party.state = 'pick_song'
+        party.roundTotal += 1
+        party.save()
+        remaining_users = Users.objects.filter(
+            party=party,
+            active=True,
+            turn='not_picked',
+        ).exists()
+        user.turn = 'has_picked' if remaining_users else 'has_picked_last'
+        user.save(update_fields=['turn'])
+        return 'complete'
+
+
 def choose_category(request, pid):
     ''' Allows User with turn in picking state to create a category object
 
@@ -391,32 +427,21 @@ def choose_category(request, pid):
             artist = artist[:Library._meta.get_field('name').max_length - 15]
             custom = escape(form.cleaned_data['custom'])
             custom = custom[:Library._meta.get_field('name').max_length]
-            valid = create_category(
-                party=party,
-                user=user,
+            custom_desc = escape(form.cleaned_data['custom_desc'])
+            custom_desc = custom_desc[
+                :Library._meta.get_field('description').max_length
+            ]
+            result = complete_category_selection(
+                party_id=party.pk,
+                user_id=user.pk,
                 category=category,
                 artist=artist,
                 custom=custom,
+                custom_desc=custom_desc,
                 sc_type=form.cleaned_data['scatt_radio']
             )
-            if valid:
-                party.state = 'pick_song'
-                party.roundTotal = party.roundTotal + 1
-                party.save()
-                print(QDEBUG,'Set state to pick_song: ', party.state, ' Round Total: ',
-                    party.roundTotal)
-                party = Party.objects.get(pk=pid)
-                remaining_users = Users.objects.filter(
-                    party=party,
-                    active=True,
-                    turn='not_picked'
-                ).all()
-                if not remaining_users:
-                    user.turn = 'has_picked_last'
-                else:
-                    user.turn = 'has_picked'
-                user.save()
-                print(QDEBUG,'Set Leader Turn to: ',user.name, ' - ', user.turn)
+            valid = result != 'invalid'
+            if result in ('complete', 'stale'):
                 return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = chooseCategoryForm(repo=choices,
@@ -452,42 +477,34 @@ def pick_category(request, pid):
     if request.method == 'POST':
         form = pickCategoryForm(request.POST)
         if form.is_valid():
-            category = form.cleaned_data['result']
-            category = Library.objects.get(id=category)
+            category = Library.objects.filter(
+                Q(pk__in=choices) | Q(special=True),
+                pk=form.cleaned_data['result'],
+                visible=True,
+            ).first()
             artist = escape(form.cleaned_data['artist'])
             artist = artist[:Library._meta.get_field('name').max_length - 15]
             custom = escape(form.cleaned_data['custom'])
             custom = custom[:Library._meta.get_field('name').max_length]
             custom_desc = escape(form.cleaned_data['custom_desc'])
             custom_desc = custom_desc[:Library._meta.get_field('description').max_length]
-            valid = create_category(
-                party=party,
-                user=user,
+            if category is None:
+                valid = False
+            else:
+                result = complete_category_selection(
+                party_id=party.pk,
+                user_id=user.pk,
                 category=category,
                 artist=artist,
                 custom=custom,
                 custom_desc=custom_desc,
                 sc_type=""
-            )
-            if valid:
-                party.state = 'pick_song'
-                party.roundTotal = party.roundTotal + 1
-                party.save()
-                print(QDEBUG,'Set state to pick_song: ', party.state, ' Round Total: ',
-                    party.roundTotal)
-                party = Party.objects.get(pk=pid)
-                remaining_users = Users.objects.filter(
-                    party=party,
-                    active=True,
-                    turn='not_picked'
-                ).all()
-                if not remaining_users:
-                    user.turn = 'has_picked_last'
-                else:
-                    user.turn = 'has_picked'
-                user.save()
-                print(QDEBUG,'Set Leader Turn to: ',user.name, ' - ', user.turn)
-                return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
+                )
+                valid = result != 'invalid'
+                if result in ('complete', 'stale'):
+                    return HttpResponseRedirect(
+                        reverse('play', kwargs={'pid': pid})
+                    )
     else:
         form = pickCategoryForm()
 

@@ -31,6 +31,8 @@ Semantic Versioning once releases resume.
   code collisions, and hardened missing and inactive join-code handling.
 - Serialized party starts and song picks, made repeated submissions idempotent,
   and rejected song results that do not belong to the submitting member.
+- Serialized category transitions, restricted library selections to choices
+  offered to the current leader, and made replayed selections harmless.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced
