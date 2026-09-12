@@ -18,11 +18,15 @@ from party.models import Party, Users, Category, Songs, Searches, Devices, Libra
 from game.forms import (blankForm, chooseCategoryForm, pickCategoryForm,
     searchForm, settingsForm)
 from html import escape
+import logging
 import spotipy
 import time
 import threading
 import random
-from queue_it_up.settings import URL, QDEBUG
+from queue_it_up.settings import URL
+
+
+logger = logging.getLogger(__name__)
 
 
 def lobby(request, pid):
@@ -296,7 +300,10 @@ def update_like(request):
             user.hasLiked = False
             user.hasSkip = False
     user.save()
-    print(QDEBUG,user.name, ': Set User Like: ', user.hasLiked, ' Set User Dislike: ', user.hasSkip)
+    logger.info(
+        'Updated member vote party=%s user=%s liked=%s skipped=%s',
+        party.pk, user.pk, user.hasLiked, user.hasSkip,
+    )
     data = {}
     return JsonResponse(data)
 
@@ -375,7 +382,7 @@ def run_game(pid):
             assign_leader(party)
             party.state = 'choose_category'
             party.save()
-            print(QDEBUG,'Set state to choose category: ', party.state)
+            logger.info('Advanced party=%s state=%s', party.pk, party.state)
                     
         complete_song_selection(pid)
         
@@ -383,9 +390,9 @@ def run_game(pid):
         if claim_playback(pid):
             thread = threading.Thread(target=play_songs, args=(pid,))
             thread.start()
-            print(QDEBUG,'Set Thread to True: ', party.thread)
+            logger.info('Claimed playback party=%s', party.pk)
 
-    print(QDEBUG, "exiting task: ", Party.objects.filter(pk=pid, active=True).first())
+    logger.info('Game task exited party=%s', pid)
 
 
 def complete_category_selection(
@@ -860,7 +867,7 @@ def play_songs(pid):
     if party.device_error:
         party.device_error = False
         party.save()
-        print(QDEBUG,'Reset Device Error: ', party.device_error)
+        logger.info('Reset playback device error party=%s', party.pk)
     while (Songs.objects.filter(
             category__party=party,
             category__roundNum=party.roundNum,
@@ -896,13 +903,13 @@ def play_songs(pid):
             song.state = 'playing'
             song.startTime = time.time()
             song.save()
-            print(QDEBUG,'Set Song to playing: ', song.name, ' - ', song.state)
+            logger.info('Started playback party=%s song=%s', party.pk, song.pk)
             wait_for_song(song)
         song = Songs.objects.filter(pk=song.pk).first()
         song.state = 'played'
         song.likes = get_like_total(song) 
         song.save()
-        print(QDEBUG,'Set Song to played: ', song.name, ' - ', song.state)
+        logger.info('Completed playback party=%s song=%s', party.pk, song.pk)
         reset_user_likes(party)
         party = Party.objects.get(pk=pid)
         if not Songs.objects.filter(category__party=party,
@@ -912,9 +919,8 @@ def play_songs(pid):
             set_user_points(party, party.roundNum) 
             party.roundNum += 1
             party.save()
-            print(QDEBUG,'Increment Round Number: ', party.roundNum)
+            logger.info('Advanced party=%s round=%s', party.pk, party.roundNum)
     party = Party.objects.get(pk=pid)
     party.thread = False
     party.save()
-    print(QDEBUG,'Set Thread Flag to False: ', party.thread)
-    print(QDEBUG,'EXITING THREAD')
+    logger.info('Playback thread exited party=%s', party.pk)

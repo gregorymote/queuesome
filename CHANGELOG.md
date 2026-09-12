@@ -5,6 +5,9 @@ Semantic Versioning once releases resume.
 
 ## Unreleased
 
+- Add database-aware readiness and database-independent liveness endpoints plus
+  validated stdout logging configuration.
+
 - Align background-task primary keys with its published migrations and check all
   installed applications for migration drift in CI.
 

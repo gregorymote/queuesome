@@ -17,8 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from queue_it_up import views
 
 urlpatterns = [
+    path('health/live', views.live, name='health_live'),
+    path('health/ready', views.ready, name='health_ready'),
     path('admin/', admin.site.urls),
     path('', include('start.urls')),
     path('party/', include('party.urls')),

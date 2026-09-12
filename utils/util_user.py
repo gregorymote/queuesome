@@ -1,5 +1,8 @@
 from party.models import Party, Users, Songs
-from queue_it_up.settings import QDEBUG
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 def get_user(request, party):
     ''' Returns the User object of the current user based on the Request
@@ -74,8 +77,7 @@ def assign_leader(party):
             user.turn = 'not_picked'
             user.save()
             debug.append((user.name, user.turn))
-        print(QDEBUG, 'Reset User Turn: ')
-        print(QDEBUG, debug)
+        logger.info('Reset member turns party=%s members=%s', party.pk, debug)
             
         leader = Users.objects.filter(
             party=party,
@@ -88,7 +90,7 @@ def assign_leader(party):
             ).order_by('?').first()
     leader.turn = 'picking'
     leader.save()
-    print(QDEBUG, 'Set Round Leader: ', leader.name, ' - ', leader.turn)
+    logger.info('Assigned round leader party=%s user=%s', party.pk, leader.pk)
 
 
 def reset_users(party):
@@ -105,8 +107,7 @@ def reset_users(party):
         user.hasPicked = False
         user.save()
         debug.append((user.name, user.hasPicked))
-    print(QDEBUG,'Reset Users Has Picked:')
-    print(QDEBUG, debug)
+    logger.info('Reset member picks party=%s members=%s', party.pk, debug)
 
 
 def get_like_total(song):
@@ -145,7 +146,7 @@ def set_user_points(party, round_number):
         user = song.user
         user.points = user.points + song.likes
         user.save()
-    print(QDEBUG,'Reset Users Likes:')
+    logger.info('Updated member points party=%s round=%s', party.pk, round_number)
 
 
 def reset_user_likes(party):
@@ -161,6 +162,7 @@ def reset_user_likes(party):
         user.hasLiked = False
         user.hasSkip = False
         user.save()
+    logger.info('Reset member votes party=%s', party.pk)
 
 
 def get_like_threshold(party):

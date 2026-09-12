@@ -1,9 +1,11 @@
 from party.models import Party, Users, Songs, Library, Category
 from datetime import datetime, timezone
+import logging
 from utils.util_rand import get_numbers, get_letter
 from utils.util_user import get_like_threshold, get_like_total
 import time
-from queue_it_up.settings import QDEBUG
+
+logger = logging.getLogger(__name__)
 
 
 def get_party(pid):
@@ -29,7 +31,7 @@ def clean_up_party(pid):
     party.url_open = ""
     party.deviceID = ""
     party.save()
-    print(QDEBUG,"Clean Up Party")
+    logger.info('Cleaning up party=%s', party.pk)
 
 
 def set_lib_repo():
