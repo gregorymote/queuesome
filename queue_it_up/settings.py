@@ -102,7 +102,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'background_task',
+    'queue_it_up.apps.QueuesomeBackgroundTasksConfig',
     'start',
     'party',
     'game',
