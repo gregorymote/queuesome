@@ -57,8 +57,8 @@ jobs:
           DJANGO_SECURE_HSTS_SECONDS: "31536000"
         run: python manage.py check --deploy
 
-      - name: Check application migration drift
-        run: python manage.py makemigrations party blog spot --check --dry-run
+      - name: Check migration drift
+        run: python manage.py makemigrations --check --dry-run
 
       - name: Apply migrations
         run: python manage.py migrate --noinput
