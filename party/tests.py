@@ -5,7 +5,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from party.models import Party, Users
-from utils.util_auth import OAUTH_STATE_SESSION_KEY
+from utils.util_auth import OAUTH_STATE_SESSION_KEY, generate_url
 
 
 class HostAuthorizationTests(TestCase):
@@ -108,6 +108,24 @@ class SpotifyCallbackTests(TestCase):
         )
         self.assertEqual(replay.status_code, 400)
         self.assertEqual(Party.objects.count(), 1)
+
+    @patch('utils.util_auth.oauth2.SpotifyOAuth')
+    def test_authorization_url_passes_state_to_spotipy(self, spotify_oauth):
+        spotify_oauth.return_value.get_authorize_url.return_value = (
+            'https://accounts.spotify.test/authorize'
+        )
+
+        url = generate_url(
+            client_id='client-id',
+            client_secret='client-secret',
+            redirect_uri='https://example.test/callback',
+            state='session-state',
+        )
+
+        self.assertEqual(url, 'https://accounts.spotify.test/authorize')
+        spotify_oauth.return_value.get_authorize_url.assert_called_once_with(
+            state='session-state'
+        )
 
 
 class PartyJoiningTests(TestCase):
