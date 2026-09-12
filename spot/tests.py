@@ -1,5 +1,8 @@
 import numpy as np
+from io import BytesIO
 from unittest.mock import ANY, patch
+
+from PIL import Image
 
 from django.contrib.auth import get_user_model
 from django.test import SimpleTestCase, TestCase
@@ -8,6 +11,12 @@ from datetime import date
 
 from spot.models import Day, Fly, Play, Studio, Users
 from utils.spotify_background_color import SpotifyBackgroundColor
+from utils.util_song import (
+    IMAGE_DOWNLOAD_TIMEOUT,
+    MAX_IMAGE_DOWNLOAD_BYTES,
+    RemoteImageError,
+    download_spotify_image,
+)
 from utils.util_auth import SPOT_OAUTH_STATE_SESSION_KEY
 
 
@@ -21,6 +30,70 @@ class ImageProcessingCompatibilityTests(SimpleTestCase):
         )
 
         self.assertEqual(processor.img.shape, (2, 2, 3))
+
+
+class RemoteArtworkDownloadTests(SimpleTestCase):
+    @patch('utils.util_song.requests.get')
+    def test_rejects_non_spotify_hosts_without_requesting_them(self, get):
+        for url in (
+            'http://i.scdn.co/image/example',
+            'https://127.0.0.1/image/example',
+            'https://example.com/image/example',
+            'https://i.scdn.co:8443/image/example',
+        ):
+            with self.subTest(url=url), self.assertRaises(RemoteImageError):
+                download_spotify_image(url)
+        get.assert_not_called()
+
+    @patch('utils.util_song.requests.get')
+    def test_downloads_a_bounded_valid_spotify_image(self, get):
+        image_bytes = BytesIO()
+        Image.new('RGB', (4, 4), 'red').save(image_bytes, format='JPEG')
+        payload = image_bytes.getvalue()
+        response = get.return_value
+        response.status_code = 200
+        response.headers = {
+            'Content-Type': 'image/jpeg',
+            'Content-Length': str(len(payload)),
+        }
+        response.iter_content.return_value = [payload]
+
+        image = download_spotify_image('https://i.scdn.co/image/example')
+
+        self.assertEqual(image.size, (4, 4))
+        get.assert_called_once_with(
+            'https://i.scdn.co/image/example',
+            stream=True,
+            timeout=IMAGE_DOWNLOAD_TIMEOUT,
+            allow_redirects=False,
+        )
+        response.close.assert_called_once_with()
+
+    @patch('utils.util_song.requests.get')
+    def test_rejects_oversized_response_before_streaming(self, get):
+        response = get.return_value
+        response.status_code = 200
+        response.headers = {
+            'Content-Type': 'image/jpeg',
+            'Content-Length': str(MAX_IMAGE_DOWNLOAD_BYTES + 1),
+        }
+
+        with self.assertRaises(RemoteImageError):
+            download_spotify_image('https://i.scdn.co/image/example')
+
+        response.iter_content.assert_not_called()
+        response.close.assert_called_once_with()
+
+    @patch('utils.util_song.requests.get')
+    def test_rejects_redirect_response(self, get):
+        response = get.return_value
+        response.status_code = 302
+        response.headers = {'Location': 'http://127.0.0.1/private'}
+
+        with self.assertRaises(RemoteImageError):
+            download_spotify_image('https://i.scdn.co/image/example')
+
+        response.close.assert_called_once_with()
 
 
 class StudioSpotifyOAuthTests(TestCase):
