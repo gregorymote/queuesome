@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest
-from utils.util_song import get_album_color
+from utils.util_song import download_spotify_image, get_album_color
 from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User as Admin
@@ -11,11 +11,10 @@ from spot.forms import FlyForm, DayForm
 from PIL import Image
 from datetime import date, datetime, timedelta, timezone
 from .models import Day, Fly, Play, Studio, Users
-import requests
-import shutil
 import json
 import logging
 import secrets
+import uuid
 import spotipy
 import boto3
 from os import remove
@@ -532,15 +531,7 @@ def studio(request, pid):
 
 
 def set_up(artwork_url, x_mult, y_mult, fly_color):
-    if artwork_url and len(artwork_url.split('image/')) > 1:
-        art_id = artwork_url.split('image/')[1]
-    response = requests.get(artwork_url, stream=True)
-    img_id = 'artwork/img-'+ art_id +'.png' 
-    with open(img_id, 'wb') as out_file:
-        shutil.copyfileobj(response.raw, out_file)
-    
-    # Opening the primary image (used in background) 
-    img1 = Image.open('artwork/img-'+ art_id +'.png' )
+    img1 = download_spotify_image(artwork_url)
     if img1.mode == "CMYK":
         img1 = img1.convert("RGB")
         
@@ -556,17 +547,25 @@ def set_up(artwork_url, x_mult, y_mult, fly_color):
     img1.paste(img2, (x_coord,y_coord), mask = img2)
 
     # Displaying the image 
-    file_name = 'media/images/fly-img-' + art_id +'.png'    
-    img1.save(file_name)
-    s3_key = STATE + '/images/'  + 'fly-img-' + art_id
-    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-    s3.upload_file(file_name, AWS_STORAGE_BUCKET_NAME,  s3_key, ExtraArgs={'ContentType': 'image/png'})
-    
-    if exists(img_id):
-        remove(img_id)
-
-    if exists(file_name):
-        remove(file_name)
+    image_id = uuid.uuid4().hex
+    file_name = 'media/images/fly-img-' + image_id + '.png'
+    s3_key = STATE + '/images/fly-img-' + image_id
+    try:
+        img1.save(file_name)
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        )
+        s3.upload_file(
+            file_name,
+            AWS_STORAGE_BUCKET_NAME,
+            s3_key,
+            ExtraArgs={'ContentType': 'image/png'},
+        )
+    finally:
+        if exists(file_name):
+            remove(file_name)
 
     return s3_key
 

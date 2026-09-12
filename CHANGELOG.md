@@ -8,6 +8,9 @@ Semantic Versioning once releases resume.
 - Align background-task primary keys with its published migrations and check all
   installed applications for migration drift in CI.
 
+- Bound and validate Spotify artwork downloads, restrict their source hosts, and
+  stop deriving temporary file paths from remote URLs.
+
 - Restrict Spot the Fly studio data APIs to superusers and require CSRF-protected
   POST requests for gameplay mutations.
 
