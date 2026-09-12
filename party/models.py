@@ -2,6 +2,8 @@ from django.db import models
 from django_mysql.models import SetTextField
 from datetime import datetime
 
+from utils.encrypted_fields import EncryptedTokenField
+
 STRUCTURE_CHOICES = (
     ("{} in the Title", "{} in the Title"),
     ("Songs that {}", "Songs that {}"),
@@ -17,8 +19,8 @@ STRUCTURE_CHOICES = (
 
 class Party(models.Model):
     name = models.CharField(max_length=100, null = True)
-    token = models.CharField(max_length=1000, null = True)
-    token_info = models.CharField(max_length=1000, null = True)
+    token = EncryptedTokenField(null=True)
+    token_info = EncryptedTokenField(null=True)
     code = models.CharField(max_length=10, null = True)
     url = models.CharField(max_length=1000, null = True)
     url_open = models.CharField(max_length=999, null = True)

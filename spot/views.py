@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponseBadRequest
 from utils.util_song import get_album_color
 from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
@@ -12,17 +13,25 @@ from .models import Day, Fly, Play, Studio, Users
 import requests
 import shutil
 import json
+import logging
+import secrets
 import spotipy
 import boto3
 from os import remove
 from os.path import exists
-from utils.util_auth import create_token, check_token, get_url, generate_url
+from utils.util_auth import (
+    SPOT_OAUTH_STATE_SESSION_KEY,
+    check_token,
+    create_token,
+    generate_url,
+)
 from queue_it_up.settings import (
-    IP, PORT, HEROKU, CLIENT_ID, CLIENT_SECRET, SPOT_URI, STATE,
+    CLIENT_ID, CLIENT_SECRET, SPOT_URI, STATE,
     AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME,
     AWS_S3_CUSTOM_DOMAIN
 )
 fly_size = '16%'
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -149,17 +158,30 @@ def admin(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def auth(request):
-    url = get_url(str(request.get_full_path), HEROKU, IP, PORT)
-    token_info = json.dumps(create_token(url=url, redirect_uri=SPOT_URI, scope=''))
+    expected_state = request.session.pop(SPOT_OAUTH_STATE_SESSION_KEY, None)
+    received_state = request.GET.get('state', '')
+    if not expected_state or not secrets.compare_digest(
+        expected_state, received_state
+    ):
+        return HttpResponseBadRequest('Invalid OAuth state.')
+    if request.GET.get('error'):
+        return HttpResponseRedirect(reverse('admin'))
+    code = request.GET.get('code')
+    if not code:
+        return HttpResponseBadRequest('Missing authorization code.')
     try:
-        studio = Studio.objects.get(admin=request.user)
-        studio.token_info = token_info
-    except Exception as e:
-        studio = Studio(
-            admin=request.user,
-            token_info = token_info
+        token_info = create_token(
+            code=code, redirect_uri=SPOT_URI, scope=''
         )
-    studio.save()
+    except spotipy.SpotifyException:
+        logger.exception('Studio Spotify token exchange failed.')
+        return HttpResponseRedirect(reverse('admin'))
+    if not token_info or not token_info.get('access_token'):
+        return HttpResponseRedirect(reverse('admin'))
+    Studio.objects.update_or_create(
+        admin=request.user,
+        defaults={'token_info': token_info},
+    )
     return HttpResponseRedirect(
             reverse('studio', kwargs={'pid': 0})
     )  
@@ -167,11 +189,14 @@ def auth(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def login(request):
+    state = secrets.token_urlsafe(32)
+    request.session[SPOT_OAUTH_STATE_SESSION_KEY] = state
     url = generate_url(
         scope='',
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
-        redirect_uri=SPOT_URI
+        redirect_uri=SPOT_URI,
+        state=state,
     )
     return HttpResponseRedirect(url)
 

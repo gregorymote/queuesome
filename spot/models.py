@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from utils.encrypted_fields import EncryptedTokenField
+
 # Create your models here.
 
 class Day(models.Model):
@@ -52,5 +54,5 @@ class Play(models.Model):
 from django.contrib.auth.models import User
 
 class Studio(models.Model):
-    token_info = models.CharField(max_length=1000, null = True)
+    token_info = EncryptedTokenField(null=True)
     admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
