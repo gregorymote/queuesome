@@ -1,3 +1,4 @@
+from django.conf import settings as django_settings
 from django.shortcuts import render
 from django.db import transaction
 from django.db.models import Q
@@ -60,11 +61,7 @@ def lobby(request, pid):
                 party.lib_repo = set_lib_repo()
                 party.started = True
                 party.save()
-                transaction.on_commit(
-                    lambda: threading.Thread(
-                        target=call_task, args=(pid,)
-                    ).start()
-                )
+                transaction.on_commit(lambda: call_task(pid))
             return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     else:
         form = blankForm(initial={'text':'blank',})
@@ -119,14 +116,16 @@ def update_lobby(request):
 
 
 def call_task(pid):
-    ''' Thread used to run background task, prevents delay in redirect while
-    calling the task
+    '''Start the game using the configured execution backend.
 
     Parameters:
         - pid - Primary Key of the Party the User belongs to
 
     '''
-    run_game.now(pid)
+    if django_settings.GAME_TASK_EXECUTION == 'database_worker':
+        run_game(pid, queue='game')
+        return
+    threading.Thread(target=run_game.now, args=(pid,)).start()
 
 
 def play(request, pid):
