@@ -37,6 +37,8 @@ Semantic Versioning once releases resume.
   and claimed playback before starting a worker to prevent duplicate runners.
 - Updated Pillow, Requests, and Spotipy to patched releases and added image and
   OAuth integration compatibility coverage.
+- Added rotatable authenticated encryption for stored Spotify token payloads
+  and one-time state validation to the studio administrator OAuth flow.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced

@@ -31,6 +31,7 @@ jobs:
       DJANGO_SECRET_KEY: ci-only-not-a-production-secret
       DATABASE_URL: postgresql://queuesome:queuesome@127.0.0.1:5432/queuesome
       MPLCONFIGDIR: /tmp/matplotlib
+      SPOTIFY_TOKEN_ENCRYPTION_KEYS: MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=
       PYTHONDONTWRITEBYTECODE: "1"
 
     steps:

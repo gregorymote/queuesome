@@ -5,6 +5,8 @@ Environment-driven settings for the Queuesome Django application.
 """
 
 import os
+import base64
+import hashlib
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -59,6 +61,21 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured(
             'DJANGO_SECRET_KEY is required outside development.'
+        )
+
+SPOTIFY_TOKEN_ENCRYPTION_KEYS = env_list(
+    'SPOTIFY_TOKEN_ENCRYPTION_KEYS'
+)
+if not SPOTIFY_TOKEN_ENCRYPTION_KEYS:
+    if DEBUG:
+        SPOTIFY_TOKEN_ENCRYPTION_KEYS = [
+            base64.urlsafe_b64encode(
+                hashlib.sha256(SECRET_KEY.encode()).digest()
+            ).decode()
+        ]
+    else:
+        raise ImproperlyConfigured(
+            'SPOTIFY_TOKEN_ENCRYPTION_KEYS is required outside development.'
         )
 
 

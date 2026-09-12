@@ -2,6 +2,7 @@
 # are resolved by pip and should not be added unless the application imports
 # them directly.
 boto3==1.40.46
+cryptography==50.0.1
 dj-database-url==3.1.2
 Django==5.2.17
 django-background-tasks==1.2.8

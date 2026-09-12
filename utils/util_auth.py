@@ -1,5 +1,6 @@
 
 from ast import literal_eval
+import json
 
 import spotipy.oauth2 as oauth2
 
@@ -7,6 +8,7 @@ from party.models import Party
 from queue_it_up.settings import URI, SCOPE, CLIENT_ID, CLIENT_SECRET
 
 OAUTH_STATE_SESSION_KEY = 'spotify_oauth_state'
+SPOT_OAUTH_STATE_SESSION_KEY = 'spot_spotify_oauth_state'
 
 
 def generate_url(scope=SCOPE, client_id=CLIENT_ID, client_secret=CLIENT_SECRET,
@@ -69,7 +71,11 @@ def create_token(code=None, url=None, scope=SCOPE, client_id=CLIENT_ID,
 
 def check_token(token_info, party_id, scope=SCOPE, client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET, redirect_uri=URI):
-    token_info = literal_eval(token_info)
+    if isinstance(token_info, str):
+        try:
+            token_info = json.loads(token_info)
+        except json.JSONDecodeError:
+            token_info = literal_eval(token_info)
     party = Party.objects.get(pk=party_id)
     sp_oauth = oauth2.SpotifyOAuth(
         client_id=client_id,

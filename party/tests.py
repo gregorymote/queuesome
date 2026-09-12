@@ -1,11 +1,15 @@
+import json
 from unittest.mock import patch
 
+from cryptography.fernet import Fernet
+from django.db import connection
 from django.db import IntegrityError, transaction
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from party.models import Party, Users
-from utils.util_auth import OAUTH_STATE_SESSION_KEY, generate_url
+from utils.encrypted_fields import decrypt_token_payload, encrypt_token_payload
+from utils.util_auth import OAUTH_STATE_SESSION_KEY, check_token, generate_url
 
 
 class HostAuthorizationTests(TestCase):
@@ -125,6 +129,61 @@ class SpotifyCallbackTests(TestCase):
         self.assertEqual(url, 'https://accounts.spotify.test/authorize')
         spotify_oauth.return_value.get_authorize_url.assert_called_once_with(
             state='session-state'
+        )
+
+    def test_spotify_token_payload_is_encrypted_at_rest(self):
+        party = Party.objects.create(
+            name='Encrypted party',
+            token='access-token',
+            token_info={
+                'access_token': 'access-token',
+                'refresh_token': 'refresh-token',
+                'is_valid': True,
+            },
+        )
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT token, token_info FROM party_party WHERE id = %s',
+                [party.pk],
+            )
+            stored_token, stored_payload = cursor.fetchone()
+
+        self.assertTrue(stored_token.startswith('fernet:'))
+        self.assertTrue(stored_payload.startswith('fernet:'))
+        self.assertNotIn('access-token', stored_token)
+        self.assertNotIn('refresh-token', stored_payload)
+        party.refresh_from_db()
+        self.assertEqual(party.token, 'access-token')
+        self.assertEqual(
+            json.loads(party.token_info)['refresh_token'],
+            'refresh-token',
+        )
+        with patch('utils.util_auth.oauth2.SpotifyOAuth') as spotify_oauth:
+            spotify_oauth.return_value.is_token_expired.return_value = False
+            self.assertEqual(
+                check_token(party.token_info, party.pk), 'access-token'
+            )
+
+    def test_old_encryption_key_remains_readable_during_rotation(self):
+        old_key = Fernet.generate_key().decode()
+        new_key = Fernet.generate_key().decode()
+        with override_settings(SPOTIFY_TOKEN_ENCRYPTION_KEYS=[old_key]):
+            old_ciphertext = encrypt_token_payload('token-value')
+
+        with override_settings(
+            SPOTIFY_TOKEN_ENCRYPTION_KEYS=[new_key, old_key]
+        ):
+            self.assertEqual(
+                decrypt_token_payload(old_ciphertext), 'token-value'
+            )
+            new_ciphertext = encrypt_token_payload('new-token-value')
+
+        self.assertEqual(
+            Fernet(new_key).decrypt(
+                new_ciphertext.removeprefix('fernet:').encode()
+            ).decode(),
+            'new-token-value',
         )
 
 
