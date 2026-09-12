@@ -1,0 +1,17 @@
+# Direct production dependencies. Compile this file with the command documented
+# in CONTRIBUTING.md; deploy and CI install the generated requirements.txt.
+boto3==1.40.46
+cryptography==50.0.1
+dj-database-url==3.1.2
+Django==5.2.17
+django-background-tasks==1.2.8
+django-mysql==4.19.0
+gunicorn==26.2.0
+matplotlib==3.11.1
+numpy==2.2.6
+pillow==12.3.0
+psycopg[binary]==3.3.5
+requests==2.34.2
+scikit-learn==1.7.2
+spotipy==2.26.0
+whitenoise==6.12.0

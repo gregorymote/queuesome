@@ -1,18 +1,40 @@
-# Direct production dependencies. Keep this list small; transitive dependencies
-# are resolved by pip and should not be added unless the application imports
-# them directly.
+asgiref==3.12.1
 boto3==1.40.46
+botocore==1.40.76
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.1
+cloudpickle==3.1.2
+contourpy==1.4.0
 cryptography==50.0.1
+cycler==0.12.1
 dj-database-url==3.1.2
 Django==5.2.17
 django-background-tasks==1.2.8
 django-mysql==4.19.0
+fonttools==4.65.0
 gunicorn==26.2.0
+idna==3.19
+jmespath==1.1.0
+joblib==1.6.0
+kiwisolver==1.5.1
 matplotlib==3.11.1
 numpy==2.2.6
+packaging==26.3
 pillow==12.3.0
-psycopg[binary]==3.3.5
+psycopg==3.3.5
+psycopg-binary==3.3.5
+pycparser==3.0
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+redis==8.1.0
 requests==2.34.2
+s3transfer==0.14.0
 scikit-learn==1.7.2
+scipy==1.18.1
+six==1.17.0
 spotipy==2.26.0
+sqlparse==0.6.0
+threadpoolctl==3.6.0
+urllib3==2.7.0
 whitenoise==6.12.0
