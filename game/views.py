@@ -43,7 +43,7 @@ def lobby(request, pid):
     party = get_party(pid)
     current_user = get_user(request, party)
     if party == -1 or current_user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     if get_inactivity(pid,19):
         clean_up_party(party.pk)
     if request.method == 'POST':
@@ -145,7 +145,7 @@ def play(request, pid):
     party = get_party(pid)
     user = get_user(request, pid)
     if party == -1 or user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     song = Songs.objects.filter(category__party=party, state='playing').first()
     if song:
         category = song.category
@@ -443,7 +443,7 @@ def choose_category(request, pid):
     party = get_party(pid)
     user = get_user(request, pid)
     if party == -1 or user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     if user.turn != 'picking':
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     valid=True
@@ -498,7 +498,7 @@ def pick_category(request, pid):
     party = get_party(pid)
     user = get_user(request, pid)
     if party == -1 or user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     if user.turn != 'picking':
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
     valid=True
@@ -599,7 +599,7 @@ def pick_song(request, pid):
     party = get_party(pid)
     user = get_user(request, party)
     if party == -1 or user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     invalid = False
     if user.hasPicked or party.state != 'pick_song':
         return HttpResponseRedirect(reverse('play', kwargs={'pid':pid}))
@@ -771,7 +771,7 @@ def settings(request, pid):
             Devices.objects.filter(party=party).all().delete()
             if ('kill' in request.POST):
                 clean_up_party(party.pk)
-                return HttpResponseRedirect(reverse('index'))   
+                return HttpResponseRedirect(reverse('app_home'))
             else:
                 time = form.cleaned_data['time']
                 party.time = time
@@ -796,7 +796,7 @@ def users(request, pid):
     party = get_party(pid)
     current_user = get_user(request, party)
     if party == -1 or current_user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     users = Users.objects.filter(party=party, active=True).all()
     if request.method == 'POST':
         if not current_user.isHost:

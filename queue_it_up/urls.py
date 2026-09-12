@@ -18,12 +18,14 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from queue_it_up import views
+from start import views as start_views
 
 urlpatterns = [
     path('health/live', views.live, name='health_live'),
     path('health/ready', views.ready, name='health_ready'),
     path('admin/', admin.site.urls),
     path('', include('start.urls')),
+    path('', start_views.start, name='app_home'),
     path('party/', include('party.urls')),
     path('sesh/', include('game.urls')),
     path('blog/', include('blog.urls')),

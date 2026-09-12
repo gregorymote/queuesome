@@ -5,6 +5,9 @@ Semantic Versioning once releases resume.
 
 ## Unreleased
 
+- Give the main homepage a unique route name so rejected party and game access
+  cannot redirect into another app with a colliding `index` route.
+
 - Add database-aware readiness and database-independent liveness endpoints plus
   validated stdout logging configuration.
 
