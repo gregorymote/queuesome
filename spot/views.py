@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User as Admin
 from django.contrib.auth.decorators import user_passes_test
+from django.views.decorators.http import require_GET, require_POST
 from party.forms import BlankForm
 from spot.forms import FlyForm, DayForm
 from PIL import Image
@@ -277,6 +278,8 @@ def day(request, date_param):
     return render(request, 'spot/day.html', context)
 
 
+@user_passes_test(lambda u: u.is_superuser)
+@require_GET
 def get_dates(request):
     days = []
     start = request.GET.get('start', None)
@@ -305,6 +308,8 @@ def get_dates(request):
     return JsonResponse(data)
 
 
+@user_passes_test(lambda u: u.is_superuser)
+@require_GET
 def get_flys(request):
     f = []
     search_text = request.GET.get('text', None)
@@ -331,6 +336,8 @@ def get_flys(request):
     return JsonResponse(data)
 
 
+@user_passes_test(lambda u: u.is_superuser)
+@require_GET
 def update_search(request):
     studio = Studio.objects.get(admin=request.user)
     search_text = request.GET.get('text', None)
@@ -361,6 +368,7 @@ def update_search(request):
     return JsonResponse(data)
 
 
+@require_POST
 def update_play(request):
     tzinfo = get_tz_info()
     stop = False
@@ -372,7 +380,7 @@ def update_play(request):
     if play and not play.finish_time:
         if not play.pathm:
             play.pathm = []
-        play.pathm = play.pathm + json.loads(request.GET.get('pathm', None))
+        play.pathm = play.pathm + json.loads(request.POST.get('pathm', None))
         if(len(play.pathm) > 0):
             play.x_mult = play.pathm[-1][0]
             play.y_mult = play.pathm[-1][1]
@@ -388,6 +396,7 @@ def update_play(request):
     return JsonResponse(data)
 
 
+@require_POST
 def get_path(request):
     tzinfo = get_tz_info()
     pathm = []  
@@ -400,10 +409,10 @@ def get_path(request):
         if not play.pathm:
             play.pathm = []
         
-        play.finish_time = request.GET.get('finish', None)
-        play.x_mult = request.GET.get('x', None)
-        play.y_mult = request.GET.get('y', None)
-        play.give_up = request.GET.get('give_up', None) == "true"
+        play.finish_time = request.POST.get('finish', None)
+        play.x_mult = request.POST.get('x', None)
+        play.y_mult = request.POST.get('y', None)
+        play.give_up = request.POST.get('give_up', None) == "true"
         play.save()
         play = Play.objects.get(user=user.id, day=day.id)
         time = str(datetime.combine(date.today(), play.finish_time) - datetime.combine(date.today(), play.start_time))
@@ -418,10 +427,11 @@ def get_path(request):
     return JsonResponse(data)
 
 
+@require_POST
 def set_start(request):
     tzinfo = get_tz_info()
     try: 
-        start_time = request.GET.get('start_time', None)
+        start_time = request.POST.get('start_time', None)
         if(start_time):
             session_key = request.session.session_key
             user = Users.objects.get(sessionID=session_key)
@@ -440,6 +450,7 @@ def set_start(request):
     return JsonResponse(data)
 
 
+@require_POST
 def update_give_up(request):
     try:
         tzinfo = get_tz_info()
