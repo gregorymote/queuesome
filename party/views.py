@@ -20,7 +20,6 @@ from django.views.decorators.http import require_POST
 from party.models import Party, Users, Devices
 from party.forms import (NamePartyForm, CreateUserForm, ChooseDeviceForm,
  BlankForm)
-from queue_it_up.settings import QDEBUG
 from datetime import datetime, timezone
 from html import escape
 import random
@@ -117,11 +116,11 @@ def update_set_device(request):
     if device["id"] != party.deviceID and device["id"]:
         party.deviceID = device['id']
         party.save()
-        print(QDEBUG,'Set Party Device')
+        logger.info('Set playback device party=%s', party.pk)
     if(party.device_error and device['active']):
         party.device_error = False
         party.save()
-        print(QDEBUG,'Reset Party Device Error')
+        logger.info('Reset playback device error party=%s', party.pk)
     if get_inactivity(pid, 19):
         stop = True
         clean_up_party(party.pk)
