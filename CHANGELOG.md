@@ -5,6 +5,13 @@ Semantic Versioning once releases resume.
 
 ## Unreleased
 
+### Changed
+
+- Split direct dependencies into `requirements.in` and fully pinned every
+  transitive production dependency in the Heroku/CI deployment lock.
+
+## [0.1.0] - 2026-09-12
+
 - Give the main homepage a unique route name so rejected party and game access
   cannot redirect into another app with a colliding `index` route.
 

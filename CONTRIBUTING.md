@@ -18,5 +18,18 @@ Never commit credentials, production data, OAuth tokens, or local environment
 files. Report suspected credential exposure privately and rotate the affected
 credential before attempting repository cleanup.
 
-The exact local commands will be added when the runtime and dependency baseline
-is established in the first modernization implementation change.
+## Dependency updates
+
+Edit only the direct production requirements in `requirements.in`, then rebuild
+the fully pinned deployment lock from a clean Python 3.13 environment:
+
+```shell
+lock_workspace="$(mktemp -d)"
+python -m venv "$lock_workspace/venv"
+"$lock_workspace/venv/bin/pip" install --requirement requirements.in
+"$lock_workspace/venv/bin/pip" freeze \
+  --exclude pip --exclude setuptools --exclude wheel > requirements.txt
+```
+
+Commit `requirements.in` and the resulting `requirements.txt` together. Install
+and test from `requirements.txt`, which is the file used by CI and Heroku.
