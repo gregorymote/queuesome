@@ -1,9 +1,9 @@
 from unittest.mock import patch
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from game.views import claim_playback
+from game.views import call_task, claim_playback
 from party.models import Category, Library, Party, Searches, Songs, Users
 
 
@@ -254,6 +254,15 @@ class RoundTransitionTests(TestCase):
         self.assertFalse(second_claim)
         party.refresh_from_db()
         self.assertTrue(party.thread)
+
+    @override_settings(GAME_TASK_EXECUTION='database_worker')
+    @patch('game.views.threading.Thread')
+    @patch('game.views.run_game')
+    def test_database_worker_mode_queues_game(self, run_game, thread):
+        call_task(42)
+
+        run_game.assert_called_once_with(42, queue='game')
+        thread.assert_not_called()
 
 
 class CategoryTransitionTests(TestCase):

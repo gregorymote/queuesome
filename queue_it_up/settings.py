@@ -123,8 +123,14 @@ MIDDLEWARE = [
 
 SESSION_SAVE_EVERY_REQUEST = True
 
-BACKGROUND_TASK_RUN_ASYNC = True
-BACKGROUND_TASK_ASYNC_THREADS = 1000
+BACKGROUND_TASK_RUN_ASYNC = env_bool('BACKGROUND_TASK_RUN_ASYNC', False)
+GAME_TASK_EXECUTION = os.getenv(
+    'GAME_TASK_EXECUTION', 'legacy_thread'
+).strip().lower()
+if GAME_TASK_EXECUTION not in {'legacy_thread', 'database_worker'}:
+    raise ImproperlyConfigured(
+        'GAME_TASK_EXECUTION must be legacy_thread or database_worker.'
+    )
 
 ROOT_URLCONF = 'queue_it_up.urls'
 

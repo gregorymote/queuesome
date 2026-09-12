@@ -39,6 +39,8 @@ Semantic Versioning once releases resume.
   OAuth integration compatibility coverage.
 - Added rotatable authenticated encryption for stored Spotify token payloads
   and one-time state validation to the studio administrator OAuth flow.
+- Declared a cost-neutral, scale-zero game worker process and added a validated
+  execution switch while retaining the existing web-thread default.
 - Reserved an ignored local agent-harness directory and ignored common local
   secret, coverage, test, type-check, and lint artifacts.
 - Reduced the production dependency manifest to direct dependencies, replaced
