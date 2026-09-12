@@ -45,7 +45,9 @@
 		if (!inactivity && pathm.length > 0) {
 			$.ajax({
 				url: '/spot/update_play',
+				type: 'POST',
 				data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
                     'pathm': JSON.stringify(pathm)
 				},
 				dataType: 'json',
@@ -66,7 +68,9 @@
         if(!started){
             $.ajax({
                 url: '/spot/set_start',
+                type: 'POST',
                 data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
                     'start_time': start
                 },
                 dataType: 'json',

@@ -304,6 +304,8 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
     async function getPath(x, y, finish, give_up, callback) { 
       $.ajax({
           url: '/spot/get_path',
+          type: 'POST',
+          headers: {'X-CSRFToken': getCookie('csrftoken')},
           data: {
             'x' : x / img.width, 
             'y' : y / img.width,
@@ -320,6 +322,17 @@ function magnify(imgID, zoom, background_image, x_mult, y_mult, play_x_mult, pla
           }
       }).done(function(){callback(saved_path, time)});
     }
+}
+
+function getCookie(name) {
+  const cookies = document.cookie ? document.cookie.split(';') : [];
+  for (const cookie of cookies) {
+    const trimmed = cookie.trim();
+    if (trimmed.startsWith(name + '=')) {
+      return decodeURIComponent(trimmed.slice(name.length + 1));
+    }
+  }
+  return null;
 }
 
 function is_cached(src) {

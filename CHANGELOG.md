@@ -5,6 +5,9 @@ Semantic Versioning once releases resume.
 
 ## Unreleased
 
+- Restrict Spot the Fly studio data APIs to superusers and require CSRF-protected
+  POST requests for gameplay mutations.
+
 ### Added
 
 - Documented the trunk-based branching, Heroku promotion, and release strategy.
