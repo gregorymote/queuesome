@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from django.test import TestCase
-from django.urls import resolve
+from django.urls import resolve, reverse
 
 from utils.util_auth import OAUTH_STATE_SESSION_KEY
 
@@ -17,6 +17,9 @@ class PublicStartPageTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'start.html')
+
+    def test_unique_application_home_route_points_to_root(self):
+        self.assertEqual(reverse('app_home'), '/')
 
     @patch(
         'start.views.generate_url',

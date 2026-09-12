@@ -33,7 +33,7 @@ class PartyAuthorizationTests(TestCase):
         response = self.client.get(reverse("lobby", kwargs={"pid": self.party.pk}))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("index"))
+        self.assertEqual(response.url, reverse("app_home"))
 
     def test_non_host_cannot_start_party(self):
         response = self.member_client.post(

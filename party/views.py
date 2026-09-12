@@ -37,7 +37,7 @@ def auth(request):
         return HttpResponseBadRequest('Invalid OAuth state.')
 
     if request.GET.get('error'):
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
 
     code = request.GET.get('code')
     if not code:
@@ -47,9 +47,9 @@ def auth(request):
         token_info = create_token(code=code)
     except spotipy.SpotifyException:
         logger.exception('Spotify token exchange failed.')
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     if not token_info or not token_info.get('access_token'):
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
 
     if request.session.session_key is None:
         request.session.create()
@@ -84,7 +84,7 @@ def auth(request):
 
 def set_device(request, pid):
     if not check_permission(pid, request):
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     party = Party.objects.get(pk=pid)
     party.save()
     device = get_active_device(party)
@@ -136,7 +136,7 @@ def update_set_device(request):
 #OBE
 def choose_device(request, pid):
     if not check_permission(pid, request):
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     party = Party.objects.get(pk=pid)
     get_devices(party)
     if request.method == 'POST':
@@ -189,12 +189,12 @@ def update_devices(request):
 
 def name_party(request, pid):
     if not check_permission(pid, request):
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     party = Party.objects.get(pk=pid)
     device = get_active_device(party)
     user = get_user(request, party)
     if user == -1:
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('app_home'))
     if party.joinCode or party.started:
         return HttpResponseRedirect(reverse('lobby', kwargs={'pid': party.pk}))
     if request.method == 'POST':
